@@ -11,17 +11,18 @@ from app.modules.admin.schemas import ModerateCarRequest, RestoreRequest
 from typing import List
 from sqlalchemy import select
 from app.modules.cars.models import Car
-from app.modules.cars.schemas import CarResponse
+from app.modules.cars.schemas import PaginatedCarResponse
 
 router = APIRouter(prefix="/cars", tags=["admin-cars"])
 
-@router.get("", response_model=List[CarResponse])
+@router.get("", response_model=PaginatedCarResponse)
 async def list_all_cars(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RequirePermissions([PermissionEnum.APPROVE_CAR])),
 ):
     result = await db.execute(select(Car))
-    return result.scalars().all()
+    cars = result.scalars().all()
+    return {"items": cars, "total": len(cars)}
 
 @router.post("/{id}/approve")
 async def approve_car(

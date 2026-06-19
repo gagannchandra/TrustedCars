@@ -120,7 +120,11 @@ app.include_router(
     dealers_router, prefix=f"{settings.API_V1_STR}/dealers", tags=["dealers"]
 )
 app.include_router(cars_router, prefix=f"{settings.API_V1_STR}/cars", tags=["cars"])
-app.include_router(car_images_router)
+app.include_router(
+    car_images_router,
+    prefix=f"{settings.API_V1_STR}/cars",
+    tags=["Car Images"],
+)
 app.include_router(
     dealers_cars_router, prefix=f"{settings.API_V1_STR}/dealers", tags=["dealers"]
 )

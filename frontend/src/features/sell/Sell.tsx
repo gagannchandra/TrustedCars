@@ -109,6 +109,7 @@ export default function Sell() {
       // Upload photos sequentially
       for (let i = 0; i < previewPhotos.length; i++) {
         await carsApi.uploadCarImages(newCar.id, {
+          car_id: newCar.id,
           image_url: previewPhotos[i], // Typically this would be a real uploaded URL, using data URL for mock
           storage_key: `cars/${newCar.id}/img_${i}.jpg`,
           sort_order: i,

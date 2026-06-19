@@ -54,7 +54,7 @@ export const carsApi = {
     return res.data;
   },
 
-  uploadCarImages: async (carId: string, payload: { image_url: string; storage_key: string; sort_order: number; is_primary: boolean }): Promise<any> => {
+  uploadCarImages: async (carId: string, payload: { car_id: string; image_url: string; storage_key: string; sort_order: number; is_primary: boolean }): Promise<any> => {
     // The API expects individual image metadata uploads via POST /cars/{id}/images
     const res = await axiosInstance.post(`/cars/${carId}/images`, payload);
     return res.data;

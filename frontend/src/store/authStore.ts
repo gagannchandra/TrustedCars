@@ -68,8 +68,15 @@ export const useAuthStore = create<AuthState>()(
 
       fetchProfile: async () => {
         try {
-          const res = await axiosInstance.get('/users/me');
-          set({ user: res.data, isAuthenticated: true });
+          const [userRes, wishlistRes] = await Promise.all([
+            axiosInstance.get('/users/me'),
+            axiosInstance.get('/wishlist').catch(() => ({ data: { items: [] } }))
+          ]);
+          set({ 
+            user: userRes.data, 
+            isAuthenticated: true,
+            wishlist: wishlistRes.data?.items?.map((item: any) => item.car_id) || []
+          });
         } catch (error) {
           get().logout();
         }

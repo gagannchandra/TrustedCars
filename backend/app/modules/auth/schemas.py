@@ -22,6 +22,7 @@ class RegisterDealerRequest(BaseModel):
 
 
 class LoginRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     email: EmailStr
     password: str
     mfa_code: Optional[str] = None
@@ -52,9 +53,11 @@ class MFAEnrollResponse(BaseModel):
 
 
 class MFAVerifyRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     code: str
 
 
 class MFARecoveryRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     email: EmailStr
     recovery_code: str

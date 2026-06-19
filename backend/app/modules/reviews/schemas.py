@@ -1,9 +1,10 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from uuid import UUID
 from datetime import datetime
 
 
 class ReviewCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     car_id: UUID
     rating: int = Field(..., ge=1, le=5)
     comment: str = Field(..., min_length=10, max_length=2000)
@@ -16,6 +17,7 @@ class ReviewCreate(BaseModel):
 
 
 class ReviewUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     rating: int = Field(..., ge=1, le=5)
     comment: str = Field(..., min_length=10, max_length=2000)
 

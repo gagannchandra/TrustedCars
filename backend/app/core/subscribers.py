@@ -7,6 +7,8 @@ from app.modules.inquiries.service import InquiryService
 from app.modules.wishlist.service import WishlistService
 from app.modules.reviews.service import ReviewsService
 
+_subscribers_configured = False
+
 
 async def on_user_deleted(session, user_id):
     from uuid import UUID
@@ -45,6 +47,10 @@ async def on_cars_bulk_deleted(session, car_ids, user_id):
 
 
 def setup_subscribers():
+    global _subscribers_configured
+    if _subscribers_configured:
+        return
+
     event_bus.subscribe("USER_SOFT_DELETED", on_user_deleted)
     event_bus.subscribe("USER_DEACTIVATED", on_user_deactivated)
     event_bus.subscribe("CAR_SOFT_DELETED", on_car_deleted)
@@ -75,6 +81,8 @@ def setup_subscribers():
             await svc.handle_review_created(**kwargs)
         elif event_type == "REVIEW_DELETED":
             await svc.handle_review_deleted(**kwargs)
+        elif event_type == "INQUIRY_CREATED":
+            await svc.handle_inquiry_created(**kwargs)
 
     # Wrap the handlers
     event_bus.subscribe("USER_CREATED", lambda **k: handle_stats("USER_CREATED", **k))
@@ -96,3 +104,7 @@ def setup_subscribers():
     event_bus.subscribe(
         "REVIEW_DELETED", lambda **k: handle_stats("REVIEW_DELETED", **k)
     )
+    event_bus.subscribe(
+        "INQUIRY_CREATED", lambda **k: handle_stats("INQUIRY_CREATED", **k)
+    )
+    _subscribers_configured = True

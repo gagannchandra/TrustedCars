@@ -83,6 +83,13 @@ class PlatformStatistics(Base):
     active_cars: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     hidden_cars: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     total_reviews: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    total_inquiries: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
 
 
 class ProcessedEvent(Base):
@@ -93,10 +100,4 @@ class ProcessedEvent(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
-    )
-    total_inquiries: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
     )

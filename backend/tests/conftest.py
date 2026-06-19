@@ -1,4 +1,5 @@
 import os
+
 os.environ["TESTING"] = "1"
 os.environ["PYTHONASYNCIODEBUG"] = "1"
 
@@ -6,6 +7,7 @@ import pytest_asyncio
 import uuid
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.pool import NullPool
 from app.main import app
 from app.core.config import settings
 from app.modules.auth.models import User, RoleEnum
@@ -13,45 +15,52 @@ from app.core.security import create_access_token
 
 # Removed custom event_loop fixture to let pytest-asyncio manage loops
 
-from sqlalchemy.exc import InterfaceError
 
 @pytest_asyncio.fixture(scope="function")
-async def setup_db():
-    test_engine = create_async_engine(settings.DATABASE_URL, echo=False)
-    TestingSessionLocal = async_sessionmaker(
-        autocommit=False, autoflush=False, expire_on_commit=False, bind=test_engine
+async def test_engine():
+    engine = create_async_engine(
+        settings.DATABASE_URL,
+        echo=False,
+        poolclass=NullPool,
     )
-    session = TestingSessionLocal()
     try:
-        yield session
+        yield engine
     finally:
-        try:
-            await session.close()
-        except InterfaceError:
-            pass
-        await test_engine.dispose()
+        await engine.dispose()
+
 
 @pytest_asyncio.fixture(scope="function")
-async def setup_app_db():
-    test_engine = create_async_engine(settings.DATABASE_URL, echo=False)
+async def setup_db(test_engine):
     TestingSessionLocal = async_sessionmaker(
-        autocommit=False, autoflush=False, expire_on_commit=False, bind=test_engine
+        autocommit=False,
+        autoflush=False,
+        expire_on_commit=False,
+        bind=test_engine,
     )
-    session = TestingSessionLocal()
-    try:
+    async with TestingSessionLocal() as session:
         yield session
-    finally:
-        try:
-            await session.close()
-        except InterfaceError:
-            pass
-        await test_engine.dispose()
 
 from app.db.session import get_db
 
+
 @pytest_asyncio.fixture(scope="function")
-async def async_client(setup_db, setup_app_db):
-    app.dependency_overrides[get_db] = lambda: setup_app_db
+async def async_client(test_engine):
+    TestingSessionLocal = async_sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        expire_on_commit=False,
+        bind=test_engine,
+    )
+
+    async def override_get_db():
+        async with TestingSessionLocal() as session:
+            try:
+                yield session
+            except Exception:
+                await session.rollback()
+                raise
+
+    app.dependency_overrides[get_db] = override_get_db
     transport = ASGITransport(app=app)
     try:
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
@@ -62,7 +71,6 @@ async def async_client(setup_db, setup_app_db):
 
 @pytest_asyncio.fixture
 async def admin_user(setup_db):
-    print("ADMIN_USER START")
     user = User(
         email=f"admin_{uuid.uuid4()}@test.com",
         hashed_password="pw",
@@ -72,9 +80,7 @@ async def admin_user(setup_db):
         mfa_enabled=True,
     )
     setup_db.add(user)
-    print("ADMIN_USER BEFORE FLUSH")
     await setup_db.commit()
-    print("ADMIN_USER AFTER FLUSH")
     return user
 
 
@@ -117,5 +123,5 @@ async def support_user(setup_db):
 async def cleanup_redis():
     yield
     from app.db.redis import redis_client
-    await redis_client.close()
 
+    await redis_client.close()

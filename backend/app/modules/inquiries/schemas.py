@@ -1,16 +1,18 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from uuid import UUID
 from datetime import datetime
 from app.modules.inquiries.models import InquiryStatusEnum
 
 
 class MessageCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     message: str = Field(
         ..., min_length=1, max_length=5000, json_schema_extra={"strip_whitespace": True}
     )
 
 
 class InquiryCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     car_id: UUID
     initial_message: str = Field(
         ..., min_length=1, max_length=5000, json_schema_extra={"strip_whitespace": True}

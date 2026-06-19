@@ -70,11 +70,11 @@ class AuthService:
         return f.decrypt(str(encrypted_secret).encode()).decode()
 
     async def register_user(self, req: RegisterUserRequest) -> User:
+        hashed = await self.hash_password(req.password)
         existing = await self.repository.get_user_by_email(req.email)
         if existing:
             raise CustomException(400, "Email already registered")
 
-        hashed = await self.hash_password(req.password)
         user = User(
             email=req.email,
             hashed_password=hashed,
@@ -94,11 +94,11 @@ class AuthService:
         return user
 
     async def register_dealer(self, req: RegisterDealerRequest) -> User:
+        hashed = await self.hash_password(req.password)
         existing = await self.repository.get_user_by_email(req.email)
         if existing:
             raise CustomException(400, "Email already registered")
 
-        hashed = await self.hash_password(req.password)
         user = User(
             email=req.email,
             hashed_password=hashed,
@@ -129,28 +129,44 @@ class AuthService:
 
     async def login(self, req: LoginRequest):
         user = await self.repository.get_user_by_email(req.email)
-        if not user or not await self.verify_password_async(
-            req.password, user.hashed_password
-        ):
+        if not user:
+            await self.session.rollback()
             raise CustomException(401, "Invalid credentials")
 
-        if user.mfa_enabled:
+        user_id = user.id
+        hashed_password = user.hashed_password
+        mfa_enabled = user.mfa_enabled
+        mfa_recovery_verified_until = user.mfa_recovery_verified_until
+        encrypted_mfa_secret = user.mfa_secret
+
+        await self.session.rollback()
+
+        if not await self.verify_password_async(req.password, hashed_password):
+            raise CustomException(401, "Invalid credentials")
+
+        recovery_window_consumed = False
+        if mfa_enabled:
             now = datetime.now(timezone.utc)
             if (
-                user.mfa_recovery_verified_until
-                and user.mfa_recovery_verified_until > now
+                mfa_recovery_verified_until
+                and mfa_recovery_verified_until > now
             ):
-                # Recovery window is active. Bypass TOTP and consume window.
-                user.mfa_recovery_verified_until = None
+                recovery_window_consumed = True
             else:
                 if not req.mfa_code:
                     raise CustomException(401, "MFA code required")
                 import pyotp
 
-                secret = self.decrypt_mfa_secret(user.mfa_secret, settings.SECRET_KEY)
+                secret = self.decrypt_mfa_secret(encrypted_mfa_secret, settings.SECRET_KEY)
                 totp = pyotp.TOTP(secret)
                 if not totp.verify(req.mfa_code):
                     raise CustomException(401, "Invalid MFA code")
+
+        user = await self.repository.get_user_by_id(user_id)
+        if not user:
+            raise CustomException(401, "Invalid credentials")
+        if recovery_window_consumed:
+            user.mfa_recovery_verified_until = None
 
         access_token = create_access_token(subject=user.id)
         refresh_token_plain = create_refresh_token(subject=user.id)

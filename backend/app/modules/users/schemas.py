@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, HttpUrl, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, HttpUrl, Field
 from typing import Optional
 from uuid import UUID
 from datetime import datetime
@@ -6,6 +6,7 @@ from app.modules.auth.models import RoleEnum
 
 
 class UserProfileUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     full_name: Optional[str] = Field(None, min_length=2, max_length=255)
     email: Optional[EmailStr] = None
     phone_number: Optional[str] = Field(None, pattern=r"^\+?[1-9]\d{1,14}$")

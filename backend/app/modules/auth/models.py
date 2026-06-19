@@ -1,6 +1,14 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, Boolean, DateTime, ForeignKey, Enum as SQLEnum
+from sqlalchemy import (
+    String,
+    Boolean,
+    DateTime,
+    ForeignKey,
+    Enum as SQLEnum,
+    Index,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -93,6 +101,10 @@ class RefreshToken(Base):
 
 class UserMFABackupCode(Base):
     __tablename__ = "user_mfa_backup_codes"
+    __table_args__ = (
+        UniqueConstraint("user_id", "code_hash", name="uq_mfa_backup_user_code_hash"),
+        Index("ix_user_mfa_backup_codes_user_id", "user_id"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4

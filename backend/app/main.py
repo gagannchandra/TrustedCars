@@ -21,6 +21,7 @@ from app.modules.reviews.router import router as reviews_router, user_reviews_ro
 from app.modules.admin.router import router as admin_router
 from app.modules.health.router import router as health_router
 from app.core.subscribers import setup_subscribers
+from app.db.session import engine
 
 from app.core.worker import AsyncOutboxWorker
 
@@ -31,11 +32,12 @@ worker = AsyncOutboxWorker()
 async def lifespan(app: FastAPI):
     # Startup
     setup_logging()
-    sentry_sdk.init(
-        dsn="https://placeholder@o0.ingest.sentry.io/0",  # Configured in env later
-        traces_sample_rate=1.0,
-        profiles_sample_rate=1.0,
-    )
+    if settings.SENTRY_DSN:
+        sentry_sdk.init(
+            dsn=settings.SENTRY_DSN,
+            traces_sample_rate=1.0,
+            profiles_sample_rate=1.0,
+        )
     setup_subscribers()
     import os
 
@@ -45,6 +47,10 @@ async def lifespan(app: FastAPI):
     # Shutdown
     if os.getenv("TESTING") != "1":
         await worker.stop()
+    from app.db.redis import redis_client
+
+    await redis_client.close()
+    await engine.dispose()
 
 
 app = FastAPI(

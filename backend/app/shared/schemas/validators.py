@@ -1,8 +1,9 @@
 import re
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class ReasonRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     reason: str = Field(min_length=10, max_length=1000)
 
     @field_validator("reason")

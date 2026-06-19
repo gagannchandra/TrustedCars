@@ -13,7 +13,7 @@ from app.db.base import Base
 # IMPORTANT: For Alembic to autogenerate migrations correctly,
 # you MUST import all your SQLAlchemy models here before target_metadata.
 # Alembic inspects the state of the metadata associated with these imported models.
-from app.modules.auth.models import User, RefreshToken, Dealership
+from app.modules.auth.models import User, RefreshToken, Dealership, UserMFABackupCode
 from app.modules.users.models import UserProfile
 from app.shared.audit.models import AuditLog
 from app.modules.cars.models import Car
@@ -21,7 +21,7 @@ from app.modules.images.models import CarImage
 from app.modules.inquiries.models import Inquiry, InquiryMessage
 from app.modules.wishlist.models import Wishlist
 from app.modules.reviews.models import Review
-from app.core.models import OutboxEvent
+from app.core.models import OutboxEvent, PlatformStatistics, ProcessedEvent
 
 config = context.config
 

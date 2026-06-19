@@ -1,9 +1,10 @@
-from pydantic import BaseModel, HttpUrl, Field
+from pydantic import BaseModel, ConfigDict, HttpUrl, Field
 from uuid import UUID
 from datetime import datetime
 
 
 class ImageCreateRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     car_id: UUID
     image_url: HttpUrl
     storage_key: str = Field(..., pattern=r"^[a-zA-Z0-9/_\.-]+$")
@@ -12,6 +13,7 @@ class ImageCreateRequest(BaseModel):
 
 
 class ImageReorderRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     image_id: UUID
     sort_order: int
 

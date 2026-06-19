@@ -1,13 +1,15 @@
 import asyncio
 import json
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from app.db.session import AsyncSessionLocal
-from app.core.models import OutboxEvent, OutboxEventStatus
+from app.core.models import OutboxEvent, OutboxEventStatus, ProcessedEvent
 from app.core.events import event_bus
 from app.core.metrics import OUTBOX_QUEUE_SIZE, OUTBOX_FAILED_EVENTS
 import logging
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +25,17 @@ class WorkerInterface(ABC):
 
 
 class AsyncOutboxWorker(WorkerInterface):
-    def __init__(self, poll_interval: float = 5.0):
+    def __init__(
+        self,
+        poll_interval: float = 5.0,
+        batch_size: int = 100,
+        max_concurrency: int = 10,
+    ):
         self.poll_interval = poll_interval
+        self.batch_size = batch_size
+        self.max_concurrency = max_concurrency
         self._running = False
-        self._task = None
+        self._task: asyncio.Task | None = None
 
     async def start(self):
         if not self._running:
@@ -49,8 +58,10 @@ class AsyncOutboxWorker(WorkerInterface):
             try:
                 await self.update_metrics()
                 await self.process_pending_events()
+            except asyncio.CancelledError:
+                raise
             except Exception as e:
-                logger.error(f"Error in OutboxWorker loop: {e}")
+                logger.exception("Error in OutboxWorker loop: %s", e)
             await asyncio.sleep(self.poll_interval)
 
     async def update_metrics(self):
@@ -72,14 +83,10 @@ class AsyncOutboxWorker(WorkerInterface):
 
     async def process_pending_events(self):
         from sqlalchemy import or_, and_
-        from datetime import timedelta
-        import random
 
-        event_ids = []
         now = datetime.now(timezone.utc)
         timeout_threshold = now - timedelta(minutes=5)
 
-        # 1. Fetch & lock events inside a transaction
         async with AsyncSessionLocal() as session:
             stmt = (
                 select(OutboxEvent.id)
@@ -98,17 +105,16 @@ class AsyncOutboxWorker(WorkerInterface):
                     )
                 )
                 .order_by(OutboxEvent.created_at)
-                .limit(100)
+                .limit(self.batch_size)
                 .with_for_update(skip_locked=True)
             )
 
             result = await session.execute(stmt)
-            event_ids = result.scalars().all()
+            event_ids = list(result.scalars().all())
 
             if not event_ids:
                 return
 
-            # Mark them as processing immediately in the SAME transaction
             for eid in event_ids:
                 event = await session.get(OutboxEvent, eid)
                 if event:
@@ -118,74 +124,91 @@ class AsyncOutboxWorker(WorkerInterface):
 
             await session.commit()
 
-        # 2. Process each event sequentially
-        for eid in event_ids:
-            try:
-                # Open isolated session for the actual subscribers
-                async with AsyncSessionLocal() as event_session:
-                    event = await event_session.get(OutboxEvent, eid)
-                    if not event or event.status != OutboxEventStatus.processing:
-                        continue
+        semaphore = asyncio.Semaphore(self.max_concurrency)
 
-                    payload = json.loads(event.payload)
-                    subscribers = event_bus.get_subscribers(event.event_type)
+        async def process_with_limit(event_id):
+            async with semaphore:
+                await self._process_event_with_failure_handling(event_id)
 
-                    if not subscribers:
-                        event.status = OutboxEventStatus.processed
-                        event.processed_at = datetime.now(timezone.utc)
-                    else:
-                        from app.core.context import request_id_ctx, correlation_id_ctx
+        await asyncio.gather(*(process_with_limit(eid) for eid in event_ids))
 
-                        corr_token = correlation_id_ctx.set(
-                            str(event.correlation_id) if event.correlation_id else None
-                        )
-                        req_token = request_id_ctx.set(str(event.id))
+    async def _process_event_with_failure_handling(self, event_id):
+        try:
+            await self._process_event(event_id)
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            logger.exception("Failed to process event %s: %s", event_id, e)
+            await self._record_failure(event_id, e)
 
-                        from app.core.models import ProcessedEvent
-                        from sqlalchemy.exc import IntegrityError
+    async def _process_event(self, event_id):
+        async with AsyncSessionLocal() as event_session:
+            async with event_session.begin():
+                event = await event_session.get(OutboxEvent, event_id)
+                if not event or event.status != OutboxEventStatus.processing:
+                    return
 
-                        try:
-                            # Idempotency check: Ensure we only process this event once successfully.
-                            processed = ProcessedEvent(event_id=event.id)
-                            event_session.add(processed)
-                            await event_session.flush()
+                payload = json.loads(event.payload)
+                subscribers = event_bus.get_subscribers(event.event_type)
 
-                            for callback in subscribers:
-                                await callback(session=event_session, **payload)
+                if not subscribers:
+                    self._mark_processed(event)
+                    return
 
-                            event.status = OutboxEventStatus.processed
-                            event.processed_at = datetime.now(timezone.utc)
-                        except IntegrityError:
-                            # ALREADY PROCESSED - Safely skip execution.
-                            await event_session.rollback()
-                            logger.info(
-                                f"Event {event.id} already processed. Skipping."
-                            )
-                            # Still mark outbox event as processed if it was stuck
-                            event.status = OutboxEventStatus.processed
-                            event.processed_at = datetime.now(timezone.utc)
-                            event_session.add(event)
-                        finally:
-                            correlation_id_ctx.reset(corr_token)
-                            request_id_ctx.reset(req_token)
+                from app.core.context import request_id_ctx, correlation_id_ctx
 
-                    await event_session.commit()
+                corr_token = correlation_id_ctx.set(
+                    str(event.correlation_id) if event.correlation_id else None
+                )
+                req_token = request_id_ctx.set(str(event.id))
 
-            except Exception as e:
-                logger.error(f"Failed to process event {eid}: {e}")
-                # 3. Handle failure in a new session block to guarantee we save the failure state
-                async with AsyncSessionLocal() as fail_session:
-                    failed_event = await fail_session.get(OutboxEvent, eid)
-                    if failed_event:
-                        failed_event.error = str(e)
-                        if failed_event.retry_count >= failed_event.max_retries:
-                            failed_event.status = OutboxEventStatus.failed
-                        else:
-                            failed_event.status = OutboxEventStatus.failed
-                            # Exponential backoff with jitter
-                            jitter = random.uniform(0.8, 1.2)
-                            delay_seconds = (2**failed_event.retry_count) * 10 * jitter
-                            failed_event.next_retry_at = datetime.now(
-                                timezone.utc
-                            ) + timedelta(seconds=delay_seconds)
-                        await fail_session.commit()
+                try:
+                    is_first_processing = await self._insert_processed_event(
+                        event_session, event.id
+                    )
+                    if not is_first_processing:
+                        logger.info("Event %s already processed. Skipping.", event.id)
+                        self._mark_processed(event)
+                        return
+
+                    for callback in subscribers:
+                        async with event_session.begin_nested():
+                            await callback(session=event_session, **payload)
+
+                    self._mark_processed(event)
+                finally:
+                    correlation_id_ctx.reset(corr_token)
+                    request_id_ctx.reset(req_token)
+
+    async def _insert_processed_event(self, session, event_id) -> bool:
+        try:
+            async with session.begin_nested():
+                session.add(ProcessedEvent(event_id=event_id))
+                await session.flush()
+        except IntegrityError:
+            return False
+        return True
+
+    def _mark_processed(self, event: OutboxEvent) -> None:
+        event.status = OutboxEventStatus.processed
+        event.processed_at = datetime.now(timezone.utc)
+        event.error = None
+        event.next_retry_at = None
+
+    async def _record_failure(self, event_id, error: Exception) -> None:
+        async with AsyncSessionLocal() as fail_session:
+            failed_event = await fail_session.get(OutboxEvent, event_id)
+            if not failed_event:
+                return
+
+            failed_event.error = str(error)
+            failed_event.status = OutboxEventStatus.failed
+            if failed_event.retry_count >= failed_event.max_retries:
+                failed_event.next_retry_at = None
+            else:
+                jitter = random.uniform(0.8, 1.2)
+                delay_seconds = (2**failed_event.retry_count) * 10 * jitter
+                failed_event.next_retry_at = datetime.now(timezone.utc) + timedelta(
+                    seconds=delay_seconds
+                )
+            await fail_session.commit()

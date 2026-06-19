@@ -1,9 +1,10 @@
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy import event
-from sqlalchemy.exc import InterfaceError
+from typing import AsyncGenerator
 import time
 import structlog
 from app.core.config import settings
+from app.core.metrics import DATABASE_POOL_USAGE
 
 logger = structlog.get_logger(__name__)
 
@@ -20,19 +21,28 @@ if os.getenv("TESTING") == "1":
 else:
     engine_kwargs.update(
         {
-            "pool_size": 100,
-            "max_overflow": 50,
+            "pool_size": settings.DATABASE_POOL_SIZE,
+            "max_overflow": settings.DATABASE_MAX_OVERFLOW,
+            "pool_timeout": settings.DATABASE_POOL_TIMEOUT,
             "pool_pre_ping": True,
-            "pool_recycle": 1800,
+            "pool_recycle": settings.DATABASE_POOL_RECYCLE_SECONDS,
         }
     )
 
 engine = create_async_engine(settings.DATABASE_URL, **engine_kwargs)
 
 
+def _record_pool_usage() -> None:
+    checked_out = getattr(engine.sync_engine.pool, "checkedout", None)
+    if checked_out is None:
+        return
+    DATABASE_POOL_USAGE.set(checked_out())
+
+
 @event.listens_for(engine.sync_engine, "checkout")
 def receive_checkout(dbapi_connection, connection_record, connection_proxy):
     connection_record.info["checkout_time"] = time.time()
+    _record_pool_usage()
 
 
 @event.listens_for(engine.sync_engine, "checkin")
@@ -42,6 +52,7 @@ def receive_checkin(dbapi_connection, connection_record):
         duration = time.time() - checkout_time
         if duration > 1.0:
             logger.warning("long_connection_hold", duration=duration)
+    _record_pool_usage()
 
 
 @event.listens_for(engine.sync_engine, "invalidate")
@@ -57,12 +68,10 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 
-async def get_db():
-    session = AsyncSessionLocal()
-    try:
-        yield session
-    finally:
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSessionLocal() as session:
         try:
-            await session.close()
-        except InterfaceError as e:
-            logger.warning("suppressed_interface_error_on_close", error=str(e))
+            yield session
+        except Exception:
+            await session.rollback()
+            raise

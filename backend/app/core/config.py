@@ -11,7 +11,12 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     DATABASE_URL: str
+    DATABASE_POOL_SIZE: int = 20
+    DATABASE_MAX_OVERFLOW: int = 10
+    DATABASE_POOL_TIMEOUT: int = 30
+    DATABASE_POOL_RECYCLE_SECONDS: int = 1800
     REDIS_URL: str = "redis://localhost:6380/0"
+    SENTRY_DSN: str | None = None
 
     CORS_ORIGINS: List[str] = [
         "http://localhost:5173",

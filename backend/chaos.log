@@ -1,8 +1,0 @@
-=== Capturing Data Integrity BEFORE Chaos ===
-=== Starting Background Load ===
-=== Chaos: Restarting API (Worker & Web) ===
-=== Chaos: Restarting Redis ===
-=== Chaos: Restarting Database ===
-Waiting for load test to finish...
-=== Capturing Data Integrity AFTER Chaos ===
-=== Data Integrity Drift ===

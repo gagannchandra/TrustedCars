@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Depends, Body, Response, Request, Cookie, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
+from app.core.limiter import limiter
 from app.modules.auth.schemas import (
     RegisterUserRequest,
     RegisterDealerRequest,
@@ -23,22 +24,44 @@ def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
 
 
 @router.post("/register/user", response_model=UserResponse)
+@limiter.limit("5/minute")
 async def register_user(
-    req: RegisterUserRequest, service: AuthService = Depends(get_auth_service)
+    request: Request, req: RegisterUserRequest, service: AuthService = Depends(get_auth_service)
 ):
     return await service.register_user(req)
 
 
 @router.post("/register/dealer", response_model=UserResponse)
+@limiter.limit("5/minute")
 async def register_dealer(
-    req: RegisterDealerRequest, service: AuthService = Depends(get_auth_service)
+    request: Request, req: RegisterDealerRequest, service: AuthService = Depends(get_auth_service)
 ):
     return await service.register_dealer(req)
 
 
-@router.post("/login", response_model=TokenResponse)
-async def login(req: LoginRequest, service: AuthService = Depends(get_auth_service)):
-    return await service.login(req)
+@router.post("/login")
+@limiter.limit("10/minute")
+async def login(
+    request: Request, response: Response, req: LoginRequest, service: AuthService = Depends(get_auth_service)
+):
+    tokens = await service.login(req)
+    response.set_cookie(
+        key="access_token",
+        value=tokens.access_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=30 * 60, # 30 mins
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=tokens.refresh_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=7 * 24 * 60 * 60, # 7 days
+    )
+    return {"detail": "Successfully logged in"}
 
 
 @router.post("/mfa/enroll", response_model=MFAEnrollResponse)
@@ -72,18 +95,44 @@ async def recover_mfa(
     }
 
 
-@router.post("/refresh", response_model=TokenResponse)
+@router.post("/refresh")
+@limiter.limit("20/minute")
 async def refresh(
-    refresh_token: str = Body(..., embed=True),
+    request: Request,
+    response: Response,
+    refresh_token: str | None = Cookie(None),
     service: AuthService = Depends(get_auth_service),
 ):
-    return await service.refresh(refresh_token)
+    if not refresh_token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token missing")
+    tokens = await service.refresh(refresh_token)
+    response.set_cookie(
+        key="access_token",
+        value=tokens.access_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=30 * 60,
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=tokens.refresh_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=7 * 24 * 60 * 60,
+    )
+    return {"detail": "Successfully refreshed"}
 
 
 @router.post("/logout")
 async def logout(
-    refresh_token: str = Body(..., embed=True),
+    response: Response,
+    refresh_token: str | None = Cookie(None),
     service: AuthService = Depends(get_auth_service),
 ):
-    await service.logout(refresh_token)
+    if refresh_token:
+        await service.logout(refresh_token)
+    response.delete_cookie(key="access_token")
+    response.delete_cookie(key="refresh_token")
     return {"detail": "Successfully logged out"}

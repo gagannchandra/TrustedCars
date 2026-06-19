@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, status, Response
 import sentry_sdk
+import secrets
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from app.core.logging import setup_logging
 from contextlib import asynccontextmanager
 from app.core.config import settings
@@ -10,7 +12,11 @@ from app.shared.exceptions.handlers import (
     http_exception_handler,
 )
 from starlette.exceptions import HTTPException
-from prometheus_client import make_asgi_app
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from app.core.limiter import limiter
 from app.modules.auth.router import router as auth_router
 from app.modules.users.router import router as users_router, dealers_router
 from app.modules.cars.router import router as cars_router, dealers_cars_router
@@ -59,6 +65,10 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
 )
 
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+
 # Set up CORS
 from app.core.middleware import CorrelationIdMiddleware
 
@@ -75,11 +85,34 @@ app.add_middleware(
 app.add_exception_handler(CustomException, custom_exception_handler)  # type: ignore
 app.add_exception_handler(HTTPException, http_exception_handler)  # type: ignore
 
+@app.exception_handler(Exception)
+async def generic_exception_handler(request, exc):
+    import sentry_sdk
+    sentry_sdk.capture_exception(exc)
+    from fastapi.responses import JSONResponse
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error. Please try again later."},
+    )
+
 app.include_router(health_router, tags=["health"])
 
-# Metrics endpoint
-metrics_app = make_asgi_app()
-app.mount("/metrics", metrics_app)
+security = HTTPBasic()
+
+def get_current_metrics_user(credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, "admin")
+    correct_password = secrets.compare_digest(credentials.password, settings.SECRET_KEY)
+    if not (correct_username and correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
+
+@app.get("/metrics", response_class=Response)
+def metrics(user: str = Depends(get_current_metrics_user)):
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 app.include_router(auth_router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(users_router, prefix=f"{settings.API_V1_STR}/users", tags=["users"])

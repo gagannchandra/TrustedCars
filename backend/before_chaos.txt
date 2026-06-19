@@ -1,8 +1,0 @@
-  table_name   | count 
----------------+-------
- users         |   269
- cars          |    61
- reviews       |    23
- outbox_events |    86
-(4 rows)
-

@@ -1,5 +1,4 @@
-from fastapi import Depends, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException, Request
 import jwt
 from jwt import InvalidTokenError
 from app.core.config import settings
@@ -10,14 +9,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from app.modules.auth.models import User
 
-security = HTTPBearer()
-
-
 async def get_current_user_id(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ) -> str:
-    token = credentials.credentials
+    token = request.cookies.get("access_token")
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+        else:
+            raise CustomException(401, "Not authenticated")
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]

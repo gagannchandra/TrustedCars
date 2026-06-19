@@ -7,12 +7,10 @@ import toast from 'react-hot-toast';
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
-  accessToken: string | null;
-  refreshToken: string | null;
   wishlist: string[];
   
-  setTokens: (access: string, refresh?: string) => void;
   setUser: (user: User) => void;
+  setAuthenticated: (status: boolean) => void;
   logout: () => void;
   
   fetchProfile: () => Promise<void>;
@@ -26,25 +24,16 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       isAuthenticated: false,
-      accessToken: null,
-      refreshToken: null,
       wishlist: [],
 
-      setTokens: (access, refresh) => {
-        set((state) => ({
-          accessToken: access,
-          refreshToken: refresh !== undefined ? refresh : state.refreshToken,
-          isAuthenticated: true,
-        }));
-      },
-
       setUser: (user) => set({ user }),
+      setAuthenticated: (status) => set({ isAuthenticated: status }),
 
       login: async (email, password) => {
         try {
           const res = await axiosInstance.post('/auth/login', { email, password });
-          if (res.data?.access_token) {
-            get().setTokens(res.data.access_token, res.data.refresh_token);
+          if (res.status === 200) {
+            set({ isAuthenticated: true });
             await get().fetchProfile();
             return true;
           }
@@ -56,16 +45,13 @@ export const useAuthStore = create<AuthState>()(
 
       register: async (data) => {
         try {
-          // Send to correct endpoint based on role. (Assuming dealer if they provide dealer info, else user)
           const endpoint = data.role === 'user' ? '/auth/register/user' : '/auth/register/dealer';
           const payload = {
             email: data.email,
             password: data.password,
             full_name: data.full_name,
-            // If dealer, we might need dealer fields, but for now just pass data.
           };
           const res = await axiosInstance.post(endpoint, payload);
-          // Auto login after register
           if (res.data?.id) {
              return await get().login(data.email, data.password);
           }
@@ -76,15 +62,14 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        set({ user: null, isAuthenticated: false, accessToken: null, refreshToken: null, wishlist: [] });
-        // Optionally notify backend about logout
+        set({ user: null, isAuthenticated: false, wishlist: [] });
         axiosInstance.post('/auth/logout').catch(() => {});
       },
 
       fetchProfile: async () => {
         try {
           const res = await axiosInstance.get('/users/me');
-          set({ user: res.data });
+          set({ user: res.data, isAuthenticated: true });
         } catch (error) {
           get().logout();
         }

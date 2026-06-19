@@ -79,3 +79,9 @@ ENV/
 logs/
 *.log
 coverage/
+
+# Output text files
+*_results*.txt
+db_metrics.txt
+after_chaos.txt
+before_chaos.txt

@@ -37,15 +37,16 @@ export default function Cars() {
 
   const [searchInput, setSearchInput] = useState(filters.q || '');
 
-  const { data: filteredCars = [], isLoading } = useQuery({
+  const { data: response = { items: [], total: 0 }, isLoading } = useQuery({
     queryKey: ['cars', filters],
     queryFn: () => carsApi.getCars(filters)
   });
 
+  const filteredCars = response.items;
   const PAGE_SIZE = 12;
   const page = filters.page || 1;
-  const totalPages = Math.ceil(filteredCars.length / PAGE_SIZE);
-  const pageCars = filteredCars.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = Math.ceil(response.total / PAGE_SIZE);
+  const pageCars = filteredCars; // No longer slice client-side
 
   const handleFilterChange = (key: keyof FilterState, value: FilterState[keyof FilterState]) => {
     setFilters(prev => ({ ...prev, [key]: value, page: key === 'page' ? (value as number) : 1 }));
@@ -86,7 +87,7 @@ export default function Cars() {
       <div className="bg-white border-b border-slate-200 sticky top-16 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h1 className="font-display font-bold text-3xl text-slate-900 tracking-tight">Explore Inventory <span className="text-slate-400 font-medium text-lg ml-2">{filteredCars.length} vehicles</span></h1>
+            <h1 className="font-display font-bold text-3xl text-slate-900 tracking-tight">Explore Inventory <span className="text-slate-400 font-medium text-lg ml-2">{response.total} vehicles</span></h1>
             
             <div className="flex items-center gap-3 w-full sm:w-auto">
               {/* Search */}

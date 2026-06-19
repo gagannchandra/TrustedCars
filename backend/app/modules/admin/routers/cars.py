@@ -8,8 +8,20 @@ from app.shared.rbac.permissions import PermissionEnum
 from app.modules.admin.services.moderation import AdminModerationService
 from app.modules.admin.schemas import ModerateCarRequest, RestoreRequest
 
+from typing import List
+from sqlalchemy import select
+from app.modules.cars.models import Car
+from app.modules.cars.schemas import CarResponse
+
 router = APIRouter(prefix="/cars", tags=["admin-cars"])
 
+@router.get("", response_model=List[CarResponse])
+async def list_all_cars(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(RequirePermissions([PermissionEnum.APPROVE_CAR])),
+):
+    result = await db.execute(select(Car))
+    return result.scalars().all()
 
 @router.post("/{id}/approve")
 async def approve_car(

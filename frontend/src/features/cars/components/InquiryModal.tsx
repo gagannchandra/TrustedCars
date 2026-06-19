@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, CheckCircle, X } from 'lucide-react';
 import { useAuthStore } from '../../../store/authStore';
-import { formatPrice } from '../../../shared/utils/utils';
 import { Car } from '../../../types';
+import { inquiriesApi } from '../../../shared/api/client';
+import toast from 'react-hot-toast';
+import { formatPrice } from '../../../shared/utils/utils';
 
 interface InquiryModalProps {
   car: Car;
@@ -15,6 +17,22 @@ export default function InquiryModal({ car, onClose }: InquiryModalProps) {
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: user?.full_name || '', phone: user?.phone || '', message: `Hi, I'm interested in the ${car.year} ${car.make} ${car.model}. Is it still available?`, date: '' });
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      await inquiriesApi.createInquiry({
+        car_id: car.id,
+        message: form.message
+      });
+      setSent(true);
+    } catch (error) {
+      toast.error('Failed to send inquiry. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!isAuthenticated) {
     return (
@@ -78,8 +96,8 @@ export default function InquiryModal({ car, onClose }: InquiryModalProps) {
             <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
               className="w-full border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all bg-slate-50 focus:bg-white" />
           </div>
-          <button onClick={() => setSent(true)} className="w-full bg-primary hover:bg-blue-800 text-white py-4 rounded-xl font-bold text-base transition-colors shadow-md mt-2">
-            Submit Inquiry
+          <button onClick={handleSubmit} disabled={loading} className="w-full bg-primary hover:bg-blue-800 text-white py-4 rounded-xl font-bold text-base transition-colors shadow-md mt-2 disabled:opacity-50">
+            {loading ? 'Sending...' : 'Submit Inquiry'}
           </button>
         </div>
       </div>

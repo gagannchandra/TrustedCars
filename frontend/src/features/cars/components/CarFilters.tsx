@@ -68,9 +68,9 @@ export default function CarFilters({ filters, onChange, onReset }: CarFiltersPro
           <div>
             <label className="text-sm font-bold text-slate-900 block mb-3">Manufacturing Year</label>
             <div className="flex gap-3">
-              <input type="number" placeholder="From" min={2010} max={2024} value={filters.year_min ?? ''} onChange={e => onChange('year_min', e.target.value ? Number(e.target.value) : undefined)}
+              <input type="number" placeholder="From" min={2010} max={new Date().getFullYear()} value={filters.year_min ?? ''} onChange={e => onChange('year_min', e.target.value ? Number(e.target.value) : undefined)}
                 className="flex-1 min-w-0 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-slate-50 focus:bg-white" />
-              <input type="number" placeholder="To" min={2010} max={2024} value={filters.year_max ?? ''} onChange={e => onChange('year_max', e.target.value ? Number(e.target.value) : undefined)}
+              <input type="number" placeholder="To" min={2010} max={new Date().getFullYear()} value={filters.year_max ?? ''} onChange={e => onChange('year_max', e.target.value ? Number(e.target.value) : undefined)}
                 className="flex-1 min-w-0 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-slate-50 focus:bg-white" />
             </div>
           </div>

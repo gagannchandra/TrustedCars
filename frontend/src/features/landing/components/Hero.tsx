@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, CheckCircle, ShieldCheck, Award, Lock } from 'lucide-react';
 import { CITIES } from '../../../data/mockData';

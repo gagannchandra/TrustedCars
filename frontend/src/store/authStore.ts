@@ -16,7 +16,7 @@ interface AuthState {
   fetchProfile: () => Promise<void>;
   toggleWishlist: (carId: string) => void;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (data: { email: string; password: string; full_name: string; role: 'user' | 'admin' }) => Promise<boolean>;
+  register: (data: { email: string; password: string; full_name: string; role: 'user' | 'dealer' }) => Promise<boolean>;
 }
 
 export const useAuthStore = create<AuthState>()(

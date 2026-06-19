@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Heart, MapPin, Eye, Fuel, Gauge, Users, Calendar, CheckCircle, ShieldCheck } from 'lucide-react';
+import { Heart, MapPin, Eye, Fuel, Gauge, Users, CheckCircle, ShieldCheck } from 'lucide-react';
 import { Car } from '../../types';
 import { formatPrice, formatOdometer, getQualityBadgeConfig, calculateEMI } from '../../shared/utils/utils';
 import { useAuthStore } from '../../store/authStore';
@@ -17,7 +17,6 @@ const FUEL_LABELS: Record<string, string> = {
 export default function CarCard({ car, compact = false, index = 0 }: CarCardProps) {
   const { wishlist, toggleWishlist, isAuthenticated } = useAuthStore();
   const isWishlisted = wishlist.includes(car.id);
-  const badge = getQualityBadgeConfig(car.quality_badge);
   const emi = calculateEMI(car.asking_price * 0.8, 9.5, 60);
   const primaryImage = car.images?.[0]?.url || 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&q=80';
   const priceDiff = car.market_value ? Math.round(((car.market_value - car.asking_price) / car.market_value) * 100) : 0;

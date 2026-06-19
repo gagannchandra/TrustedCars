@@ -2,18 +2,28 @@ import { Car, FilterState, Inquiry, Review, User } from '../../types';
 import { axiosInstance } from './axiosInstance';
 
 export const carsApi = {
-  getCars: async (filters?: FilterState): Promise<Car[]> => {
+  getCars: async (filters?: FilterState): Promise<{ items: Car[], total: number }> => {
     const params = new URLSearchParams();
-    if (filters?.q) params.append('make', filters.q); // Simple map for search text
+    if (filters?.q) params.append('q', filters.q);
     if (filters?.make) params.append('make', filters.make);
     if (filters?.model) params.append('model', filters.model);
-    if (filters?.year_min) params.append('year', filters.year_min.toString()); // Backend only has exact 'year', we'll just send min as year or drop it. Let's drop it to avoid breaking.
+    if (filters?.year_min) params.append('min_year', filters.year_min.toString());
+    if (filters?.year_max) params.append('max_year', filters.year_max.toString());
     if (filters?.price_min) params.append('min_price', filters.price_min.toString());
     if (filters?.price_max) params.append('max_price', filters.price_max.toString());
     if (filters?.fuel_type) params.append('fuel_type', filters.fuel_type);
     if (filters?.transmission) params.append('transmission', filters.transmission);
+    if (filters?.body_type) params.append('body_type', filters.body_type);
     if (filters?.city) params.append('city', filters.city);
     if (filters?.km_max) params.append('max_mileage', filters.km_max.toString());
+    if (filters?.ownership) params.append('ownership_count', filters.ownership.toString());
+    if (filters?.sort) params.append('sort', filters.sort);
+    
+    // Pagination
+    const limit = 12;
+    const page = filters?.page || 1;
+    params.append('limit', limit.toString());
+    params.append('skip', ((page - 1) * limit).toString());
     
     const res = await axiosInstance.get(`/cars?${params.toString()}`);
     return res.data;
@@ -25,30 +35,36 @@ export const carsApi = {
   },
 
   getFeaturedCars: async (): Promise<Car[]> => {
-    // Backend doesn't have a featured filter yet, fetch latest and filter locally
-    const res = await axiosInstance.get('/cars?limit=50');
-    return res.data.filter((c: Car) => c.is_featured).slice(0, 6);
+    const res = await axiosInstance.get('/cars?limit=50&sort=newest');
+    return res.data.items.filter((c: Car) => c.is_featured).slice(0, 6);
   },
 
   getSimilarCars: async (car: Car, limit = 4): Promise<Car[]> => {
-    // Search by same make
     const res = await axiosInstance.get(`/cars?make=${car.make}&limit=10`);
-    return res.data.filter((c: Car) => c.id !== car.id).slice(0, limit);
+    return res.data.items.filter((c: Car) => c.id !== car.id).slice(0, limit);
   },
 
   getAllCarsAdmin: async (): Promise<Car[]> => {
-    // For admin we might want all cars including pending, but /cars is public
-    // Admin has specific routes or we just use /cars
-    const res = await axiosInstance.get('/cars?limit=100');
+    const res = await axiosInstance.get('/admin/cars');
+    return res.data.items;
+  },
+
+  createCar: async (payload: any): Promise<Car> => {
+    const res = await axiosInstance.post('/cars', payload);
+    return res.data;
+  },
+
+  uploadCarImages: async (carId: string, payload: { image_url: string; storage_key: string; sort_order: number; is_primary: boolean }): Promise<any> => {
+    // The API expects individual image metadata uploads via POST /cars/{id}/images
+    const res = await axiosInstance.post(`/cars/${carId}/images`, payload);
     return res.data;
   }
 };
 
 export const usersApi = {
   getAllUsers: async (): Promise<User[]> => {
-    // Admin route required for this
-    const res = await axiosInstance.get('/users/me'); // Just a placeholder, to be updated when admin is fixed
-    return [res.data];
+    const res = await axiosInstance.get('/admin/users');
+    return res.data;
   }
 };
 
@@ -56,12 +72,16 @@ export const inquiriesApi = {
   getAllInquiries: async (): Promise<Inquiry[]> => {
     const res = await axiosInstance.get('/inquiries');
     return res.data;
+  },
+  createInquiry: async (payload: { car_id: string; message: string }): Promise<Inquiry> => {
+    const res = await axiosInstance.post('/inquiries', payload);
+    return res.data;
   }
 };
 
 export const reviewsApi = {
   getAllReviews: async (): Promise<Review[]> => {
-    const res = await axiosInstance.get('/reviews');
+    const res = await axiosInstance.get('/admin/reviews');
     return res.data;
   }
 };

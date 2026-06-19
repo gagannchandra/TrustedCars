@@ -84,9 +84,43 @@ export default function Sell() {
     }
   };
 
-  const onSubmit = (data: SellFormValues) => {
-    console.log("Submitted:", data, previewPhotos);
-    setSubmitted(true);
+  const onSubmit = async (data: SellFormValues) => {
+    try {
+      // Map SellFormValues to CarCreateRequest
+      const payload = {
+        make: data.make,
+        model: data.model,
+        variant: data.variant || '',
+        year: parseInt(data.year),
+        fuel_type: data.fuel,
+        transmission: data.transmission,
+        body_type: 'sedan', // Fallback, body_type is missing from form
+        odometer_km: parseInt(data.odometer.replace(/,/g, '')),
+        ownership_count: parseInt(data.owners),
+        asking_price: parseFloat(data.price.replace(/,/g, '')),
+        city: data.city || 'Unknown',
+        state: 'Unknown', // Fallback, state is missing from form
+        description: `Contact: ${data.name} (${data.contactTime}) - ${data.accident === 'yes' ? 'Accident History' : 'No Accidents'}`
+      };
+
+      const { carsApi } = await import('../../shared/api/client');
+      const newCar = await carsApi.createCar(payload);
+
+      // Upload photos sequentially
+      for (let i = 0; i < previewPhotos.length; i++) {
+        await carsApi.uploadCarImages(newCar.id, {
+          image_url: previewPhotos[i], // Typically this would be a real uploaded URL, using data URL for mock
+          storage_key: `cars/${newCar.id}/img_${i}.jpg`,
+          sort_order: i,
+          is_primary: i === 0
+        });
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Failed to submit listing:', err);
+      alert('Failed to submit listing. Please try again.');
+    }
   };
 
   if (!started) {

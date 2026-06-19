@@ -1,0 +1,39 @@
+name: Security Scans
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 0 * * *' # Daily at midnight
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install security tools
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install bandit safety pip-audit
+
+    - name: Run Bandit
+      run: |
+        cd backend
+        bandit -r app/ -c pyproject.toml
+
+    - name: Run Safety
+      run: |
+        cd backend
+        safety check -r requirements.txt --full-report
+
+    - name: Run pip-audit
+      run: |
+        cd backend
+        pip-audit -r requirements.txt

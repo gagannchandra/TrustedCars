@@ -1,0 +1,89 @@
+Starting DB performance monitor...
+--- Capture 1 ---
+=== Database Performance Metrics ===
+ total_connections | active_connections 
+-------------------+--------------------
+                 8 |                  1
+(1 row)
+
+ lock_waits 
+------------
+          0
+(1 row)
+
+ deadlocks 
+-----------
+         0
+(1 row)
+
+ total_seq_scans | total_index_scans 
+-----------------+-------------------
+           24268 |               624
+(1 row)
+
+--- Capture 2 ---
+=== Database Performance Metrics ===
+ total_connections | active_connections 
+-------------------+--------------------
+                50 |                  1
+(1 row)
+
+ lock_waits 
+------------
+          0
+(1 row)
+
+ deadlocks 
+-----------
+         0
+(1 row)
+
+ total_seq_scans | total_index_scans 
+-----------------+-------------------
+           24562 |               625
+(1 row)
+
+--- Capture 3 ---
+=== Database Performance Metrics ===
+ total_connections | active_connections 
+-------------------+--------------------
+                50 |                  1
+(1 row)
+
+ lock_waits 
+------------
+          0
+(1 row)
+
+ deadlocks 
+-----------
+         0
+(1 row)
+
+ total_seq_scans | total_index_scans 
+-----------------+-------------------
+           25012 |               625
+(1 row)
+
+--- Capture 4 ---
+=== Database Performance Metrics ===
+ total_connections | active_connections 
+-------------------+--------------------
+                50 |                  1
+(1 row)
+
+ lock_waits 
+------------
+          0
+(1 row)
+
+ deadlocks 
+-----------
+         0
+(1 row)
+
+ total_seq_scans | total_index_scans 
+-----------------+-------------------
+           25481 |               625
+(1 row)
+

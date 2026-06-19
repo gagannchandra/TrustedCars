@@ -1,0 +1,2179 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-9.1.0, pluggy-1.6.0
+rootdir: /app
+plugins: asyncio-1.4.0, anyio-4.14.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 26 items
+
+tests/admin/test_admin_hierarchy.py ..                                   [  7%]
+tests/admin/test_admin_self_protection.py .                              [ 11%]
+tests/admin/test_audit_log_pagination.py .                               [ 15%]
+tests/admin/test_cars.py .                                               [ 19%]
+tests/admin/test_dashboard.py .                                          [ 23%]
+tests/admin/test_dealer_restore_safety.py .                              [ 26%]
+tests/admin/test_dealers.py ..                                           [ 34%]
+tests/admin/test_hierarchy_car.py .                                      [ 38%]
+tests/admin/test_hierarchy_dealer.py ..                                  [ 46%]
+tests/admin/test_hierarchy_inquiry.py .                                  [ 50%]
+tests/admin/test_hierarchy_review.py .                                   [ 53%]
+tests/admin/test_inquiries.py .                                          [ 57%]
+tests/admin/test_outbox_idempotency.py .                                 [ 61%]
+tests/admin/test_review_restore_safety.py .                              [ 65%]
+tests/admin/test_reviews.py .                                            [ 69%]
+tests/admin/test_users.py ....                                           [ 84%]
+tests/test_car_mass_assignment.py .                                      [ 88%]
+tests/test_mass_assignment_regression.py ..                              [ 96%]
+tests/test_mfa_backup_codes.py E                                         [100%]
+
+==================================== ERRORS ====================================
+___________________ ERROR at setup of test_mfa_backup_codes ____________________
+  + Exception Group Traceback (most recent call last):
+  |   File "/usr/local/lib/python3.11/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+  |     yield
+  |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 190, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 811, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/runner.py", line 361, in from_call
+    |     result: TResult | None = func()
+    |                              ^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/runner.py", line 250, in <lambda>
+    |     lambda: runtest_hook(item=item, **kwds),
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_hooks.py", line 512, in __call__
+    |     return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_manager.py", line 120, in _hookexec
+    |     return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_callers.py", line 167, in _multicall
+    |     raise exception
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/logging.py", line 858, in pytest_runtest_setup
+    |     yield
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/capture.py", line 895, in pytest_runtest_setup
+    |     return (yield)
+    |             ^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_callers.py", line 121, in _multicall
+    |     res = hook_impl.function(*args)
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/runner.py", line 170, in pytest_runtest_setup
+    |     item.session._setupstate.setup(item)
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/runner.py", line 536, in setup
+    |     col.setup()
+    |   File "/usr/local/lib/python3.11/site-packages/pytest_asyncio/plugin.py", line 558, in setup
+    |     return super().setup()
+    |            ^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/python.py", line 1710, in setup
+    |     self._request._fillfixtures()
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/fixtures.py", line 805, in _fillfixtures
+    |     item.funcargs[argname] = self.getfixturevalue(argname)
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/fixtures.py", line 629, in getfixturevalue
+    |     fixturedef = self._get_active_fixturedef(argname)
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/fixtures.py", line 725, in _get_active_fixturedef
+    |     fixturedef.execute(request=subrequest)
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/fixtures.py", line 1231, in execute
+    |     result: FixtureValue = ihook.pytest_fixture_setup(
+    |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_hooks.py", line 512, in __call__
+    |     return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_manager.py", line 120, in _hookexec
+    |     return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_callers.py", line 167, in _multicall
+    |     raise exception
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_callers.py", line 53, in run_old_style_hookwrapper
+    |     return result.get_result()
+    |            ^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_result.py", line 103, in get_result
+    |     raise exc.with_traceback(tb)
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_callers.py", line 38, in run_old_style_hookwrapper
+    |     res = yield
+    |           ^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |   File "/usr/local/lib/python3.11/site-packages/pytest_asyncio/plugin.py", line 944, in pytest_fixture_setup
+    |     hook_result = yield
+    |                   ^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/setuponly.py", line 36, in pytest_fixture_setup
+    |     return (yield)
+    |             ^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/pluggy/_callers.py", line 121, in _multicall
+    |     res = hook_impl.function(*args)
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/fixtures.py", line 1327, in pytest_fixture_setup
+    |     result = call_fixture_func(fixturefunc, request, kwargs)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/_pytest/fixtures.py", line 1004, in call_fixture_func
+    |     fixture_result = fixturefunc(**kwargs)
+    |                      ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/pytest_asyncio/plugin.py", line 455, in _async_fixture_wrapper
+    |     result = runner.run(setup(), context=context)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    |     return self._loop.run_until_complete(task)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    |     return future.result()
+    |            ^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/pytest_asyncio/plugin.py", line 451, in setup
+    |     res = await fixture_function(*args, **kwargs)
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/app/tests/test_mfa_backup_codes.py", line 17, in user_auth
+    |     await ac.post("/api/v1/auth/register/user", json=reg_data)
+    |   File "/usr/local/lib/python3.11/site-packages/httpx/_client.py", line 1859, in post
+    |     return await self.request(
+    |            ^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/httpx/_client.py", line 1540, in request
+    |     return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/httpx/_client.py", line 1629, in send
+    |     response = await self._send_handling_auth(
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    |     response = await self._send_handling_redirects(
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    |     response = await self._send_single_request(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    |     response = await transport.handle_async_request(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/httpx/_transports/asgi.py", line 170, in handle_async_request
+    |     await self.app(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 123, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    |     raise exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 189, in __call__
+    |     with collapse_excgroups():
+    |   File "/usr/local/lib/python3.11/contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/_utils.py", line 93, in collapse_excgroups
+    |     raise exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 191, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/app/app/core/middleware.py", line 50, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    |     raise app_exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 65, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 756, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 776, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 297, in handle
+    |     await self.app(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 77, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 72, in app
+    |     response = await func(request)
+    |                ^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 278, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/app/app/modules/auth/router.py", line 29, in register_user
+    |     return await service.register_user(req)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/app/app/modules/auth/service.py", line 72, in register_user
+    |     existing = await self.repository.get_user_by_email(req.email)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/app/app/modules/auth/repository.py", line 13, in get_user_by_email
+    |     result = await self.session.execute(
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/ext/asyncio/session.py", line 461, in execute
+    |     result = await greenlet_spawn(
+    |              ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 201, in greenlet_spawn
+    |     result = context.throw(*sys.exc_info())
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    |     return self._execute_internal(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2226, in _execute_internal
+    |     conn = self._connection_for_bind(bind)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2095, in _connection_for_bind
+    |     return trans._connection_for_bind(engine, execution_options)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "<string>", line 2, in _connection_for_bind
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    |     ret_value = fn(self, *arg, **kw)
+    |                 ^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1189, in _connection_for_bind
+    |     conn = bind.connect()
+    |            ^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3276, in connect
+    |     return self._connection_cls(self)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 146, in __init__
+    |     self._dbapi_connection = engine.raw_connection()
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3300, in raw_connection
+    |     return self.pool.connect()
+    |            ^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 449, in connect
+    |     return _ConnectionFairy._checkout(self)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1362, in _checkout
+    |     with util.safe_reraise():
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 146, in __exit__
+    |     raise exc_value.with_traceback(exc_tb)
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1300, in _checkout
+    |     result = pool._dialect._do_ping_w_event(
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 715, in _do_ping_w_event
+    |     return self.do_ping(dbapi_connection)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 1138, in do_ping
+    |     dbapi_connection.ping()
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 810, in ping
+    |     self._handle_exception(error)
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 791, in _handle_exception
+    |     raise error
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 808, in ping
+    |     _ = self.await_(self._async_ping())
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 131, in await_only
+    |     return current.driver.switch(awaitable)  # type: ignore[no-any-return]
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    |     value = await result
+    |             ^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 817, in _async_ping
+    |     await tr.start()
+    |   File "/usr/local/lib/python3.11/site-packages/asyncpg/transaction.py", line 146, in start
+    |     await self._connection.execute(query)
+    |   File "/usr/local/lib/python3.11/site-packages/asyncpg/connection.py", line 350, in execute
+    |     result = await self._protocol.query(query, timeout)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "asyncpg/protocol/protocol.pyx", line 374, in query
+    | RuntimeError: Task <Task pending name='starlette.middleware.base.BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.coro' coro=<TaskHandle._run_coro() running at /usr/local/lib/python3.11/site-packages/anyio/_core/_tasks.py:278> cb=[TaskGroup._spawn.<locals>.task_done() at /usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:832]> got Future <Future pending cb=[Protocol._on_waiter_completed()]> attached to a different loop
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/app/tests/test_mfa_backup_codes.py", line 17, in user_auth
+    await ac.post("/api/v1/auth/register/user", json=reg_data)
+  File "/usr/local/lib/python3.11/site-packages/httpx/_client.py", line 1859, in post
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/httpx/_client.py", line 1540, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/httpx/_transports/asgi.py", line 170, in handle_async_request
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 123, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 189, in __call__
+    with collapse_excgroups():
+  File "/usr/local/lib/python3.11/contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_utils.py", line 93, in collapse_excgroups
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 191, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/core/middleware.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 776, in app
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 72, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 278, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/modules/auth/router.py", line 29, in register_user
+    return await service.register_user(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/modules/auth/service.py", line 72, in register_user
+    existing = await self.repository.get_user_by_email(req.email)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/modules/auth/repository.py", line 13, in get_user_by_email
+    result = await self.session.execute(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/ext/asyncio/session.py", line 461, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2226, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2095, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1189, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3276, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 146, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3300, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 449, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1362, in _checkout
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1300, in _checkout
+    result = pool._dialect._do_ping_w_event(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 715, in _do_ping_w_event
+    return self.do_ping(dbapi_connection)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 1138, in do_ping
+    dbapi_connection.ping()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 810, in ping
+    self._handle_exception(error)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 791, in _handle_exception
+    raise error
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 808, in ping
+    _ = self.await_(self._async_ping())
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 131, in await_only
+    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 817, in _async_ping
+    await tr.start()
+  File "/usr/local/lib/python3.11/site-packages/asyncpg/transaction.py", line 146, in start
+    await self._connection.execute(query)
+  File "/usr/local/lib/python3.11/site-packages/asyncpg/connection.py", line 350, in execute
+    result = await self._protocol.query(query, timeout)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "asyncpg/protocol/protocol.pyx", line 374, in query
+RuntimeError: Task <Task pending name='starlette.middleware.base.BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.coro' coro=<TaskHandle._run_coro() running at /usr/local/lib/python3.11/site-packages/anyio/_core/_tasks.py:278> cb=[TaskGroup._spawn.<locals>.task_done() at /usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:832]> got Future <Future pending cb=[Protocol._on_waiter_completed()]> attached to a different loop
+
+During handling of the above exception, another exception occurred:
+
+    @pytest_asyncio.fixture
+    async def user_auth():
+        email = f"user_{uuid.uuid4()}@test.com"
+        pwd = "password123"
+    
+        async with AsyncClient(
+            transport=ASGITransport(app=app), base_url="http://test"
+        ) as ac:
+            reg_data = {"email": email, "password": pwd, "full_name": "Test User"}
+>           await ac.post("/api/v1/auth/register/user", json=reg_data)
+
+tests/test_mfa_backup_codes.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1859: in post
+    return await self.request(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1540: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1629: in send
+    response = await self._send_handling_auth(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1657: in _send_handling_auth
+    response = await self._send_handling_redirects(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1694: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1730: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/httpx/_transports/asgi.py:170: in handle_async_request
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/applications.py:123: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py:85: in __call__
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py:189: in __call__
+    with collapse_excgroups():
+/usr/local/lib/python3.11/contextlib.py:158: in __exit__
+    self.gen.throw(typ, value, traceback)
+/usr/local/lib/python3.11/site-packages/starlette/_utils.py:93: in collapse_excgroups
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py:191: in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/core/middleware.py:50: in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py:165: in call_next
+    raise app_exc
+/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py:151: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py:65: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:756: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:776: in app
+    await route.handle(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:297: in handle
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:77: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:72: in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:278: in app
+    raw_response = await run_endpoint_function(
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:191: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/modules/auth/router.py:29: in register_user
+    return await service.register_user(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/modules/auth/service.py:72: in register_user
+    existing = await self.repository.get_user_by_email(req.email)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/modules/auth/repository.py:13: in get_user_by_email
+    result = await self.session.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/ext/asyncio/session.py:461: in execute
+    result = await greenlet_spawn(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:201: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2351: in execute
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2226: in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2095: in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<string>:2: in _connection_for_bind
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1189: in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3276: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:146: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3300: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py:449: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1362: in _checkout
+    with util.safe_reraise():
+/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1300: in _checkout
+    result = pool._dialect._do_ping_w_event(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:715: in _do_ping_w_event
+    return self.do_ping(dbapi_connection)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:1138: in do_ping
+    dbapi_connection.ping()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:810: in ping
+    self._handle_exception(error)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:791: in _handle_exception
+    raise error
+/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:808: in ping
+    _ = self.await_(self._async_ping())
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:131: in await_only
+    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:817: in _async_ping
+    await tr.start()
+/usr/local/lib/python3.11/site-packages/asyncpg/transaction.py:146: in start
+    await self._connection.execute(query)
+/usr/local/lib/python3.11/site-packages/asyncpg/connection.py:350: in execute
+    result = await self._protocol.query(query, timeout)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   RuntimeError: Task <Task pending name='starlette.middleware.base.BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.coro' coro=<TaskHandle._run_coro() running at /usr/local/lib/python3.11/site-packages/anyio/_core/_tasks.py:278> cb=[TaskGroup._spawn.<locals>.task_done() at /usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:832]> got Future <Future pending cb=[Protocol._on_waiter_completed()]> attached to a different loop
+
+asyncpg/protocol/protocol.pyx:374: RuntimeError
+---------------------------- Captured stdout setup -----------------------------
+2026-06-19 03:59:19 [info     ] request_started                client_host=127.0.0.1 method=POST service=trustedcars-api url=http://test/api/v1/auth/register/user
+2026-06-19 03:59:19 [warning  ] connection_invalidated
+Task <Task pending name='starlette.middleware.base.BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.coro' coro=<TaskHandle._run_coro() running at /usr/local/lib/python3.11/site-packages/anyio/_core/_tasks.py:278> cb=[TaskGroup._spawn.<locals>.task_done() at /usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:832]> got Future <Future pending cb=[Protocol._on_waiter_completed()]> attached to a different loop
+2026-06-19 03:59:19 [error    ] request_failure                duration=0.005024909973144531 error="Task <Task pending name='starlette.middleware.base.BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.coro' coro=<TaskHandle._run_coro() running at /usr/local/lib/python3.11/site-packages/anyio/_core/_tasks.py:278> cb=[TaskGroup._spawn.<locals>.task_done() at /usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:832]> got Future <Future pending cb=[Protocol._on_waiter_completed()]> attached to a different loop" service=trustedcars-api
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /usr/local/lib/python3.11/site-packages/starlette/middleware/base.py:159 in  │
+│ call_next                                                                    │
+│                                                                              │
+│   156 │   │   │   task_group.start_soon(coro)                                │
+│   157 │   │   │                                                              │
+│   158 │   │   │   try:                                                       │
+│ ❱ 159 │   │   │   │   message = await recv_stream.receive()                  │
+│   160 │   │   │   │   info = message.get("info", None)                       │
+│   161 │   │   │   │   if message["type"] == "http.response.debug" and info i │
+│   162 │   │   │   │   │   message = await recv_stream.receive()              │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │         app_exc = RuntimeError("Task <Task pending                       │ │
+│ │                   name='starlette.middleware.base.BaseHTTPMiddleware.__… │ │
+│ │                   coro=<TaskHandle._run_coro() running at                │ │
+│ │                   /usr/local/lib/python3.11/site-packages/anyio/_core/_… │ │
+│ │                   cb=[TaskGroup._spawn.<locals>.task_done() at           │ │
+│ │                   /usr/local/lib/python3.11/site-packages/anyio/_backen… │ │
+│ │                   got Future <Future pending                             │ │
+│ │                   cb=[Protocol._on_waiter_completed()]> attached to a    │ │
+│ │                   different loop")                                       │ │
+│ │     recv_stream = MemoryObjectReceiveStream(                             │ │
+│ │                   │   _state=_MemoryObjectStreamState(                   │ │
+│ │                   │   │   max_buffer_size=0,                             │ │
+│ │                   │   │   buffer=deque(),                                │ │
+│ │                   │   │   open_send_channels=0,                          │ │
+│ │                   │   │   open_receive_channels=1,                       │ │
+│ │                   │   │   waiting_receivers=OrderedDict(),               │ │
+│ │                   │   │   waiting_senders=OrderedDict()                  │ │
+│ │                   │   ),                                                 │ │
+│ │                   │   _closed=False                                      │ │
+│ │                   )                                                      │ │
+│ │         request = <starlette.middleware.base._CachedRequest object at    │ │
+│ │                   0x7f75e3e294d0>                                        │ │
+│ │   response_sent = <anyio._backends._asyncio.Event object at              │ │
+│ │                   0x7f75e3e26740>                                        │ │
+│ │           scope = {                                                      │ │
+│ │                   │   'type': 'http',                                    │ │
+│ │                   │   'asgi': {'version': '3.0'},                        │ │
+│ │                   │   'http_version': '1.1',                             │ │
+│ │                   │   'method': 'POST',                                  │ │
+│ │                   │   'headers': [                                       │ │
+│ │                   │   │   (b'host', b'test'),                            │ │
+│ │                   │   │   (b'accept', b'*/*'),                           │ │
+│ │                   │   │   (b'accept-encoding', b'gzip, deflate'),        │ │
+│ │                   │   │   (b'connection', b'keep-alive'),                │ │
+│ │                   │   │   (b'user-agent', b'python-httpx/0.28.1'),       │ │
+│ │                   │   │   (b'content-length', b'111'),                   │ │
+│ │                   │   │   (b'content-type', b'application/json')         │ │
+│ │                   │   ],                                                 │ │
+│ │                   │   'scheme': 'http',                                  │ │
+│ │                   │   'path': '/api/v1/auth/register/user',              │ │
+│ │                   │   'raw_path': b'/api/v1/auth/register/user',         │ │
+│ │                   │   'query_string': b'',                               │ │
+│ │                   │   'server': ('test', None),                          │ │
+│ │                   │   ... +9                                             │ │
+│ │                   }                                                      │ │
+│ │            self = <app.core.middleware.CorrelationIdMiddleware object at │ │
+│ │                   0x7f75e92ac910>                                        │ │
+│ │     send_stream = MemoryObjectSendStream(                                │ │
+│ │                   │   _state=_MemoryObjectStreamState(                   │ │
+│ │                   │   │   max_buffer_size=0,                             │ │
+│ │                   │   │   buffer=deque(),                                │ │
+│ │                   │   │   open_send_channels=0,                          │ │
+│ │                   │   │   open_receive_channels=1,                       │ │
+│ │                   │   │   waiting_receivers=OrderedDict(),               │ │
+│ │                   │   │   waiting_senders=OrderedDict()                  │ │
+│ │                   │   ),                                                 │ │
+│ │                   │   _closed=True                                       │ │
+│ │                   )                                                      │ │
+│ │      task_group = <anyio._backends._asyncio.TaskGroup object at          │ │
+│ │                   0x7f75e3e353d0>                                        │ │
+│ │ wrapped_receive = <bound method _CachedRequest.wrapped_receive of        │ │
+│ │                   <starlette.middleware.base._CachedRequest object at    │ │
+│ │                   0x7f75e3e294d0>>                                       │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/anyio/streams/memory.py:132 in       │
+│ receive                                                                      │
+│                                                                              │
+│   129 │   │   │   try:                                                       │
+│   130 │   │   │   │   return receiver.item                                   │
+│   131 │   │   │   except AttributeError:                                     │
+│ ❱ 132 │   │   │   │   raise EndOfStream from None                            │
+│   133 │                                                                      │
+│   134 │   def clone(self) -> MemoryObjectReceiveStream[T_co]:                │
+│   135 │   │   """                                                            │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ receive_event = <anyio._backends._asyncio.Event object at                │ │
+│ │                 0x7f75e3e26ef0>                                          │ │
+│ │      receiver = _MemoryObjectItemReceiver(task_info=AsyncIOTaskInfo(id=… │ │
+│ │                 name='Task-243'), item=None)                             │ │
+│ │          self = MemoryObjectReceiveStream(                               │ │
+│ │                 │   _state=_MemoryObjectStreamState(                     │ │
+│ │                 │   │   max_buffer_size=0,                               │ │
+│ │                 │   │   buffer=deque(),                                  │ │
+│ │                 │   │   open_send_channels=0,                            │ │
+│ │                 │   │   open_receive_channels=1,                         │ │
+│ │                 │   │   waiting_receivers=OrderedDict(),                 │ │
+│ │                 │   │   waiting_senders=OrderedDict()                    │ │
+│ │                 │   ),                                                   │ │
+│ │                 │   _closed=False                                        │ │
+│ │                 )                                                        │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /app/app/core/middleware.py:50 in dispatch                                   │
+│                                                                              │
+│   47 │   │   endpoint = request.url.path                                     │
+│   48 │   │                                                                   │
+│   49 │   │   try:                                                            │
+│ ❱ 50 │   │   │   response = await call_next(request)                         │
+│   51 │   │   │   duration = time.time() - start_time                         │
+│   52 │   │   │   REQUEST_DURATION.labels(method=request.method, endpoint=end │
+│   53 │   │   │   │   duration                                                │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │    corr_id = 'da08c2be-4730-4428-893e-8ff88a89efba'                      │ │
+│ │ corr_token = <Token var=<ContextVar name='correlation_id' default=None   │ │
+│ │              at 0x7f75eb1d2890> at 0x7f75e3e37fc0>                       │ │
+│ │   duration = 0.005024909973144531                                        │ │
+│ │          e = RuntimeError("Task <Task pending                            │ │
+│ │              name='starlette.middleware.base.BaseHTTPMiddleware.__call_… │ │
+│ │              coro=<TaskHandle._run_coro() running at                     │ │
+│ │              /usr/local/lib/python3.11/site-packages/anyio/_core/_tasks… │ │
+│ │              cb=[TaskGroup._spawn.<locals>.task_done() at                │ │
+│ │              /usr/local/lib/python3.11/site-packages/anyio/_backends/_a… │ │
+│ │              got Future <Future pending                                  │ │
+│ │              cb=[Protocol._on_waiter_completed()]> attached to a         │ │
+│ │              different loop")                                            │ │
+│ │   endpoint = '/api/v1/auth/register/user'                                │ │
+│ │     req_id = '20632b7c-2168-4839-8add-4d3a40bc3606'                      │ │
+│ │  req_token = <Token var=<ContextVar name='request_id' default=None at    │ │
+│ │              0x7f75eb1d2840> at 0x7f75e3e34880>                          │ │
+│ │    request = <starlette.middleware.base._CachedRequest object at         │ │
+│ │              0x7f75e3e294d0>                                             │ │
+│ │       self = <app.core.middleware.CorrelationIdMiddleware object at      │ │
+│ │              0x7f75e92ac910>                                             │ │
+│ │ start_time = 1781841559.9183056                                          │ │
+│ │    user_id = None                                                        │ │
+│ │ user_token = None                                                        │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/starlette/middleware/base.py:165 in  │
+│ call_next                                                                    │
+│                                                                              │
+│   162 │   │   │   │   │   message = await recv_stream.receive()              │
+│   163 │   │   │   except anyio.EndOfStream:                                  │
+│   164 │   │   │   │   if app_exc is not None:                                │
+│ ❱ 165 │   │   │   │   │   raise app_exc                                      │
+│   166 │   │   │   │   raise RuntimeError("No response returned.")            │
+│   167 │   │   │                                                              │
+│   168 │   │   │   assert message["type"] == "http.response.start"            │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │         app_exc = RuntimeError("Task <Task pending                       │ │
+│ │                   name='starlette.middleware.base.BaseHTTPMiddleware.__… │ │
+│ │                   coro=<TaskHandle._run_coro() running at                │ │
+│ │                   /usr/local/lib/python3.11/site-packages/anyio/_core/_… │ │
+│ │                   cb=[TaskGroup._spawn.<locals>.task_done() at           │ │
+│ │                   /usr/local/lib/python3.11/site-packages/anyio/_backen… │ │
+│ │                   got Future <Future pending                             │ │
+│ │                   cb=[Protocol._on_waiter_completed()]> attached to a    │ │
+│ │                   different loop")                                       │ │
+│ │     recv_stream = MemoryObjectReceiveStream(                             │ │
+│ │                   │   _state=_MemoryObjectStreamState(                   │ │
+│ │                   │   │   max_buffer_size=0,                             │ │
+│ │                   │   │   buffer=deque(),                                │ │
+│ │                   │   │   open_send_channels=0,                          │ │
+│ │                   │   │   open_receive_channels=1,                       │ │
+│ │                   │   │   waiting_receivers=OrderedDict(),               │ │
+│ │                   │   │   waiting_senders=OrderedDict()                  │ │
+│ │                   │   ),                                                 │ │
+│ │                   │   _closed=False                                      │ │
+│ │                   )                                                      │ │
+│ │         request = <starlette.middleware.base._CachedRequest object at    │ │
+│ │                   0x7f75e3e294d0>                                        │ │
+│ │   response_sent = <anyio._backends._asyncio.Event object at              │ │
+│ │                   0x7f75e3e26740>                                        │ │
+│ │           scope = {                                                      │ │
+│ │                   │   'type': 'http',                                    │ │
+│ │                   │   'asgi': {'version': '3.0'},                        │ │
+│ │                   │   'http_version': '1.1',                             │ │
+│ │                   │   'method': 'POST',                                  │ │
+│ │                   │   'headers': [                                       │ │
+│ │                   │   │   (b'host', b'test'),                            │ │
+│ │                   │   │   (b'accept', b'*/*'),                           │ │
+│ │                   │   │   (b'accept-encoding', b'gzip, deflate'),        │ │
+│ │                   │   │   (b'connection', b'keep-alive'),                │ │
+│ │                   │   │   (b'user-agent', b'python-httpx/0.28.1'),       │ │
+│ │                   │   │   (b'content-length', b'111'),                   │ │
+│ │                   │   │   (b'content-type', b'application/json')         │ │
+│ │                   │   ],                                                 │ │
+│ │                   │   'scheme': 'http',                                  │ │
+│ │                   │   'path': '/api/v1/auth/register/user',              │ │
+│ │                   │   'raw_path': b'/api/v1/auth/register/user',         │ │
+│ │                   │   'query_string': b'',                               │ │
+│ │                   │   'server': ('test', None),                          │ │
+│ │                   │   ... +9                                             │ │
+│ │                   }                                                      │ │
+│ │            self = <app.core.middleware.CorrelationIdMiddleware object at │ │
+│ │                   0x7f75e92ac910>                                        │ │
+│ │     send_stream = MemoryObjectSendStream(                                │ │
+│ │                   │   _state=_MemoryObjectStreamState(                   │ │
+│ │                   │   │   max_buffer_size=0,                             │ │
+│ │                   │   │   buffer=deque(),                                │ │
+│ │                   │   │   open_send_channels=0,                          │ │
+│ │                   │   │   open_receive_channels=1,                       │ │
+│ │                   │   │   waiting_receivers=OrderedDict(),               │ │
+│ │                   │   │   waiting_senders=OrderedDict()                  │ │
+│ │                   │   ),                                                 │ │
+│ │                   │   _closed=True                                       │ │
+│ │                   )                                                      │ │
+│ │      task_group = <anyio._backends._asyncio.TaskGroup object at          │ │
+│ │                   0x7f75e3e353d0>                                        │ │
+│ │ wrapped_receive = <bound method _CachedRequest.wrapped_receive of        │ │
+│ │                   <starlette.middleware.base._CachedRequest object at    │ │
+│ │                   0x7f75e3e294d0>>                                       │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/starlette/middleware/base.py:151 in  │
+│ coro                                                                         │
+│                                                                              │
+│   148 │   │   │   │                                                          │
+│   149 │   │   │   │   async with send_stream:                                │
+│   150 │   │   │   │   │   try:                                               │
+│ ❱ 151 │   │   │   │   │   │   await self.app(scope, receive_or_disconnect, s │
+│   152 │   │   │   │   │   except Exception as exc:                           │
+│   153 │   │   │   │   │   │   app_exc = exc                                  │
+│   154                                                                        │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │     app_exc = RuntimeError("Task <Task pending                           │ │
+│ │               name='starlette.middleware.base.BaseHTTPMiddleware.__call… │ │
+│ │               coro=<TaskHandle._run_coro() running at                    │ │
+│ │               /usr/local/lib/python3.11/site-packages/anyio/_core/_task… │ │
+│ │               cb=[TaskGroup._spawn.<locals>.task_done() at               │ │
+│ │               /usr/local/lib/python3.11/site-packages/anyio/_backends/_… │ │
+│ │               got Future <Future pending                                 │ │
+│ │               cb=[Protocol._on_waiter_completed()]> attached to a        │ │
+│ │               different loop")                                           │ │
+│ │       scope = {                                                          │ │
+│ │               │   'type': 'http',                                        │ │
+│ │               │   'asgi': {'version': '3.0'},                            │ │
+│ │               │   'http_version': '1.1',                                 │ │
+│ │               │   'method': 'POST',                                      │ │
+│ │               │   'headers': [                                           │ │
+│ │               │   │   (b'host', b'test'),                                │ │
+│ │               │   │   (b'accept', b'*/*'),                               │ │
+│ │               │   │   (b'accept-encoding', b'gzip, deflate'),            │ │
+│ │               │   │   (b'connection', b'keep-alive'),                    │ │
+│ │               │   │   (b'user-agent', b'python-httpx/0.28.1'),           │ │
+│ │               │   │   (b'content-length', b'111'),                       │ │
+│ │               │   │   (b'content-type', b'application/json')             │ │
+│ │               │   ],                                                     │ │
+│ │               │   'scheme': 'http',                                      │ │
+│ │               │   'path': '/api/v1/auth/register/user',                  │ │
+│ │               │   'raw_path': b'/api/v1/auth/register/user',             │ │
+│ │               │   'query_string': b'',                                   │ │
+│ │               │   'server': ('test', None),                              │ │
+│ │               │   ... +9                                                 │ │
+│ │               }                                                          │ │
+│ │        self = <app.core.middleware.CorrelationIdMiddleware object at     │ │
+│ │               0x7f75e92ac910>                                            │ │
+│ │ send_stream = MemoryObjectSendStream(                                    │ │
+│ │               │   _state=_MemoryObjectStreamState(                       │ │
+│ │               │   │   max_buffer_size=0,                                 │ │
+│ │               │   │   buffer=deque(),                                    │ │
+│ │               │   │   open_send_channels=0,                              │ │
+│ │               │   │   open_receive_channels=1,                           │ │
+│ │               │   │   waiting_receivers=OrderedDict(),                   │ │
+│ │               │   │   waiting_senders=OrderedDict()                      │ │
+│ │               │   ),                                                     │ │
+│ │               │   _closed=True                                           │ │
+│ │               )                                                          │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py:6 │
+│ 5 in __call__                                                                │
+│                                                                              │
+│   62 │   │   else:                                                           │
+│   63 │   │   │   conn = WebSocket(scope, receive, send)                      │
+│   64 │   │                                                                   │
+│ ❱ 65 │   │   await wrap_app_handling_exceptions(self.app, conn)(scope, recei │
+│   66 │                                                                       │
+│   67 │   def http_exception(self, request: Request, exc: Exception) -> Respo │
+│   68 │   │   assert isinstance(exc, HTTPException)                           │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │  conn = <starlette.requests.Request object at 0x7f75e3e370d0>            │ │
+│ │ scope = {                                                                │ │
+│ │         │   'type': 'http',                                              │ │
+│ │         │   'asgi': {'version': '3.0'},                                  │ │
+│ │         │   'http_version': '1.1',                                       │ │
+│ │         │   'method': 'POST',                                            │ │
+│ │         │   'headers': [                                                 │ │
+│ │         │   │   (b'host', b'test'),                                      │ │
+│ │         │   │   (b'accept', b'*/*'),                                     │ │
+│ │         │   │   (b'accept-encoding', b'gzip, deflate'),                  │ │
+│ │         │   │   (b'connection', b'keep-alive'),                          │ │
+│ │         │   │   (b'user-agent', b'python-httpx/0.28.1'),                 │ │
+│ │         │   │   (b'content-length', b'111'),                             │ │
+│ │         │   │   (b'content-type', b'application/json')                   │ │
+│ │         │   ],                                                           │ │
+│ │         │   'scheme': 'http',                                            │ │
+│ │         │   'path': '/api/v1/auth/register/user',                        │ │
+│ │         │   'raw_path': b'/api/v1/auth/register/user',                   │ │
+│ │         │   'query_string': b'',                                         │ │
+│ │         │   'server': ('test', None),                                    │ │
+│ │         │   ... +9                                                       │ │
+│ │         }                                                                │ │
+│ │  self = <starlette.middleware.exceptions.ExceptionMiddleware object at   │ │
+│ │         0x7f75e92ac850>                                                  │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64   │
+│ in wrapped_app                                                               │
+│                                                                              │
+│   61 │   │   │   │   handler = _lookup_exception_handler(exception_handlers, │
+│   62 │   │   │                                                               │
+│   63 │   │   │   if handler is None:                                         │
+│ ❱ 64 │   │   │   │   raise exc                                               │
+│   65 │   │   │                                                               │
+│   66 │   │   │   if response_started:                                        │
+│   67 │   │   │   │   msg = "Caught handled exception, but response already s │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │                app = <fastapi.routing.APIRouter object at                │ │
+│ │                      0x7f75ebfae2d0>                                     │ │
+│ │               conn = <starlette.requests.Request object at               │ │
+│ │                      0x7f75e3e370d0>                                     │ │
+│ │ exception_handlers = {                                                   │ │
+│ │                      │   <class 'starlette.exceptions.HTTPException'>:   │ │
+│ │                      <function http_exception_handler at                 │ │
+│ │                      0x7f75eb0c8e00>,                                    │ │
+│ │                      │   <class                                          │ │
+│ │                      'starlette.exceptions.WebSocketException'>: <bound  │ │
+│ │                      method ExceptionMiddleware.websocket_exception of   │ │
+│ │                      <starlette.middleware.exceptions.ExceptionMiddlewa… │ │
+│ │                      object at 0x7f75e92ac850>>,                         │ │
+│ │                      │   <class                                          │ │
+│ │                      'fastapi.exceptions.RequestValidationError'>:       │ │
+│ │                      <function request_validation_exception_handler at   │ │
+│ │                      0x7f75eb53fe20>,                                    │ │
+│ │                      │   <class                                          │ │
+│ │                      'fastapi.exceptions.WebSocketRequestValidationErro… │ │
+│ │                      <function                                           │ │
+│ │                      websocket_request_validation_exception_handler at   │ │
+│ │                      0x7f75eb53fec0>,                                    │ │
+│ │                      │   <class                                          │ │
+│ │                      'app.shared.exceptions.handlers.CustomException'>:  │ │
+│ │                      <function custom_exception_handler at               │ │
+│ │                      0x7f75eb082d40>                                     │ │
+│ │                      }                                                   │ │
+│ │            handler = None                                                │ │
+│ │   response_started = False                                               │ │
+│ │              scope = {                                                   │ │
+│ │                      │   'type': 'http',                                 │ │
+│ │                      │   'asgi': {'version': '3.0'},                     │ │
+│ │                      │   'http_version': '1.1',                          │ │
+│ │                      │   'method': 'POST',                               │ │
+│ │                      │   'headers': [                                    │ │
+│ │                      │   │   (b'host', b'test'),                         │ │
+│ │                      │   │   (b'accept', b'*/*'),                        │ │
+│ │                      │   │   (b'accept-encoding', b'gzip, deflate'),     │ │
+│ │                      │   │   (b'connection', b'keep-alive'),             │ │
+│ │                      │   │   (b'user-agent', b'python-httpx/0.28.1'),    │ │
+│ │                      │   │   (b'content-length', b'111'),                │ │
+│ │                      │   │   (b'content-type', b'application/json')      │ │
+│ │                      │   ],                                              │ │
+│ │                      │   'scheme': 'http',                               │ │
+│ │                      │   'path': '/api/v1/auth/register/user',           │ │
+│ │                      │   'raw_path': b'/api/v1/auth/register/user',      │ │
+│ │                      │   'query_string': b'',                            │ │
+│ │                      │   'server': ('test', None),                       │ │
+│ │                      │   ... +9                                          │ │
+│ │                      }                                                   │ │
+│ │    status_handlers = {}                                                  │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53   │
+│ in wrapped_app                                                               │
+│                                                                              │
+│   50 │   │   │   await send(message)                                         │
+│   51 │   │                                                                   │
+│   52 │   │   try:                                                            │
+│ ❱ 53 │   │   │   await app(scope, receive, sender)                           │
+│   54 │   │   except Exception as exc:                                        │
+│   55 │   │   │   handler = None                                              │
+│   56                                                                         │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │                app = <fastapi.routing.APIRouter object at                │ │
+│ │                      0x7f75ebfae2d0>                                     │ │
+│ │               conn = <starlette.requests.Request object at               │ │
+│ │                      0x7f75e3e370d0>                                     │ │
+│ │ exception_handlers = {                                                   │ │
+│ │                      │   <class 'starlette.exceptions.HTTPException'>:   │ │
+│ │                      <function http_exception_handler at                 │ │
+│ │                      0x7f75eb0c8e00>,                                    │ │
+│ │                      │   <class                                          │ │
+│ │                      'starlette.exceptions.WebSocketException'>: <bound  │ │
+│ │                      method ExceptionMiddleware.websocket_exception of   │ │
+│ │                      <starlette.middleware.exceptions.ExceptionMiddlewa… │ │
+│ │                      object at 0x7f75e92ac850>>,                         │ │
+│ │                      │   <class                                          │ │
+│ │                      'fastapi.exceptions.RequestValidationError'>:       │ │
+│ │                      <function request_validation_exception_handler at   │ │
+│ │                      0x7f75eb53fe20>,                                    │ │
+│ │                      │   <class                                          │ │
+│ │                      'fastapi.exceptions.WebSocketRequestValidationErro… │ │
+│ │                      <function                                           │ │
+│ │                      websocket_request_validation_exception_handler at   │ │
+│ │                      0x7f75eb53fec0>,                                    │ │
+│ │                      │   <class                                          │ │
+│ │                      'app.shared.exceptions.handlers.CustomException'>:  │ │
+│ │                      <function custom_exception_handler at               │ │
+│ │                      0x7f75eb082d40>                                     │ │
+│ │                      }                                                   │ │
+│ │            handler = None                                                │ │
+│ │   response_started = False                                               │ │
+│ │              scope = {                                                   │ │
+│ │                      │   'type': 'http',                                 │ │
+│ │                      │   'asgi': {'version': '3.0'},                     │ │
+│ │                      │   'http_version': '1.1',                          │ │
+│ │                      │   'method': 'POST',                               │ │
+│ │                      │   'headers': [                                    │ │
+│ │                      │   │   (b'host', b'test'),                         │ │
+│ │                      │   │   (b'accept', b'*/*'),                        │ │
+│ │                      │   │   (b'accept-encoding', b'gzip, deflate'),     │ │
+│ │                      │   │   (b'connection', b'keep-alive'),             │ │
+│ │                      │   │   (b'user-agent', b'python-httpx/0.28.1'),    │ │
+│ │                      │   │   (b'content-length', b'111'),                │ │
+│ │                      │   │   (b'content-type', b'application/json')      │ │
+│ │                      │   ],                                              │ │
+│ │                      │   'scheme': 'http',                               │ │
+│ │                      │   'path': '/api/v1/auth/register/user',           │ │
+│ │                      │   'raw_path': b'/api/v1/auth/register/user',      │ │
+│ │                      │   'query_string': b'',                            │ │
+│ │                      │   'server': ('test', None),                       │ │
+│ │                      │   ... +9                                          │ │
+│ │                      }                                                   │ │
+│ │    status_handlers = {}                                                  │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/starlette/routing.py:756 in __call__ │
+│                                                                              │
+│   753 │   │   """                                                            │
+│   754 │   │   The main entry point to the Router class.                      │
+│   755 │   │   """                                                            │
+│ ❱ 756 │   │   await self.middleware_stack(scope, receive, send)              │
+│   757 │                                                                      │
+│   758 │   async def app(self, scope: Scope, receive: Receive, send: Send) -> │
+│   759 │   │   assert scope["type"] in ("http", "websocket", "lifespan")      │
+│                                                                              │
+│ ╭─────────────────────────── locals ───────────────────────────╮             │
+│ │ scope = {                                                    │             │
+│ │         │   'type': 'http',                                  │             │
+│ │         │   'asgi': {'version': '3.0'},                      │             │
+│ │         │   'http_version': '1.1',                           │             │
+│ │         │   'method': 'POST',                                │             │
+│ │         │   'headers': [                                     │             │
+│ │         │   │   (b'host', b'test'),                          │             │
+│ │         │   │   (b'accept', b'*/*'),                         │             │
+│ │         │   │   (b'accept-encoding', b'gzip, deflate'),      │             │
+│ │         │   │   (b'connection', b'keep-alive'),              │             │
+│ │         │   │   (b'user-agent', b'python-httpx/0.28.1'),     │             │
+│ │         │   │   (b'content-length', b'111'),                 │             │
+│ │         │   │   (b'content-type', b'application/json')       │             │
+│ │         │   ],                                               │             │
+│ │         │   'scheme': 'http',                                │             │
+│ │         │   'path': '/api/v1/auth/register/user',            │             │
+│ │         │   'raw_path': b'/api/v1/auth/register/user',       │             │
+│ │         │   'query_string': b'',                             │             │
+│ │         │   'server': ('test', None),                        │             │
+│ │         │   ... +9                                           │             │
+│ │         }                                                    │             │
+│ │  self = <fastapi.routing.APIRouter object at 0x7f75ebfae2d0> │             │
+│ ╰──────────────────────────────────────────────────────────────╯             │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/starlette/routing.py:776 in app      │
+│                                                                              │
+│   773 │   │   │   match, child_scope = route.matches(scope)                  │
+│   774 │   │   │   if match == Match.FULL:                                    │
+│   775 │   │   │   │   scope.update(child_scope)                              │
+│ ❱ 776 │   │   │   │   await route.handle(scope, receive, send)               │
+│   777 │   │   │   │   return                                                 │
+│   778 │   │   │   elif match == Match.PARTIAL and partial is None:           │
+│   779 │   │   │   │   partial = route                                        │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ child_scope = {                                                          │ │
+│ │               │   'endpoint': <function register_user at                 │ │
+│ │               0x7f75e9d73b00>,                                           │ │
+│ │               │   'path_params': {},                                     │ │
+│ │               │   'route': APIRoute(path='/api/v1/auth/register/user',   │ │
+│ │               name='register_user', methods=['POST'])                    │ │
+│ │               }                                                          │ │
+│ │       match = <Match.FULL: 2>                                            │ │
+│ │     partial = None                                                       │ │
+│ │       route = APIRoute(path='/api/v1/auth/register/user',                │ │
+│ │               name='register_user', methods=['POST'])                    │ │
+│ │       scope = {                                                          │ │
+│ │               │   'type': 'http',                                        │ │
+│ │               │   'asgi': {'version': '3.0'},                            │ │
+│ │               │   'http_version': '1.1',                                 │ │
+│ │               │   'method': 'POST',                                      │ │
+│ │               │   'headers': [                                           │ │
+│ │               │   │   (b'host', b'test'),                                │ │
+│ │               │   │   (b'accept', b'*/*'),                               │ │
+│ │               │   │   (b'accept-encoding', b'gzip, deflate'),            │ │
+│ │               │   │   (b'connection', b'keep-alive'),                    │ │
+│ │               │   │   (b'user-agent', b'python-httpx/0.28.1'),           │ │
+│ │               │   │   (b'content-length', b'111'),                       │ │
+│ │               │   │   (b'content-type', b'application/json')             │ │
+│ │               │   ],                                                     │ │
+│ │               │   'scheme': 'http',                                      │ │
+│ │               │   'path': '/api/v1/auth/register/user',                  │ │
+│ │               │   'raw_path': b'/api/v1/auth/register/user',             │ │
+│ │               │   'query_string': b'',                                   │ │
+│ │               │   'server': ('test', None),                              │ │
+│ │               │   ... +9                                                 │ │
+│ │               }                                                          │ │
+│ │        self = <fastapi.routing.APIRouter object at 0x7f75ebfae2d0>       │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/starlette/routing.py:297 in handle   │
+│                                                                              │
+│   294 │   │   │   │   )                                                      │
+│   295 │   │   │   await response(scope, receive, send)                       │
+│   296 │   │   else:                                                          │
+│ ❱ 297 │   │   │   await self.app(scope, receive, send)                       │
+│   298 │                                                                      │
+│   299 │   def __eq__(self, other: typing.Any) -> bool:                       │
+│   300 │   │   return (                                                       │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ scope = {                                                                │ │
+│ │         │   'type': 'http',                                              │ │
+│ │         │   'asgi': {'version': '3.0'},                                  │ │
+│ │         │   'http_version': '1.1',                                       │ │
+│ │         │   'method': 'POST',                                            │ │
+│ │         │   'headers': [                                                 │ │
+│ │         │   │   (b'host', b'test'),                                      │ │
+│ │         │   │   (b'accept', b'*/*'),                                     │ │
+│ │         │   │   (b'accept-encoding', b'gzip, deflate'),                  │ │
+│ │         │   │   (b'connection', b'keep-alive'),                          │ │
+│ │         │   │   (b'user-agent', b'python-httpx/0.28.1'),                 │ │
+│ │         │   │   (b'content-length', b'111'),                             │ │
+│ │         │   │   (b'content-type', b'application/json')                   │ │
+│ │         │   ],                                                           │ │
+│ │         │   'scheme': 'http',                                            │ │
+│ │         │   'path': '/api/v1/auth/register/user',                        │ │
+│ │         │   'raw_path': b'/api/v1/auth/register/user',                   │ │
+│ │         │   'query_string': b'',                                         │ │
+│ │         │   'server': ('test', None),                                    │ │
+│ │         │   ... +9                                                       │ │
+│ │         }                                                                │ │
+│ │  self = APIRoute(path='/api/v1/auth/register/user',                      │ │
+│ │         name='register_user', methods=['POST'])                          │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/starlette/routing.py:77 in app       │
+│                                                                              │
+│    74 │   │   │   │   response = await run_in_threadpool(func, request)      │
+│    75 │   │   │   await response(scope, receive, send)                       │
+│    76 │   │                                                                  │
+│ ❱  77 │   │   await wrap_app_handling_exceptions(app, request)(scope, receiv │
+│    78 │                                                                      │
+│    79 │   return app                                                         │
+│    80                                                                        │
+│                                                                              │
+│ ╭──────────────────────────── locals ─────────────────────────────╮          │
+│ │ request = <starlette.requests.Request object at 0x7f75e3e36bd0> │          │
+│ │   scope = {                                                     │          │
+│ │           │   'type': 'http',                                   │          │
+│ │           │   'asgi': {'version': '3.0'},                       │          │
+│ │           │   'http_version': '1.1',                            │          │
+│ │           │   'method': 'POST',                                 │          │
+│ │           │   'headers': [                                      │          │
+│ │           │   │   (b'host', b'test'),                           │          │
+│ │           │   │   (b'accept', b'*/*'),                          │          │
+│ │           │   │   (b'accept-encoding', b'gzip, deflate'),       │          │
+│ │           │   │   (b'connection', b'keep-alive'),               │          │
+│ │           │   │   (b'user-agent', b'python-httpx/0.28.1'),      │          │
+│ │           │   │   (b'content-length', b'111'),                  │          │
+│ │           │   │   (b'content-type', b'application/json')        │          │
+│ │           │   ],                                                │          │
+│ │           │   'scheme': 'http',                                 │          │
+│ │           │   'path': '/api/v1/auth/register/user',             │          │
+│ │           │   'raw_path': b'/api/v1/auth/register/user',        │          │
+│ │           │   'query_string': b'',                              │          │
+│ │           │   'server': ('test', None),                         │          │
+│ │           │   ... +9                                            │          │
+│ │           }                                                     │          │
+│ ╰─────────────────────────────────────────────────────────────────╯          │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64   │
+│ in wrapped_app                                                               │
+│                                                                              │
+│   61 │   │   │   │   handler = _lookup_exception_handler(exception_handlers, │
+│   62 │   │   │                                                               │
+│   63 │   │   │   if handler is None:                                         │
+│ ❱ 64 │   │   │   │   raise exc                                               │
+│   65 │   │   │                                                               │
+│   66 │   │   │   if response_started:                                        │
+│   67 │   │   │   │   msg = "Caught handled exception, but response already s │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │               conn = <starlette.requests.Request object at               │ │
+│ │                      0x7f75e3e36bd0>                                     │ │
+│ │ exception_handlers = {                                                   │ │
+│ │                      │   <class 'starlette.exceptions.HTTPException'>:   │ │
+│ │                      <function http_exception_handler at                 │ │
+│ │                      0x7f75eb0c8e00>,                                    │ │
+│ │                      │   <class                                          │ │
+│ │                      'starlette.exceptions.WebSocketException'>: <bound  │ │
+│ │                      method ExceptionMiddleware.websocket_exception of   │ │
+│ │                      <starlette.middleware.exceptions.ExceptionMiddlewa… │ │
+│ │                      object at 0x7f75e92ac850>>,                         │ │
+│ │                      │   <class                                          │ │
+│ │                      'fastapi.exceptions.RequestValidationError'>:       │ │
+│ │                      <function request_validation_exception_handler at   │ │
+│ │                      0x7f75eb53fe20>,                                    │ │
+│ │                      │   <class                                          │ │
+│ │                      'fastapi.exceptions.WebSocketRequestValidationErro… │ │
+│ │                      <function                                           │ │
+│ │                      websocket_request_validation_exception_handler at   │ │
+│ │                      0x7f75eb53fec0>,                                    │ │
+│ │                      │   <class                                          │ │
+│ │                      'app.shared.exceptions.handlers.CustomException'>:  │ │
+│ │                      <function custom_exception_handler at               │ │
+│ │                      0x7f75eb082d40>                                     │ │
+│ │                      }                                                   │ │
+│ │            handler = None                                                │ │
+│ │   response_started = False                                               │ │
+│ │              scope = {                                                   │ │
+│ │                      │   'type': 'http',                                 │ │
+│ │                      │   'asgi': {'version': '3.0'},                     │ │
+│ │                      │   'http_version': '1.1',                          │ │
+│ │                      │   'method': 'POST',                               │ │
+│ │                      │   'headers': [                                    │ │
+│ │                      │   │   (b'host', b'test'),                         │ │
+│ │                      │   │   (b'accept', b'*/*'),                        │ │
+│ │                      │   │   (b'accept-encoding', b'gzip, deflate'),     │ │
+│ │                      │   │   (b'connection', b'keep-alive'),             │ │
+│ │                      │   │   (b'user-agent', b'python-httpx/0.28.1'),    │ │
+│ │                      │   │   (b'content-length', b'111'),                │ │
+│ │                      │   │   (b'content-type', b'application/json')      │ │
+│ │                      │   ],                                              │ │
+│ │                      │   'scheme': 'http',                               │ │
+│ │                      │   'path': '/api/v1/auth/register/user',           │ │
+│ │                      │   'raw_path': b'/api/v1/auth/register/user',      │ │
+│ │                      │   'query_string': b'',                            │ │
+│ │                      │   'server': ('test', None),                       │ │
+│ │                      │   ... +9                                          │ │
+│ │                      }                                                   │ │
+│ │    status_handlers = {}                                                  │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53   │
+│ in wrapped_app                                                               │
+│                                                                              │
+│   50 │   │   │   await send(message)                                         │
+│   51 │   │                                                                   │
+│   52 │   │   try:                                                            │
+│ ❱ 53 │   │   │   await app(scope, receive, sender)                           │
+│   54 │   │   except Exception as exc:                                        │
+│   55 │   │   │   handler = None                                              │
+│   56                                                                         │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │               conn = <starlette.requests.Request object at               │ │
+│ │                      0x7f75e3e36bd0>                                     │ │
+│ │ exception_handlers = {                                                   │ │
+│ │                      │   <class 'starlette.exceptions.HTTPException'>:   │ │
+│ │                      <function http_exception_handler at                 │ │
+│ │                      0x7f75eb0c8e00>,                                    │ │
+│ │                      │   <class                                          │ │
+│ │                      'starlette.exceptions.WebSocketException'>: <bound  │ │
+│ │                      method ExceptionMiddleware.websocket_exception of   │ │
+│ │                      <starlette.middleware.exceptions.ExceptionMiddlewa… │ │
+│ │                      object at 0x7f75e92ac850>>,                         │ │
+│ │                      │   <class                                          │ │
+│ │                      'fastapi.exceptions.RequestValidationError'>:       │ │
+│ │                      <function request_validation_exception_handler at   │ │
+│ │                      0x7f75eb53fe20>,                                    │ │
+│ │                      │   <class                                          │ │
+│ │                      'fastapi.exceptions.WebSocketRequestValidationErro… │ │
+│ │                      <function                                           │ │
+│ │                      websocket_request_validation_exception_handler at   │ │
+│ │                      0x7f75eb53fec0>,                                    │ │
+│ │                      │   <class                                          │ │
+│ │                      'app.shared.exceptions.handlers.CustomException'>:  │ │
+│ │                      <function custom_exception_handler at               │ │
+│ │                      0x7f75eb082d40>                                     │ │
+│ │                      }                                                   │ │
+│ │            handler = None                                                │ │
+│ │   response_started = False                                               │ │
+│ │              scope = {                                                   │ │
+│ │                      │   'type': 'http',                                 │ │
+│ │                      │   'asgi': {'version': '3.0'},                     │ │
+│ │                      │   'http_version': '1.1',                          │ │
+│ │                      │   'method': 'POST',                               │ │
+│ │                      │   'headers': [                                    │ │
+│ │                      │   │   (b'host', b'test'),                         │ │
+│ │                      │   │   (b'accept', b'*/*'),                        │ │
+│ │                      │   │   (b'accept-encoding', b'gzip, deflate'),     │ │
+│ │                      │   │   (b'connection', b'keep-alive'),             │ │
+│ │                      │   │   (b'user-agent', b'python-httpx/0.28.1'),    │ │
+│ │                      │   │   (b'content-length', b'111'),                │ │
+│ │                      │   │   (b'content-type', b'application/json')      │ │
+│ │                      │   ],                                              │ │
+│ │                      │   'scheme': 'http',                               │ │
+│ │                      │   'path': '/api/v1/auth/register/user',           │ │
+│ │                      │   'raw_path': b'/api/v1/auth/register/user',      │ │
+│ │                      │   'query_string': b'',                            │ │
+│ │                      │   'server': ('test', None),                       │ │
+│ │                      │   ... +9                                          │ │
+│ │                      }                                                   │ │
+│ │    status_handlers = {}                                                  │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/starlette/routing.py:72 in app       │
+│                                                                              │
+│    69 │   │                                                                  │
+│    70 │   │   async def app(scope: Scope, receive: Receive, send: Send) -> N │
+│    71 │   │   │   if is_async_callable(func):                                │
+│ ❱  72 │   │   │   │   response = await func(request)                         │
+│    73 │   │   │   else:                                                      │
+│    74 │   │   │   │   response = await run_in_threadpool(func, request)      │
+│    75 │   │   │   await response(scope, receive, send)                       │
+│                                                                              │
+│ ╭──────────────────────────── locals ─────────────────────────────╮          │
+│ │ request = <starlette.requests.Request object at 0x7f75e3e36bd0> │          │
+│ │   scope = {                                                     │          │
+│ │           │   'type': 'http',                                   │          │
+│ │           │   'asgi': {'version': '3.0'},                       │          │
+│ │           │   'http_version': '1.1',                            │          │
+│ │           │   'method': 'POST',                                 │          │
+│ │           │   'headers': [                                      │          │
+│ │           │   │   (b'host', b'test'),                           │          │
+│ │           │   │   (b'accept', b'*/*'),                          │          │
+│ │           │   │   (b'accept-encoding', b'gzip, deflate'),       │          │
+│ │           │   │   (b'connection', b'keep-alive'),               │          │
+│ │           │   │   (b'user-agent', b'python-httpx/0.28.1'),      │          │
+│ │           │   │   (b'content-length', b'111'),                  │          │
+│ │           │   │   (b'content-type', b'application/json')        │          │
+│ │           │   ],                                                │          │
+│ │           │   'scheme': 'http',                                 │          │
+│ │           │   'path': '/api/v1/auth/register/user',             │          │
+│ │           │   'raw_path': b'/api/v1/auth/register/user',        │          │
+│ │           │   'query_string': b'',                              │          │
+│ │           │   'server': ('test', None),                         │          │
+│ │           │   ... +9                                            │          │
+│ │           }                                                     │          │
+│ ╰─────────────────────────────────────────────────────────────────╯          │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/fastapi/routing.py:278 in app        │
+│                                                                              │
+│    275 │   │   │   │   )                                                     │
+│    276 │   │   │   │   values, errors, background_tasks, sub_response, _ = s │
+│    277 │   │   │   │   if not errors:                                        │
+│ ❱  278 │   │   │   │   │   raw_response = await run_endpoint_function(       │
+│    279 │   │   │   │   │   │   dependant=dependant, values=values, is_corout │
+│    280 │   │   │   │   │   )                                                 │
+│    281 │   │   │   │   │   if isinstance(raw_response, Response):            │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │                               _ = {                                      │ │
+│ │                                   │   (<function get_db at               │ │
+│ │                                   0x7f75eaaf96c0>, ()):                  │ │
+│ │                                   <sqlalchemy.ext.asyncio.session.Async… │ │
+│ │                                   object at 0x7f75e3e35f10>,             │ │
+│ │                                   │   (<function get_auth_service at     │ │
+│ │                                   0x7f75eb13ad40>, ()):                  │ │
+│ │                                   <app.modules.auth.service.AuthService  │ │
+│ │                                   object at 0x7f75e3fc1a10>              │ │
+│ │                                   }                                      │ │
+│ │                async_exit_stack = <contextlib.AsyncExitStack object at   │ │
+│ │                                   0x7f75e3e37f10>                        │ │
+│ │                background_tasks = None                                   │ │
+│ │                            body = {                                      │ │
+│ │                                   │   'email':                           │ │
+│ │                                   'user_9ad723dc-495a-4860-8c3a-82d2b54… │ │
+│ │                                   │   'password': 'password123',         │ │
+│ │                                   │   'full_name': 'Test User'           │ │
+│ │                                   }                                      │ │
+│ │                      body_bytes = b'{"email":"user_9ad723dc-495a-4860-8… │ │
+│ │                      body_field = ModelField(                            │ │
+│ │                                   │   field_info=Body(                   │ │
+│ │                                   │   │                                  │ │
+│ │                                   annotation=RegisterUserRequest,        │ │
+│ │                                   │   │   required=True,                 │ │
+│ │                                   │   │   alias='req',                   │ │
+│ │                                   │   │   json_schema_extra={}           │ │
+│ │                                   │   ),                                 │ │
+│ │                                   │   name='req',                        │ │
+│ │                                   │   mode='validation'                  │ │
+│ │                                   )                                      │ │
+│ │              content_type_value = 'application/json'                     │ │
+│ │                       dependant = <fastapi.dependencies.models.Dependant │ │
+│ │                                   object at 0x7f75e9427e90>              │ │
+│ │   dependency_overrides_provider = <fastapi.applications.FastAPI object   │ │
+│ │                                   at 0x7f75e99ad790>                     │ │
+│ │                          errors = []                                     │ │
+│ │                      file_stack = <contextlib.AsyncExitStack object at   │ │
+│ │                                   0x7f75e3e36910>                        │ │
+│ │                    is_body_form = False                                  │ │
+│ │                    is_coroutine = True                                   │ │
+│ │                       json_body = {                                      │ │
+│ │                                   │   'email':                           │ │
+│ │                                   'user_9ad723dc-495a-4860-8c3a-82d2b54… │ │
+│ │                                   │   'password': 'password123',         │ │
+│ │                                   │   'full_name': 'Test User'           │ │
+│ │                                   }                                      │ │
+│ │                         message = <email.message.Message object at       │ │
+│ │                                   0x7f75e3e37cd0>                        │ │
+│ │                         request = <starlette.requests.Request object at  │ │
+│ │                                   0x7f75e3e36bd0>                        │ │
+│ │                        response = None                                   │ │
+│ │                  response_field = ModelField(                            │ │
+│ │                                   │   field_info=FieldInfo(              │ │
+│ │                                   │   │   annotation=UserResponse,       │ │
+│ │                                   │   │   required=True                  │ │
+│ │                                   │   ),                                 │ │
+│ │                                   │                                      │ │
+│ │                                   name='Response_register_user_api_v1_a… │ │
+│ │                                   │   mode='serialization'               │ │
+│ │                                   )                                      │ │
+│ │         response_model_by_alias = True                                   │ │
+│ │          response_model_exclude = None                                   │ │
+│ │ response_model_exclude_defaults = False                                  │ │
+│ │     response_model_exclude_none = False                                  │ │
+│ │    response_model_exclude_unset = False                                  │ │
+│ │          response_model_include = None                                   │ │
+│ │                   solved_result = (                                      │ │
+│ │                                   │   {                                  │ │
+│ │                                   │   │   'service':                     │ │
+│ │                                   <app.modules.auth.service.AuthService  │ │
+│ │                                   object at 0x7f75e3fc1a10>,             │ │
+│ │                                   │   │   'req': RegisterUserRequest(    │ │
+│ │                                   │   │   │                              │ │
+│ │                                   email='user_9ad723dc-495a-4860-8c3a-8… │ │
+│ │                                   │   │   │   password='password123',    │ │
+│ │                                   │   │   │   full_name='Test User'      │ │
+│ │                                   │   │   )                              │ │
+│ │                                   │   },                                 │ │
+│ │                                   │   [],                                │ │
+│ │                                   │   None,                              │ │
+│ │                                   │   <starlette.responses.Response      │ │
+│ │                                   object at 0x7f75e3e371d0>,             │ │
+│ │                                   │   {                                  │ │
+│ │                                   │   │   (<function get_db at           │ │
+│ │                                   0x7f75eaaf96c0>, ()):                  │ │
+│ │                                   <sqlalchemy.ext.asyncio.session.Async… │ │
+│ │                                   object at 0x7f75e3e35f10>,             │ │
+│ │                                   │   │   (<function get_auth_service at │ │
+│ │                                   0x7f75eb13ad40>, ()):                  │ │
+│ │                                   <app.modules.auth.service.AuthService  │ │
+│ │                                   object at 0x7f75e3fc1a10>              │ │
+│ │                                   │   }                                  │ │
+│ │                                   )                                      │ │
+│ │                     status_code = None                                   │ │
+│ │                    sub_response = <starlette.responses.Response object   │ │
+│ │                                   at 0x7f75e3e371d0>                     │ │
+│ │                         subtype = 'json'                                 │ │
+│ │                          values = {                                      │ │
+│ │                                   │   'service':                         │ │
+│ │                                   <app.modules.auth.service.AuthService  │ │
+│ │                                   object at 0x7f75e3fc1a10>,             │ │
+│ │                                   │   'req': RegisterUserRequest(        │ │
+│ │                                   │   │                                  │ │
+│ │                                   email='user_9ad723dc-495a-4860-8c3a-8… │ │
+│ │                                   │   │   password='password123',        │ │
+│ │                                   │   │   full_name='Test User'          │ │
+│ │                                   │   )                                  │ │
+│ │                                   }                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/fastapi/routing.py:191 in            │
+│ run_endpoint_function                                                        │
+│                                                                              │
+│    188 │   assert dependant.call is not None, "dependant.call must be a func │
+│    189 │                                                                     │
+│    190 │   if is_coroutine:                                                  │
+│ ❱  191 │   │   return await dependant.call(**values)                         │
+│    192 │   else:                                                             │
+│    193 │   │   return await run_in_threadpool(dependant.call, **values)      │
+│    194                                                                       │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │    dependant = <fastapi.dependencies.models.Dependant object at          │ │
+│ │                0x7f75e9427e90>                                           │ │
+│ │ is_coroutine = True                                                      │ │
+│ │       values = {                                                         │ │
+│ │                │   'service': <app.modules.auth.service.AuthService      │ │
+│ │                object at 0x7f75e3fc1a10>,                                │ │
+│ │                │   'req': RegisterUserRequest(                           │ │
+│ │                │   │                                                     │ │
+│ │                email='user_9ad723dc-495a-4860-8c3a-82d2b54749d9@test.co… │ │
+│ │                │   │   password='password123',                           │ │
+│ │                │   │   full_name='Test User'                             │ │
+│ │                │   )                                                     │ │
+│ │                }                                                         │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /app/app/modules/auth/router.py:29 in register_user                          │
+│                                                                              │
+│   26 async def register_user(                                                │
+│   27 │   req: RegisterUserRequest, service: AuthService = Depends(get_auth_s │
+│   28 ):                                                                      │
+│ ❱ 29 │   return await service.register_user(req)                             │
+│   30                                                                         │
+│   31                                                                         │
+│   32 @router.post("/register/dealer", response_model=UserResponse)           │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │     req = RegisterUserRequest(                                           │ │
+│ │           │                                                              │ │
+│ │           email='user_9ad723dc-495a-4860-8c3a-82d2b54749d9@test.com',    │ │
+│ │           │   password='password123',                                    │ │
+│ │           │   full_name='Test User'                                      │ │
+│ │           )                                                              │ │
+│ │ service = <app.modules.auth.service.AuthService object at                │ │
+│ │           0x7f75e3fc1a10>                                                │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /app/app/modules/auth/service.py:72 in register_user                         │
+│                                                                              │
+│    69 │   │   return f.decrypt(str(encrypted_secret).encode()).decode()      │
+│    70 │                                                                      │
+│    71 │   async def register_user(self, req: RegisterUserRequest) -> User:   │
+│ ❱  72 │   │   existing = await self.repository.get_user_by_email(req.email)  │
+│    73 │   │   if existing:                                                   │
+│    74 │   │   │   raise CustomException(400, "Email already registered")     │
+│    75                                                                        │
+│                                                                              │
+│ ╭──────────────────────────────── locals ────────────────────────────────╮   │
+│ │  req = RegisterUserRequest(                                            │   │
+│ │        │   email='user_9ad723dc-495a-4860-8c3a-82d2b54749d9@test.com', │   │
+│ │        │   password='password123',                                     │   │
+│ │        │   full_name='Test User'                                       │   │
+│ │        )                                                               │   │
+│ │ self = <app.modules.auth.service.AuthService object at 0x7f75e3fc1a10> │   │
+│ ╰────────────────────────────────────────────────────────────────────────╯   │
+│                                                                              │
+│ /app/app/modules/auth/repository.py:13 in get_user_by_email                  │
+│                                                                              │
+│   10 │   │   self.session = session                                          │
+│   11 │                                                                       │
+│   12 │   async def get_user_by_email(self, email: str) -> User | None:       │
+│ ❱ 13 │   │   result = await self.session.execute(                            │
+│   14 │   │   │   select(User).where(                                         │
+│   15 │   │   │   │   User.email == email, User.is_active, User.deleted_at.is │
+│   16 │   │   │   )                                                           │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ email = 'user_9ad723dc-495a-4860-8c3a-82d2b54749d9@test.com'             │ │
+│ │  self = <app.modules.auth.repository.AuthRepository object at            │ │
+│ │         0x7f75e3fc1a50>                                                  │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/ext/asyncio/session.py:46 │
+│ 1 in execute                                                                 │
+│                                                                              │
+│    458 │   │   else:                                                         │
+│    459 │   │   │   execution_options = _EXECUTE_OPTIONS                      │
+│    460 │   │                                                                 │
+│ ❱  461 │   │   result = await greenlet_spawn(                                │
+│    462 │   │   │   self.sync_session.execute,                                │
+│    463 │   │   │   statement,                                                │
+│    464 │   │   │   params=params,                                            │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │    bind_arguments = None                                                 │ │
+│ │ execution_options = immutabledict({'prebuffer_rows': True})              │ │
+│ │                kw = {}                                                   │ │
+│ │            params = None                                                 │ │
+│ │              self = <sqlalchemy.ext.asyncio.session.AsyncSession object  │ │
+│ │                     at 0x7f75e3e35f10>                                   │ │
+│ │         statement = <sqlalchemy.sql.selectable.Select object at          │ │
+│ │                     0x7f75e3fc3450>                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py │
+│ :201 in greenlet_spawn                                                       │
+│                                                                              │
+│   198 │   │   │   │   # this allows an exception to be raised within         │
+│   199 │   │   │   │   # the moderated greenlet so that it can continue       │
+│   200 │   │   │   │   # its expected flow.                                   │
+│ ❱ 201 │   │   │   │   result = context.throw(*sys.exc_info())                │
+│   202 │   │   │   else:                                                      │
+│   203 │   │   │   │   result = context.switch(value)                         │
+│   204 │   finally:                                                           │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │  _require_await = False                                                  │ │
+│ │            args = (                                                      │ │
+│ │                   │   <sqlalchemy.sql.selectable.Select object at        │ │
+│ │                   0x7f75e3fc3450>,                                       │ │
+│ │                   )                                                      │ │
+│ │         context = <_AsyncIoGreenlet object at 0x7f75e3fc0b40             │ │
+│ │                   (otid=0x55b2524b95c0) dead>                            │ │
+│ │              fn = <bound method Session.execute of                       │ │
+│ │                   <sqlalchemy.orm.session.Session object at              │ │
+│ │                   0x7f75e3e36610>>                                       │ │
+│ │          kwargs = {                                                      │ │
+│ │                   │   'params': None,                                    │ │
+│ │                   │   'execution_options':                               │ │
+│ │                   immutabledict({'prebuffer_rows': True}),               │ │
+│ │                   │   'bind_arguments': None                             │ │
+│ │                   }                                                      │ │
+│ │          result = <coroutine object Connection.close at 0x7f75e3e7a880>  │ │
+│ │ switch_occurred = True                                                   │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2351 in    │
+│ execute                                                                      │
+│                                                                              │
+│   2348 │   │                                                                 │
+│   2349 │   │                                                                 │
+│   2350 │   │   """                                                           │
+│ ❱ 2351 │   │   return self._execute_internal(                                │
+│   2352 │   │   │   statement,                                                │
+│   2353 │   │   │   params,                                                   │
+│   2354 │   │   │   execution_options=execution_options,                      │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            _add_event = None                                             │ │
+│ │ _parent_execute_state = None                                             │ │
+│ │        bind_arguments = None                                             │ │
+│ │     execution_options = immutabledict({'prebuffer_rows': True})          │ │
+│ │                params = None                                             │ │
+│ │                  self = <sqlalchemy.orm.session.Session object at        │ │
+│ │                         0x7f75e3e36610>                                  │ │
+│ │             statement = <sqlalchemy.sql.selectable.Select object at      │ │
+│ │                         0x7f75e3fc3450>                                  │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2226 in    │
+│ _execute_internal                                                            │
+│                                                                              │
+│   2223 │   │                                                                 │
+│   2224 │   │   bind = self.get_bind(**bind_arguments)                        │
+│   2225 │   │                                                                 │
+│ ❱ 2226 │   │   conn = self._connection_for_bind(bind)                        │
+│   2227 │   │                                                                 │
+│   2228 │   │   if _scalar_result and not compile_state_cls:                  │
+│   2229 │   │   │   if TYPE_CHECKING:                                         │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            _add_event = None                                             │ │
+│ │ _parent_execute_state = None                                             │ │
+│ │        _scalar_result = False                                            │ │
+│ │                  bind = Engine(postgresql+asyncpg://trustedcars_user:**… │ │
+│ │        bind_arguments = {                                                │ │
+│ │                         │   'clause': <sqlalchemy.sql.selectable.Select  │ │
+│ │                         object at 0x7f75e3fc3450>,                       │ │
+│ │                         │   'mapper': <Mapper at 0x7f75eab55d90; User>   │ │
+│ │                         }                                                │ │
+│ │           events_todo = <sqlalchemy.event.attr._EmptyListener object at  │ │
+│ │                         0x7f75e9274200>                                  │ │
+│ │     execution_options = immutabledict({'prebuffer_rows': True,           │ │
+│ │                         '_result_disable_adapt_to_context': True})       │ │
+│ │                params = None                                             │ │
+│ │                  self = <sqlalchemy.orm.session.Session object at        │ │
+│ │                         0x7f75e3e36610>                                  │ │
+│ │             statement = <sqlalchemy.sql.selectable.Select object at      │ │
+│ │                         0x7f75e3fc3450>                                  │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2095 in    │
+│ _connection_for_bind                                                         │
+│                                                                              │
+│   2092 │   │   trans = self._transaction                                     │
+│   2093 │   │   if trans is None:                                             │
+│   2094 │   │   │   trans = self._autobegin_t()                               │
+│ ❱ 2095 │   │   return trans._connection_for_bind(engine, execution_options)  │
+│   2096 │                                                                     │
+│   2097 │   @overload                                                         │
+│   2098 │   def _execute_internal(                                            │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            engine = Engine(postgresql+asyncpg://trustedcars_user:***@db… │ │
+│ │ execution_options = None                                                 │ │
+│ │                kw = {}                                                   │ │
+│ │              self = <sqlalchemy.orm.session.Session object at            │ │
+│ │                     0x7f75e3e36610>                                      │ │
+│ │             trans = <sqlalchemy.orm.session.SessionTransaction object at │ │
+│ │                     0x7f75e81dfa70>                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│ in _connection_for_bind:2                                                    │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │              bind = Engine(postgresql+asyncpg://trustedcars_user:***@db… │ │
+│ │ execution_options = None                                                 │ │
+│ │              self = <sqlalchemy.orm.session.SessionTransaction object at │ │
+│ │                     0x7f75e81dfa70>                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139  │
+│ in _go                                                                       │
+│                                                                              │
+│   136 │   │   │   self._current_fn = fn                                      │
+│   137 │   │   │   self._next_state = _StateChangeStates.CHANGE_IN_PROGRESS   │
+│   138 │   │   │   try:                                                       │
+│ ❱ 139 │   │   │   │   ret_value = fn(self, *arg, **kw)                       │
+│   140 │   │   │   except:                                                    │
+│   141 │   │   │   │   raise                                                  │
+│   142 │   │   │   else:                                                      │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │                           arg = (                                        │ │
+│ │                                 │                                        │ │
+│ │                                 Engine(postgresql+asyncpg://trustedcars… │ │
+│ │                                 │   None                                 │ │
+│ │                                 )                                        │ │
+│ │                 current_state = <SessionTransactionState.ACTIVE: 1>      │ │
+│ │                   existing_fn = None                                     │ │
+│ │                  expect_state = <SessionTransactionState.ACTIVE: 1>      │ │
+│ │           expect_state_change = False                                    │ │
+│ │       has_prerequisite_states = True                                     │ │
+│ │                            kw = {}                                       │ │
+│ │                      moves_to = <_StateChangeStates.NO_CHANGE: 2>        │ │
+│ │                    next_state = <_StateChangeStates.ANY: 1>              │ │
+│ │ prerequisite_state_collection = (<SessionTransactionState.ACTIVE: 1>,)   │ │
+│ │                          self = <sqlalchemy.orm.session.SessionTransact… │ │
+│ │                                 object at 0x7f75e81dfa70>                │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1189 in    │
+│ _connection_for_bind                                                         │
+│                                                                              │
+│   1186 │   │   │   │   │   │   │   "for the given Connection's Engine"       │
+│   1187 │   │   │   │   │   │   )                                             │
+│   1188 │   │   │   │   else:                                                 │
+│ ❱ 1189 │   │   │   │   │   conn = bind.connect()                             │
+│   1190 │   │   │   │   │   local_connect = True                              │
+│   1191 │   │   │                                                             │
+│   1192 │   │   │   try:                                                      │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │              bind = Engine(postgresql+asyncpg://trustedcars_user:***@db… │ │
+│ │ execution_options = None                                                 │ │
+│ │     local_connect = False                                                │ │
+│ │              self = <sqlalchemy.orm.session.SessionTransaction object at │ │
+│ │                     0x7f75e81dfa70>                                      │ │
+│ │     should_commit = True                                                 │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3276 in    │
+│ connect                                                                      │
+│                                                                              │
+│   3273 │   │                                                                 │
+│   3274 │   │   """                                                           │
+│   3275 │   │                                                                 │
+│ ❱ 3276 │   │   return self._connection_cls(self)                             │
+│   3277 │                                                                     │
+│   3278 │   def raw_connection(self) -> PoolProxiedConnection:                │
+│   3279 │   │   """Return a "raw" DBAPI connection from the connection pool.  │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ self = Engine(postgresql+asyncpg://trustedcars_user:***@db:5432/trusted… │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:146 in     │
+│ __init__                                                                     │
+│                                                                              │
+│    143 │   │                                                                 │
+│    144 │   │   if connection is None:                                        │
+│    145 │   │   │   try:                                                      │
+│ ❱  146 │   │   │   │   self._dbapi_connection = engine.raw_connection()      │
+│    147 │   │   │   except dialect.loaded_dbapi.Error as err:                 │
+│    148 │   │   │   │   Connection._handle_dbapi_exception_noconnection(      │
+│    149 │   │   │   │   │   err, dialect, engine                              │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │  _allow_autobegin = True                                                 │ │
+│ │ _allow_revalidate = True                                                 │ │
+│ │       _has_events = None                                                 │ │
+│ │        connection = None                                                 │ │
+│ │           dialect = <sqlalchemy.dialects.postgresql.asyncpg.PGDialect_a… │ │
+│ │                     object at 0x7f75eaf95410>                            │ │
+│ │            engine = Engine(postgresql+asyncpg://trustedcars_user:***@db… │ │
+│ │              self = <sqlalchemy.engine.base.Connection object at         │ │
+│ │                     0x7f75e3fc1cd0>                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3300 in    │
+│ raw_connection                                                               │
+│                                                                              │
+│   3297 │   │   │   :ref:`dbapi_connections`                                  │
+│   3298 │   │                                                                 │
+│   3299 │   │   """                                                           │
+│ ❱ 3300 │   │   return self.pool.connect()                                    │
+│   3301                                                                       │
+│   3302                                                                       │
+│   3303 class OptionEngineMixin(log.Identified):                              │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ self = Engine(postgresql+asyncpg://trustedcars_user:***@db:5432/trusted… │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py:449 in       │
+│ connect                                                                      │
+│                                                                              │
+│    446 │   │   the pool.                                                     │
+│    447 │   │                                                                 │
+│    448 │   │   """                                                           │
+│ ❱  449 │   │   return _ConnectionFairy._checkout(self)                       │
+│    450 │                                                                     │
+│    451 │   def _return_conn(self, record: ConnectionPoolEntry) -> None:      │
+│    452 │   │   """Given a _ConnectionRecord, return it to the :class:`_pool. │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ self = <sqlalchemy.pool.impl.AsyncAdaptedQueuePool object at             │ │
+│ │        0x7f75ead86690>                                                   │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1362 in      │
+│ _checkout                                                                    │
+│                                                                              │
+│   1359 │   │   │   │                                                         │
+│   1360 │   │   │   │   attempts -= 1                                         │
+│   1361 │   │   │   except BaseException as be_outer:                         │
+│ ❱ 1362 │   │   │   │   with util.safe_reraise():                             │
+│   1363 │   │   │   │   │   rec = fairy._connection_record                    │
+│   1364 │   │   │   │   │   if rec is not None:                               │
+│   1365 │   │   │   │   │   │   rec._checkin_failed(                          │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            attempts = 2                                                  │ │
+│ │ connection_is_fresh = False                                              │ │
+│ │                pool = <sqlalchemy.pool.impl.AsyncAdaptedQueuePool object │ │
+│ │                       at 0x7f75ead86690>                                 │ │
+│ │                 rec = <sqlalchemy.pool.base._ConnectionRecord object at  │ │
+│ │                       0x7f75e9225160>                                    │ │
+│ │         threadconns = None                                               │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:146   │
+│ in __exit__                                                                  │
+│                                                                              │
+│    143 │   │   │   exc_type, exc_value, exc_tb = self._exc_info              │
+│    144 │   │   │   assert exc_value is not None                              │
+│    145 │   │   │   self._exc_info = None  # remove potential circular refere │
+│ ❱  146 │   │   │   raise exc_value.with_traceback(exc_tb)                    │
+│    147 │   │   else:                                                         │
+│    148 │   │   │   self._exc_info = None  # remove potential circular refere │
+│    149 │   │   │   assert value is not None                                  │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │    exc_tb = <traceback object at 0x7f75e3e2ce40>                         │ │
+│ │ exc_value = RuntimeError("Task <Task pending                             │ │
+│ │             name='starlette.middleware.base.BaseHTTPMiddleware.__call__… │ │
+│ │             coro=<TaskHandle._run_coro() running at                      │ │
+│ │             /usr/local/lib/python3.11/site-packages/anyio/_core/_tasks.… │ │
+│ │             cb=[TaskGroup._spawn.<locals>.task_done() at                 │ │
+│ │             /usr/local/lib/python3.11/site-packages/anyio/_backends/_as… │ │
+│ │             got Future <Future pending                                   │ │
+│ │             cb=[Protocol._on_waiter_completed()]> attached to a          │ │
+│ │             different loop")                                             │ │
+│ │      self = <sqlalchemy.util.langhelpers.safe_reraise object at          │ │
+│ │             0x7f75e3e27b20>                                              │ │
+│ │ traceback = None                                                         │ │
+│ │     type_ = None                                                         │ │
+│ │     value = None                                                         │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1300 in      │
+│ _checkout                                                                    │
+│                                                                              │
+│   1297 │   │   │   │   │   │   │   │   "Pool pre-ping on connection %s",     │
+│   1298 │   │   │   │   │   │   │   │   fairy.dbapi_connection,               │
+│   1299 │   │   │   │   │   │   │   )                                         │
+│ ❱ 1300 │   │   │   │   │   │   result = pool._dialect._do_ping_w_event(      │
+│   1301 │   │   │   │   │   │   │   fairy.dbapi_connection                    │
+│   1302 │   │   │   │   │   │   )                                             │
+│   1303 │   │   │   │   │   │   if not result:                                │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            attempts = 2                                                  │ │
+│ │ connection_is_fresh = False                                              │ │
+│ │                pool = <sqlalchemy.pool.impl.AsyncAdaptedQueuePool object │ │
+│ │                       at 0x7f75ead86690>                                 │ │
+│ │                 rec = <sqlalchemy.pool.base._ConnectionRecord object at  │ │
+│ │                       0x7f75e9225160>                                    │ │
+│ │         threadconns = None                                               │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:715 in  │
+│ _do_ping_w_event                                                             │
+│                                                                              │
+│    712 │                                                                     │
+│    713 │   def _do_ping_w_event(self, dbapi_connection: DBAPIConnection) ->  │
+│    714 │   │   try:                                                          │
+│ ❱  715 │   │   │   return self.do_ping(dbapi_connection)                     │
+│    716 │   │   except self.loaded_dbapi.Error as err:                        │
+│    717 │   │   │   is_disconnect = self.is_disconnect(err, dbapi_connection, │
+│    718                                                                       │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ dbapi_connection = <AdaptedConnection <asyncpg.connection.Connection     │ │
+│ │                    object at 0x7f75e92dfb50>>                            │ │
+│ │             self = <sqlalchemy.dialects.postgresql.asyncpg.PGDialect_as… │ │
+│ │                    object at 0x7f75eaf95410>                             │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/async │
+│ pg.py:1138 in do_ping                                                        │
+│                                                                              │
+│   1135 │   │   return ([], opts)                                             │
+│   1136 │                                                                     │
+│   1137 │   def do_ping(self, dbapi_connection):                              │
+│ ❱ 1138 │   │   dbapi_connection.ping()                                       │
+│   1139 │   │   return True                                                   │
+│   1140 │                                                                     │
+│   1141 │   @classmethod                                                      │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ dbapi_connection = <AdaptedConnection <asyncpg.connection.Connection     │ │
+│ │                    object at 0x7f75e92dfb50>>                            │ │
+│ │             self = <sqlalchemy.dialects.postgresql.asyncpg.PGDialect_as… │ │
+│ │                    object at 0x7f75eaf95410>                             │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/async │
+│ pg.py:810 in ping                                                            │
+│                                                                              │
+│    807 │   │   try:                                                          │
+│    808 │   │   │   _ = self.await_(self._async_ping())                       │
+│    809 │   │   except Exception as error:                                    │
+│ ❱  810 │   │   │   self._handle_exception(error)                             │
+│    811 │                                                                     │
+│    812 │   async def _async_ping(self):                                      │
+│    813 │   │   if self._transaction is None and self.isolation_level != "aut │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ self = <AdaptedConnection <asyncpg.connection.Connection object at       │ │
+│ │        0x7f75e92dfb50>>                                                  │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/async │
+│ pg.py:791 in _handle_exception                                               │
+│                                                                              │
+│    788 │   │   │   │   │   )                                                 │
+│    789 │   │   │   │   │   raise translated_error from error                 │
+│    790 │   │   │   else:                                                     │
+│ ❱  791 │   │   │   │   raise error                                           │
+│    792 │   │   else:                                                         │
+│    793 │   │   │   raise error                                               │
+│    794                                                                       │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │             error = RuntimeError("Task <Task pending                     │ │
+│ │                     name='starlette.middleware.base.BaseHTTPMiddleware.… │ │
+│ │                     coro=<TaskHandle._run_coro() running at              │ │
+│ │                     /usr/local/lib/python3.11/site-packages/anyio/_core… │ │
+│ │                     cb=[TaskGroup._spawn.<locals>.task_done() at         │ │
+│ │                     /usr/local/lib/python3.11/site-packages/anyio/_back… │ │
+│ │                     got Future <Future pending                           │ │
+│ │                     cb=[Protocol._on_waiter_completed()]> attached to a  │ │
+│ │                     different loop")                                     │ │
+│ │ exception_mapping = {                                                    │ │
+│ │                     │   <class                                           │ │
+│ │                     'asyncpg.exceptions.IntegrityConstraintViolationErr… │ │
+│ │                     <class                                               │ │
+│ │                     'sqlalchemy.dialects.postgresql.asyncpg.AsyncAdapt_… │ │
+│ │                     │   <class                                           │ │
+│ │                     'asyncpg.exceptions._base.PostgresError'>: <class    │ │
+│ │                     'sqlalchemy.dialects.postgresql.asyncpg.AsyncAdapt_… │ │
+│ │                     │   <class                                           │ │
+│ │                     'asyncpg.exceptions.SyntaxOrAccessError'>: <class    │ │
+│ │                     'sqlalchemy.dialects.postgresql.asyncpg.AsyncAdapt_… │ │
+│ │                     │   <class                                           │ │
+│ │                     'asyncpg.exceptions._base.InterfaceError'>: <class   │ │
+│ │                     'sqlalchemy.dialects.postgresql.asyncpg.AsyncAdapt_… │ │
+│ │                     │   <class                                           │ │
+│ │                     'asyncpg.exceptions.InvalidCachedStatementError'>:   │ │
+│ │                     <class                                               │ │
+│ │                     'sqlalchemy.dialects.postgresql.asyncpg.AsyncAdapt_… │ │
+│ │                     │   <class                                           │ │
+│ │                     'asyncpg.exceptions.InternalServerError'>: <class    │ │
+│ │                     'sqlalchemy.dialects.postgresql.asyncpg.AsyncAdapt_… │ │
+│ │                     }                                                    │ │
+│ │              self = <AdaptedConnection <asyncpg.connection.Connection    │ │
+│ │                     object at 0x7f75e92dfb50>>                           │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/async │
+│ pg.py:808 in ping                                                            │
+│                                                                              │
+│    805 │                                                                     │
+│    806 │   def ping(self):                                                   │
+│    807 │   │   try:                                                          │
+│ ❱  808 │   │   │   _ = self.await_(self._async_ping())                       │
+│    809 │   │   except Exception as error:                                    │
+│    810 │   │   │   self._handle_exception(error)                             │
+│    811                                                                       │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ self = <AdaptedConnection <asyncpg.connection.Connection object at       │ │
+│ │        0x7f75e92dfb50>>                                                  │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py │
+│ :131 in await_only                                                           │
+│                                                                              │
+│   128 │   # a coroutine to run. Once the awaitable is done, the driver green │
+│   129 │   # switches back to this greenlet with the result of awaitable that │
+│   130 │   # then returned to the caller (or raised as error)                 │
+│ ❱ 131 │   return current.driver.switch(awaitable)  # type: ignore[no-any-ret │
+│   132                                                                        │
+│   133                                                                        │
+│   134 def await_fallback(awaitable: Awaitable[_T]) -> _T:                    │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ awaitable = <coroutine object AsyncAdapt_asyncpg_connection._async_ping  │ │
+│ │             at 0x7f75e3e7a5e0>                                           │ │
+│ │   current = <_AsyncIoGreenlet object at 0x7f75e3fc0b40                   │ │
+│ │             (otid=0x55b2524b95c0) dead>                                  │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py │
+│ :196 in greenlet_spawn                                                       │
+│                                                                              │
+│   193 │   │   │   try:                                                       │
+│   194 │   │   │   │   # wait for a coroutine from await_only and then return │
+│   195 │   │   │   │   # result back to it.                                   │
+│ ❱ 196 │   │   │   │   value = await result                                   │
+│   197 │   │   │   except BaseException:                                      │
+│   198 │   │   │   │   # this allows an exception to be raised within         │
+│   199 │   │   │   │   # the moderated greenlet so that it can continue       │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │  _require_await = False                                                  │ │
+│ │            args = (                                                      │ │
+│ │                   │   <sqlalchemy.sql.selectable.Select object at        │ │
+│ │                   0x7f75e3fc3450>,                                       │ │
+│ │                   )                                                      │ │
+│ │         context = <_AsyncIoGreenlet object at 0x7f75e3fc0b40             │ │
+│ │                   (otid=0x55b2524b95c0) dead>                            │ │
+│ │              fn = <bound method Session.execute of                       │ │
+│ │                   <sqlalchemy.orm.session.Session object at              │ │
+│ │                   0x7f75e3e36610>>                                       │ │
+│ │          kwargs = {                                                      │ │
+│ │                   │   'params': None,                                    │ │
+│ │                   │   'execution_options':                               │ │
+│ │                   immutabledict({'prebuffer_rows': True}),               │ │
+│ │                   │   'bind_arguments': None                             │ │
+│ │                   }                                                      │ │
+│ │          result = <coroutine object Connection.close at 0x7f75e3e7a880>  │ │
+│ │ switch_occurred = True                                                   │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/async │
+│ pg.py:817 in _async_ping                                                     │
+│                                                                              │
+│    814 │   │   │   # create a tranasction explicitly to support pgbouncer    │
+│    815 │   │   │   # transaction mode.   See #10226                          │
+│    816 │   │   │   tr = self._connection.transaction()                       │
+│ ❱  817 │   │   │   await tr.start()                                          │
+│    818 │   │   │   try:                                                      │
+│    819 │   │   │   │   await self._connection.fetchrow(";")                  │
+│    820 │   │   │   finally:                                                  │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ self = <AdaptedConnection <asyncpg.connection.Connection object at       │ │
+│ │        0x7f75e92dfb50>>                                                  │ │
+│ │   tr = <asyncpg.Transaction state:failed 0x7f75e81ceea0>                 │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/asyncpg/transaction.py:146 in start  │
+│                                                                              │
+│   143 │   │   │   query += ';'                                               │
+│   144 │   │                                                                  │
+│   145 │   │   try:                                                           │
+│ ❱ 146 │   │   │   await self._connection.execute(query)                      │
+│   147 │   │   except BaseException:                                          │
+│   148 │   │   │   self._state = TransactionState.FAILED                      │
+│   149 │   │   │   raise                                                      │
+│                                                                              │
+│ ╭───────────────────────────── locals ─────────────────────────────╮         │
+│ │   con = <asyncpg.connection.Connection object at 0x7f75e92dfb50> │         │
+│ │ query = 'BEGIN;'                                                 │         │
+│ │  self = <asyncpg.Transaction state:failed 0x7f75e81ceea0>        │         │
+│ ╰──────────────────────────────────────────────────────────────────╯         │
+│                                                                              │
+│ /usr/local/lib/python3.11/site-packages/asyncpg/connection.py:350 in execute │
+│                                                                              │
+│    347 │   │   │   │   with self._time_and_log(query, args, timeout):        │
+│    348 │   │   │   │   │   result = await self._protocol.query(query, timeou │
+│    349 │   │   │   else:                                                     │
+│ ❱  350 │   │   │   │   result = await self._protocol.query(query, timeout)   │
+│    351 │   │   │   return result                                             │
+│    352 │   │                                                                 │
+│    353 │   │   _, status, _ = await self._execute(                           │
+│                                                                              │
+│ ╭────────────────────────────── locals ──────────────────────────────╮       │
+│ │    args = ()                                                       │       │
+│ │   query = 'BEGIN;'                                                 │       │
+│ │    self = <asyncpg.connection.Connection object at 0x7f75e92dfb50> │       │
+│ │ timeout = None                                                     │       │
+│ ╰────────────────────────────────────────────────────────────────────╯       │
+│                                                                              │
+│ in query:374                                                                 │
+╰──────────────────────────────────────────────────────────────────────────────╯
+RuntimeError: Task <Task pending 
+name='starlette.middleware.base.BaseHTTPMiddleware.__call__.<locals>.call_next.<
+locals>.coro' coro=<TaskHandle._run_coro() running at 
+/usr/local/lib/python3.11/site-packages/anyio/_core/_tasks.py:278> 
+cb=[TaskGroup._spawn.<locals>.task_done() at 
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:832]> got 
+Future <Future pending cb=[Protocol._on_waiter_completed()]> attached to a 
+different loop
+
+------------------------------ Captured log setup ------------------------------
+ERROR    sqlalchemy.pool.impl.AsyncAdaptedQueuePool:base.py:378 Exception terminating connection <AdaptedConnection <asyncpg.connection.Connection object at 0x7f75e92dfb50>>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 374, in _close_connection
+    self._dialect.do_terminate(connection)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 1105, in do_terminate
+    dbapi_connection.terminate()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 884, in terminate
+    self.await_(self._connection.close(timeout=2))
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 131, in await_only
+    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/asyncpg/connection.py", line 1467, in close
+    await self._protocol.close(timeout)
+  File "asyncpg/protocol/protocol.pyx", line 626, in close
+  File "asyncpg/protocol/protocol.pyx", line 659, in asyncpg.protocol.protocol.BaseProtocol._request_cancel
+  File "/usr/local/lib/python3.11/site-packages/asyncpg/connection.py", line 1611, in _cancel_current_command
+    self._cancellations.add(self._loop.create_task(self._cancel(waiter)))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/asyncio/base_events.py", line 435, in create_task
+    self._check_closed()
+  File "/usr/local/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+=============================== warnings summary ===============================
+../usr/local/lib/python3.11/site-packages/passlib/utils/__init__.py:854
+  /usr/local/lib/python3.11/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:284
+../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:284
+../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:284
+../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:284
+../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:284
+../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:284
+../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:284
+  /usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:284: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.7/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_mfa_backup_codes.py::test_mfa_backup_codes - RuntimeError: T...
+=================== 25 passed, 8 warnings, 1 error in 6.43s ====================

@@ -1,0 +1,590 @@
+time="2026-06-19T01:47:17Z" level=warning msg="\"cli\" level configuration overrode scenarios configuration entirely"
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: -
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 50 max VUs, 1m30s max duration (incl. graceful stop):
+              * default: 50 looping VUs for 1m0s (gracefulStop: 30s)
+
+
+running (0m01.0s), 50/50 VUs, 0 complete and 0 interrupted iterations
+default   [   2% ] 50 VUs  0m01.0s/1m0s
+
+running (0m02.0s), 50/50 VUs, 50 complete and 0 interrupted iterations
+default   [   3% ] 50 VUs  0m02.0s/1m0s
+
+running (0m03.0s), 50/50 VUs, 100 complete and 0 interrupted iterations
+default   [   5% ] 50 VUs  0m03.0s/1m0s
+
+running (0m04.0s), 50/50 VUs, 150 complete and 0 interrupted iterations
+default   [   7% ] 50 VUs  0m04.0s/1m0s
+
+running (0m05.0s), 50/50 VUs, 174 complete and 0 interrupted iterations
+default   [   8% ] 50 VUs  0m05.0s/1m0s
+
+running (0m06.0s), 50/50 VUs, 224 complete and 0 interrupted iterations
+default   [  10% ] 50 VUs  0m06.0s/1m0s
+
+running (0m07.0s), 50/50 VUs, 274 complete and 0 interrupted iterations
+default   [  12% ] 50 VUs  0m07.0s/1m0s
+
+running (0m08.0s), 50/50 VUs, 276 complete and 0 interrupted iterations
+default   [  13% ] 50 VUs  0m08.0s/1m0s
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:57762->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58204->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58160->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58202->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58190->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58178->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58126->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58206->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58158->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58128->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58124->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58330->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58320->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58288->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58294->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58374->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58214->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": EOF"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": EOF"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": EOF"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": EOF"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58276->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58286->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58310->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58216->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58224->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58212->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58292->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": EOF"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58358->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": EOF"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58346->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58376->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58236->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58300->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58260->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58396->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58450->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58454->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58438->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58486->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58462->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58460->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58492->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58458->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58500->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58498->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58520->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58614->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:26Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:58618->127.0.0.1:8000: read: connection reset by peer"
+
+running (0m09.0s), 50/50 VUs, 326 complete and 0 interrupted iterations
+default   [  15% ] 50 VUs  0m09.0s/1m0s
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59158->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59590->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59570->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59616->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59526->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59556->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59524->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59542->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59600->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59540->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59586->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59718->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59676->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59774->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59636->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59734->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59852->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59650->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59726->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59780->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59764->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59708->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59746->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59678->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59756->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59824->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59862->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59778->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59622->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59664->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59786->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59826->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59696->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59806->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59804->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59838->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59794->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59872->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59874->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59888->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59898->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59924->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59910->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59920->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59900->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59944->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59940->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:59948->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:60056->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:27Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:60064->127.0.0.1:8000: read: connection reset by peer"
+
+running (0m10.0s), 50/50 VUs, 376 complete and 0 interrupted iterations
+default   [  17% ] 50 VUs  0m10.0s/1m0s
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:60586->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:60948->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:60910->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:60972->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:60970->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:60954->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:60986->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:60938->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:60930->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": EOF"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:60916->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32778->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32810->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32776->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32824->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32772->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32920->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32964->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32986->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32820->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32966->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32960->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32932->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32974->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32948->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32982->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32852->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32840->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32946->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32954->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32876->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32834->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32854->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32884->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32906->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32774->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:32892->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:33004->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:33002->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:33018->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:33048->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:33032->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:33074->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:33064->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:33076->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:33090->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:33098->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:33092->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:33176->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:28Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:33186->127.0.0.1:8000: read: connection reset by peer"
+
+running (0m11.0s), 50/50 VUs, 426 complete and 0 interrupted iterations
+default   [  18% ] 50 VUs  0m11.0s/1m0s
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+time="2026-06-19T01:47:29Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": dial tcp 127.0.0.1:8000: connect: connection refused"
+
+running (0m12.0s), 50/50 VUs, 476 complete and 0 interrupted iterations
+default   [  20% ] 50 VUs  0m12.0s/1m0s
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35094->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35398->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35416->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35386->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35424->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35364->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35374->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35334->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35390->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35332->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35400->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35456->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35486->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35516->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35520->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35524->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35488->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35490->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35552->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35572->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35472->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35578->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": EOF"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35532->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": EOF"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35436->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": EOF"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": http: server closed idle connection"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35604->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35602->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35544->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35612->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35616->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": EOF"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35640->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35446->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35626->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35648->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35704->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35682->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35654->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35650->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35652->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35706->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35646->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35734->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35714->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35720->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35830->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:30Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35842->127.0.0.1:8000: read: connection reset by peer"
+
+running (0m13.0s), 50/50 VUs, 526 complete and 0 interrupted iterations
+default   [  22% ] 50 VUs  0m13.0s/1m0s
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34554->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34834->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34848->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34810->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34876->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34842->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34826->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34864->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34846->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34808->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34832->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34892->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34962->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34998->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34980->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35050->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34896->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35058->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34972->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35008->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34982->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35042->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34946->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34908->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35066->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34894->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35016->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34910->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34930->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35082->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35030->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35010->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35000->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": EOF"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35034->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35108->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:34960->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35170->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35176->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35118->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35116->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35114->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35162->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35138->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35136->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35180->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35204->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35182->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35298->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:31Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35302->127.0.0.1:8000: read: connection reset by peer"
+
+running (0m14.0s), 50/50 VUs, 576 complete and 0 interrupted iterations
+default   [  23% ] 50 VUs  0m14.0s/1m0s
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:35914->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36168->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36202->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36190->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36208->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36248->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36174->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36234->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36222->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36204->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36236->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36262->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36290->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36272->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36398->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36384->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36376->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36410->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36328->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36288->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36504->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36334->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36466->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36490->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36348->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36476->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36302->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36316->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36332->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36314->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36460->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36458->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36422->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36430->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36432->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36450->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36364->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36518->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36582->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36520->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36542->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36516->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36566->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36592->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36556->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36606->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36614->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36622->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36718->127.0.0.1:8000: read: connection reset by peer"
+time="2026-06-19T01:47:32Z" level=warning msg="Request Failed" error="Post \"http://localhost:8000/api/v1/inquiries/\": read tcp 127.0.0.1:36724->127.0.0.1:8000: read: connection reset by peer"
+
+running (0m15.0s), 50/50 VUs, 626 complete and 0 interrupted iterations
+default   [  25% ] 50 VUs  0m15.0s/1m0s
+
+running (0m16.0s), 50/50 VUs, 676 complete and 0 interrupted iterations
+default   [  27% ] 50 VUs  0m16.0s/1m0s
+
+running (0m17.0s), 50/50 VUs, 712 complete and 0 interrupted iterations
+default   [  28% ] 50 VUs  0m17.0s/1m0s
+
+running (0m18.0s), 50/50 VUs, 761 complete and 0 interrupted iterations
+default   [  30% ] 50 VUs  0m18.0s/1m0s
+
+running (0m19.0s), 50/50 VUs, 810 complete and 0 interrupted iterations
+default   [  32% ] 50 VUs  0m19.0s/1m0s
+
+running (0m20.0s), 50/50 VUs, 826 complete and 0 interrupted iterations
+default   [  33% ] 50 VUs  0m20.0s/1m0s
+
+running (0m21.0s), 50/50 VUs, 876 complete and 0 interrupted iterations
+default   [  35% ] 50 VUs  0m21.0s/1m0s
+
+running (0m22.0s), 50/50 VUs, 876 complete and 0 interrupted iterations
+default   [  37% ] 50 VUs  0m22.0s/1m0s
+
+running (0m23.0s), 50/50 VUs, 876 complete and 0 interrupted iterations
+default   [  38% ] 50 VUs  0m23.0s/1m0s
+
+running (0m24.0s), 50/50 VUs, 926 complete and 0 interrupted iterations
+default   [  40% ] 50 VUs  0m24.0s/1m0s
+
+running (0m25.0s), 50/50 VUs, 976 complete and 0 interrupted iterations
+default   [  42% ] 50 VUs  0m25.0s/1m0s
+
+running (0m26.0s), 50/50 VUs, 976 complete and 0 interrupted iterations
+default   [  43% ] 50 VUs  0m26.0s/1m0s
+
+running (0m27.0s), 50/50 VUs, 1026 complete and 0 interrupted iterations
+default   [  45% ] 50 VUs  0m27.0s/1m0s
+
+running (0m28.0s), 50/50 VUs, 1033 complete and 0 interrupted iterations
+default   [  47% ] 50 VUs  0m28.0s/1m0s
+
+running (0m29.0s), 50/50 VUs, 1033 complete and 0 interrupted iterations
+default   [  48% ] 50 VUs  0m29.0s/1m0s
+
+running (0m30.0s), 50/50 VUs, 1042 complete and 0 interrupted iterations
+default   [  50% ] 50 VUs  0m30.0s/1m0s
+
+running (0m31.0s), 50/50 VUs, 1076 complete and 0 interrupted iterations
+default   [  52% ] 50 VUs  0m31.0s/1m0s
+
+running (0m32.0s), 50/50 VUs, 1083 complete and 0 interrupted iterations
+default   [  53% ] 50 VUs  0m32.0s/1m0s
+
+running (0m33.0s), 50/50 VUs, 1126 complete and 0 interrupted iterations
+default   [  55% ] 50 VUs  0m33.0s/1m0s
+
+running (0m34.0s), 50/50 VUs, 1176 complete and 0 interrupted iterations
+default   [  57% ] 50 VUs  0m34.0s/1m0s
+
+running (0m35.0s), 50/50 VUs, 1183 complete and 0 interrupted iterations
+default   [  58% ] 50 VUs  0m35.0s/1m0s
+
+running (0m36.0s), 50/50 VUs, 1233 complete and 0 interrupted iterations
+default   [  60% ] 50 VUs  0m36.0s/1m0s
+
+running (0m37.0s), 50/50 VUs, 1283 complete and 0 interrupted iterations
+default   [  62% ] 50 VUs  0m37.0s/1m0s
+
+running (0m38.0s), 50/50 VUs, 1333 complete and 0 interrupted iterations
+default   [  63% ] 50 VUs  0m38.0s/1m0s
+
+running (0m39.0s), 50/50 VUs, 1376 complete and 0 interrupted iterations
+default   [  65% ] 50 VUs  0m39.0s/1m0s
+
+running (0m40.0s), 50/50 VUs, 1386 complete and 0 interrupted iterations
+default   [  67% ] 50 VUs  0m40.0s/1m0s
+
+running (0m41.0s), 50/50 VUs, 1436 complete and 0 interrupted iterations
+default   [  68% ] 50 VUs  0m41.0s/1m0s
+
+running (0m42.0s), 50/50 VUs, 1486 complete and 0 interrupted iterations
+default   [  70% ] 50 VUs  0m42.0s/1m0s
+
+running (0m43.0s), 50/50 VUs, 1536 complete and 0 interrupted iterations
+default   [  72% ] 50 VUs  0m43.0s/1m0s
+
+running (0m44.0s), 50/50 VUs, 1544 complete and 0 interrupted iterations
+default   [  73% ] 50 VUs  0m44.0s/1m0s
+
+running (0m45.0s), 50/50 VUs, 1594 complete and 0 interrupted iterations
+default   [  75% ] 50 VUs  0m45.0s/1m0s
+
+running (0m46.0s), 50/50 VUs, 1644 complete and 0 interrupted iterations
+default   [  77% ] 50 VUs  0m46.0s/1m0s
+
+running (0m47.0s), 50/50 VUs, 1694 complete and 0 interrupted iterations
+default   [  78% ] 50 VUs  0m47.0s/1m0s
+
+running (0m48.0s), 50/50 VUs, 1699 complete and 0 interrupted iterations
+default   [  80% ] 50 VUs  0m48.0s/1m0s
+
+running (0m49.0s), 50/50 VUs, 1749 complete and 0 interrupted iterations
+default   [  82% ] 50 VUs  0m49.0s/1m0s
+
+running (0m50.0s), 50/50 VUs, 1797 complete and 0 interrupted iterations
+default   [  83% ] 50 VUs  0m50.0s/1m0s
+
+running (0m51.0s), 50/50 VUs, 1845 complete and 0 interrupted iterations
+default   [  85% ] 50 VUs  0m51.0s/1m0s
+
+running (0m52.0s), 50/50 VUs, 1895 complete and 0 interrupted iterations
+default   [  87% ] 50 VUs  0m52.0s/1m0s
+
+running (0m53.0s), 50/50 VUs, 1904 complete and 0 interrupted iterations
+default   [  88% ] 50 VUs  0m53.0s/1m0s
+
+running (0m54.0s), 50/50 VUs, 1954 complete and 0 interrupted iterations
+default   [  90% ] 50 VUs  0m54.0s/1m0s
+
+running (0m55.0s), 50/50 VUs, 2004 complete and 0 interrupted iterations
+default   [  92% ] 50 VUs  0m55.0s/1m0s
+
+running (0m56.0s), 50/50 VUs, 2054 complete and 0 interrupted iterations
+default   [  93% ] 50 VUs  0m56.0s/1m0s
+
+running (0m57.0s), 50/50 VUs, 2055 complete and 0 interrupted iterations
+default   [  95% ] 50 VUs  0m57.0s/1m0s
+
+running (0m58.0s), 50/50 VUs, 2105 complete and 0 interrupted iterations
+default   [  97% ] 50 VUs  0m58.0s/1m0s
+
+running (0m59.0s), 50/50 VUs, 2155 complete and 0 interrupted iterations
+default   [  98% ] 50 VUs  0m59.0s/1m0s
+
+running (1m00.0s), 50/50 VUs, 2205 complete and 0 interrupted iterations
+default   [ 100% ] 50 VUs  1m00.0s/1m0s
+
+
+  █ THRESHOLDS 
+
+    http_req_duration
+    ✓ 'p(50)<200' p(50)=146.63ms
+    ✗ 'p(95)<500' p(95)=650.45ms
+    ✗ 'p(99)<1000' p(99)=1.93s
+
+    http_req_failed
+    ✗ 'rate<0.01' rate=54.20%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 2255   36.982355/s
+    checks_succeeded...: 84.47% 1905 out of 2255
+    checks_failed......: 15.52% 350 out of 2255
+
+    ✗ status is 201 or 401 or 404
+      ↳  84% — ✓ 1905 / ✗ 350
+
+    HTTP
+    http_req_duration..............: avg=189.89ms min=0s     med=146.63ms max=2.23s   p(90)=408.3ms  p(95)=650.45ms
+      { expected_response:true }...: avg=147.09ms min=2.26ms med=93ms     max=913.5ms p(90)=316.11ms p(95)=458.06ms
+    http_req_failed................: 54.20% 2255 out of 4160
+    http_reqs......................: 4160   68.224655/s
+
+    EXECUTION
+    iteration_duration.............: avg=1.35s    min=1s     med=1.26s    max=4.02s   p(90)=1.76s    p(95)=2.02s   
+    iterations.....................: 2255   36.982355/s
+    vus............................: 50     min=50           max=50
+    vus_max........................: 50     min=50           max=50
+
+    NETWORK
+    data_received..................: 1.1 MB 17 kB/s
+    data_sent......................: 1.1 MB 19 kB/s
+
+
+
+
+running (1m01.0s), 00/50 VUs, 2255 complete and 0 interrupted iterations
+default ✓ [ 100% ] 50 VUs  1m0s
+time="2026-06-19T01:48:19Z" level=error msg="thresholds on metrics 'http_req_duration, http_req_failed' have been crossed"

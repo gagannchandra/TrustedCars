@@ -1,17 +1,27 @@
-FROM node:20-alpine
+FROM python:3.11-slim
+
+# Create a non-root user and group
+RUN groupadd -r appgroup && useradd -r -g appgroup -d /app -s /sbin/nologin -c "App user" appuser
+
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
-RUN npm install --omit=dev
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-COPY backend ./backend
+RUN apt-get update \
+  && apt-get -y install gcc postgresql-client \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
-ENV NODE_ENV=production
-ENV PORT=4000
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 4000
+# Copy application code and set ownership
+COPY --chown=appuser:appgroup . .
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -qO- http://localhost:4000/health || exit 1
+# Switch to non-root user
+USER appuser
 
-CMD ["node", "backend/src/server.js"]
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,4 @@
+=== Security Regression Tests ===
+1. Admin Bypass (Normal user accessing admin): 401
+2. IDOR (Accessing someone else's private data): 404
+3. SQL Injection in Search: 000

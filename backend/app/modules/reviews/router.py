@@ -35,7 +35,8 @@ async def create_review(
 
 
 @router.get("/{id}", response_model=ReviewResponse)
-async def get_review(id: UUID, service: ReviewsService = Depends(get_reviews_service)):
+@limiter.limit("60/minute")
+async def get_review(request: Request, id: UUID, service: ReviewsService = Depends(get_reviews_service)):
     # Pass None for current_user if we want public access, but the service expects a user for verify_access, wait!
     # service.get_review doesn't use current_user in any strict way right now. Let's just pass None.
     # Actually wait, I need to check what `get_review` expects.
@@ -62,7 +63,9 @@ async def delete_review(
 
 
 @user_reviews_router.get("/{seller_id}/reviews", response_model=PaginatedReviewResponse)
+@limiter.limit("30/minute")
 async def list_seller_reviews(
+    request: Request,
     seller_id: UUID,
     cursor: Optional[datetime] = Query(None),
     limit: int = Query(50, ge=1, le=100),

@@ -40,12 +40,16 @@ class ImageService:
     ) -> CarImage:
         await self._verify_ownership(req.car_id, current_user)
 
+        MAX_IMAGES_PER_CAR = 20
+        existing_images = await self.repository.get_images_by_car_id(req.car_id)
+        if len(existing_images) >= MAX_IMAGES_PER_CAR:
+            raise CustomException(400, f"Maximum of {MAX_IMAGES_PER_CAR} images per listing reached")
+
         # Check if we need to set primary
         if req.is_primary:
             await self.repository.unset_primary_for_car(req.car_id)
         else:
             # If this is the first image, make it primary automatically
-            existing_images = await self.repository.get_images_by_car_id(req.car_id)
             if not existing_images:
                 req.is_primary = True
 
@@ -107,6 +111,11 @@ class ImageService:
     ):
         if len(reqs) > 50:
             raise CustomException(400, "Too many images to reorder")
+
+        sort_orders = [r.sort_order for r in reqs]
+        if len(sort_orders) != len(set(sort_orders)):
+            raise CustomException(400, "Duplicate sort_order values are not allowed")
+
         await self._verify_ownership(car_id, current_user)
 
         images = await self.repository.get_images_by_car_id(car_id)

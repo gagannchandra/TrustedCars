@@ -120,7 +120,6 @@ class AsyncOutboxWorker(WorkerInterface):
                 if event:
                     event.status = OutboxEventStatus.processing
                     event.last_attempt_at = now
-                    event.retry_count += 1
 
             await session.commit()
 
@@ -203,6 +202,7 @@ class AsyncOutboxWorker(WorkerInterface):
 
             failed_event.error = str(error)
             failed_event.status = OutboxEventStatus.failed
+            failed_event.retry_count += 1
             if failed_event.retry_count >= failed_event.max_retries:
                 failed_event.next_retry_at = None
             else:

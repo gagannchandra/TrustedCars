@@ -37,7 +37,7 @@ class User(Base):
     mfa_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
     mfa_secret: Mapped[str | None] = mapped_column(String(255), nullable=True)
     mfa_key_version: Mapped[str | None] = mapped_column(String(50), nullable=True)
-    mfa_backup_codes: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+
     mfa_recovery_verified_until: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )

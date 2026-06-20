@@ -70,10 +70,10 @@ class AuthService:
         return f.decrypt(str(encrypted_secret).encode()).decode()
 
     async def register_user(self, req: RegisterUserRequest) -> User:
-        hashed = await self.hash_password(req.password)
         existing = await self.repository.get_user_by_email(req.email)
         if existing:
             raise CustomException(400, "Email already registered")
+        hashed = await self.hash_password(req.password)
 
         user = User(
             email=req.email,
@@ -94,10 +94,10 @@ class AuthService:
         return user
 
     async def register_dealer(self, req: RegisterDealerRequest) -> User:
-        hashed = await self.hash_password(req.password)
         existing = await self.repository.get_user_by_email(req.email)
         if existing:
             raise CustomException(400, "Email already registered")
+        hashed = await self.hash_password(req.password)
 
         user = User(
             email=req.email,
@@ -152,6 +152,9 @@ class AuthService:
             except Exception:
                 pass
             raise CustomException(401, "Invalid credentials")
+
+        if user.is_suspended:
+            raise CustomException(403, "Account suspended. Please contact support.")
 
         user_id = user.id
         hashed_password = user.hashed_password
@@ -266,6 +269,14 @@ class AuthService:
         if db_token.expires_at < datetime.now(timezone.utc):
             raise CustomException(401, "Refresh token expired")
 
+        user = await self.repository.get_user_by_id(db_token.user_id)
+        if not user:
+            raise CustomException(401, "User not found")
+        if user.is_suspended:
+            raise CustomException(403, "Account suspended")
+        if user.deleted_at is not None:
+            raise CustomException(401, "Account deleted")
+
         db_token.is_revoked = True
 
         access_token = create_access_token(subject=db_token.user_id)
@@ -285,6 +296,11 @@ class AuthService:
         return {"access_token": access_token, "refresh_token": new_refresh_plain}
 
     async def enroll_mfa(self, current_user: User) -> dict:
+        if current_user.mfa_enabled:
+            raise CustomException(
+                400,
+                "MFA is already active. Disable it first before re-enrolling."
+            )
         import pyotp
         import secrets
         from app.modules.auth.models import UserMFABackupCode

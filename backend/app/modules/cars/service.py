@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.modules.cars.repository import CarRepository
 from app.modules.cars.schemas import CarCreateRequest, CarUpdateRequest
-from app.modules.cars.models import Car, CarStatusEnum
+from app.modules.cars.models import Car, CarStatusEnum, SystemModerationReason
 from app.modules.auth.models import User, RoleEnum, Dealership
 from app.shared.interfaces.dealers import DealerAuthorizationProvider
 from app.shared.audit.service import AuditService
@@ -204,7 +204,7 @@ class CarService:
                 previous_moderation_status=Car.moderation_status,
                 moderation_status="hidden",
                 moderated_at=now,
-                moderation_reason="User deactivated",
+                moderation_reason=SystemModerationReason.user_deactivated.value,
             )
         )
         await self.session.execute(stmt)
@@ -217,7 +217,7 @@ class CarService:
             .where(
                 Car.user_id == user_id,
                 Car.deleted_at.is_(None),
-                Car.moderation_reason == "User deactivated",
+                Car.moderation_reason == SystemModerationReason.user_deactivated.value,
             )
             .values(
                 moderation_status=Car.previous_moderation_status,
@@ -240,7 +240,7 @@ class CarService:
                 moderation_status="hidden",
                 moderated_at=now,
                 moderated_by=admin_id,
-                moderation_reason="Dealer suspended",
+                moderation_reason=SystemModerationReason.dealer_suspended.value,
             )
         )
         await self.session.execute(stmt)
@@ -253,7 +253,7 @@ class CarService:
             .where(
                 Car.dealership_id == dealership_id,
                 Car.deleted_at.is_(None),
-                Car.moderation_reason == "Dealer suspended",
+                Car.moderation_reason == SystemModerationReason.dealer_suspended.value,
                 Car.moderation_status == "hidden",
             )
             .values(

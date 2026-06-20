@@ -4,6 +4,7 @@ from app.core.models import PlatformStatistics
 from app.modules.auth.models import User, Dealership
 from app.modules.cars.models import Car, CarStatusEnum
 from app.modules.reviews.models import Review
+from app.modules.inquiries.models import Inquiry
 from app.shared.audit.service import AuditService
 import logging
 
@@ -69,6 +70,10 @@ async def reconcile_platform_statistics(session: AsyncSession):
         select(func.count()).select_from(Review).where(Review.deleted_at.is_(None))
     )
 
+    total_inquiries = await session.scalar(
+        select(func.count()).select_from(Inquiry).where(Inquiry.deleted_at.is_(None))
+    )
+
     mismatches = []
     
     if not stats:
@@ -94,6 +99,8 @@ async def reconcile_platform_statistics(session: AsyncSession):
             mismatches.append(f"hidden_cars: expected {hidden_cars}, got {stats.hidden_cars}")
         if stats.total_reviews != total_reviews:
             mismatches.append(f"total_reviews: expected {total_reviews}, got {stats.total_reviews}")
+        if stats.total_inquiries != total_inquiries:
+            mismatches.append(f"total_inquiries: expected {total_inquiries}, got {stats.total_inquiries}")
 
     # Upsert the new counts
     from datetime import datetime, timezone
@@ -114,7 +121,7 @@ async def reconcile_platform_statistics(session: AsyncSession):
             active_cars=active_cars,
             hidden_cars=hidden_cars,
             total_reviews=total_reviews,
-            total_inquiries=0, # Optional: query inquiries if needed, defaulting to 0
+            total_inquiries=total_inquiries,
             updated_at=now,
         )
         .on_conflict_do_update(
@@ -130,6 +137,7 @@ async def reconcile_platform_statistics(session: AsyncSession):
                 "active_cars": active_cars,
                 "hidden_cars": hidden_cars,
                 "total_reviews": total_reviews,
+                "total_inquiries": total_inquiries,
                 "updated_at": now,
             }
         )

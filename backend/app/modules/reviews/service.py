@@ -49,17 +49,17 @@ class ReviewsService:
         if not car:
             return None
 
-        seller_id = car.user_id
-        if not seller_id and car.dealership_id:
+        if car.dealership_id:
             from app.modules.auth.models import Dealership
             dealership = await self.session.scalar(
                 select(Dealership).where(Dealership.id == car.dealership_id, Dealership.deleted_at.is_(None))
             )
             if dealership:
                 seller_id = dealership.user_id
-
-        if not seller_id:
-            return None
+            else:
+                seller_id = car.user_id
+        else:
+            seller_id = car.user_id
 
         seller = await self.session.scalar(
             select(User).where(User.id == seller_id, User.deleted_at.is_(None))

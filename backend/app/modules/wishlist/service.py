@@ -55,6 +55,9 @@ class WishlistService:
         if not car:
             raise CustomException(404, "Car not found")
 
+        if car.user_id == current_user.id:
+            raise CustomException(400, "You cannot save your own listing")
+
         existing = await self.repository.get_wishlist_entry(
             current_user.id, car_id, include_deleted=True
         )

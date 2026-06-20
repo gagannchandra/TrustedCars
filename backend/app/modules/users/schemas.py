@@ -17,7 +17,6 @@ class UserPublicProfile(BaseModel):
     id: UUID
     full_name: str
     avatar_url: Optional[str] = None
-    role: RoleEnum
     created_at: datetime
     model_config = {"from_attributes": True}
 
@@ -34,5 +33,6 @@ class DealershipPublic(BaseModel):
 class UserPrivateProfile(UserPublicProfile):
     email: EmailStr
     phone_number: Optional[str] = None
+    role: RoleEnum
     is_active: bool
     dealership: Optional[DealershipPublic] = None

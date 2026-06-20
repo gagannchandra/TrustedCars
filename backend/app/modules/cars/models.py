@@ -61,6 +61,12 @@ class ModerationStatusEnum(str, enum.Enum):
     hidden = "hidden"
 
 
+class SystemModerationReason(str, enum.Enum):
+    user_deactivated = "user_deactivated"
+    dealer_suspended = "dealer_suspended"
+    admin_action     = "admin_action"
+
+
 class Car(Base):
     __tablename__ = "cars"
 

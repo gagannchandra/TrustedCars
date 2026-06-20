@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import update
 from uuid import UUID
+from datetime import datetime, timezone
 from app.modules.auth.models import User, RefreshToken, Dealership
 
 
@@ -12,7 +13,7 @@ class AuthRepository:
     async def get_user_by_email(self, email: str) -> User | None:
         result = await self.session.execute(
             select(User).where(
-                User.email == email, User.is_active, User.deleted_at.is_(None), User.is_suspended.is_(False)
+                User.email == email, User.is_active, User.deleted_at.is_(None)
             )
         )
         return result.scalars().first()
@@ -20,7 +21,7 @@ class AuthRepository:
     async def get_user_by_id(self, user_id: UUID) -> User | None:
         result = await self.session.execute(
             select(User).where(
-                User.id == user_id, User.is_active, User.deleted_at.is_(None), User.is_suspended.is_(False)
+                User.id == user_id, User.is_active, User.deleted_at.is_(None)
             )
         )
         return result.scalars().first()
@@ -59,7 +60,10 @@ class AuthRepository:
     async def revoke_refresh_token_family(self, family_id: UUID) -> None:
         await self.session.execute(
             update(RefreshToken)
-            .where(RefreshToken.family_id == family_id)
+            .where(
+                RefreshToken.family_id == family_id,
+                RefreshToken.expires_at > datetime.now(timezone.utc)
+            )
             .values(is_revoked=True)
         )
 

@@ -41,7 +41,9 @@ async def create_inquiry(
 
 
 @router.get("", response_model=list[InquiryResponse])
+@limiter.limit("30/minute")
 async def list_user_inquiries(
+    request: Request,
     as_seller: bool = Query(
         False, description="List inquiries where you are the seller"
     ),
@@ -63,7 +65,9 @@ async def get_inquiry_details(
 
 
 @router.get("/{id}/messages", response_model=PaginatedMessageResponse)
+@limiter.limit("60/minute")
 async def list_inquiry_messages(
+    request: Request,
     id: UUID,
     cursor: Optional[datetime] = Query(None),
     limit: int = Query(50, ge=1, le=100),

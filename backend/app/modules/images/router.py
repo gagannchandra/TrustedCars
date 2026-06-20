@@ -119,6 +119,8 @@ async def direct_image_upload(
 ):
     import uuid
     import mimetypes
+    import aioboto3
+    from app.core.config import settings
     
     await service._verify_ownership(car_id, current_user)
     
@@ -128,30 +130,29 @@ async def direct_image_upload(
         raise CustomException(400, "Invalid content type. Only JPEG, PNG, and WebP are allowed.")
     ext = mimetypes.guess_extension(content_type) or ".jpg"
     
-    # In a real system, you'd use aioboto3 to stream the file.boto3 is sync so we read it all into memory here
-    # Since we are using S3 presigned URLs mostly, this is a fallback.
-    MAX_IMAGE_SIZE = 10 * 1024 * 1024
-    file_bytes = await file.read(MAX_IMAGE_SIZE + 1)
-    if len(file_bytes) > MAX_IMAGE_SIZE:
-        raise CustomException(413, "File too large. Maximum size is 10MB.")
+    header = await file.read(12)
+    if content_type == "image/jpeg" and not header.startswith(b"\xff\xd8\xff"):
+        raise CustomException(400, "Invalid image content")
+    elif content_type == "image/png" and not header.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise CustomException(400, "Invalid image content")
+    elif content_type == "image/webp" and not (header.startswith(b"RIFF") and header[8:12] == b"WEBP"):
+        raise CustomException(400, "Invalid image content")
     
-    if content_type == "image/jpeg" and not file_bytes.startswith(b"\xff\xd8\xff"):
-        raise CustomException(400, "Invalid image content")
-    elif content_type == "image/png" and not file_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
-        raise CustomException(400, "Invalid image content")
-    elif content_type == "image/webp" and not (file_bytes.startswith(b"RIFF") and file_bytes[8:12] == b"WEBP"):
-        raise CustomException(400, "Invalid image content")
+    await file.seek(0)
     
     storage_key = f"{uuid.uuid4()}{ext}"
     try:
-        import asyncio
-        await asyncio.to_thread(
-            storage.s3_client.put_object,
-            Bucket=storage.bucket,
-            Key=storage_key,
-            Body=file_bytes,
-            ContentType=content_type,
-        )
+        session = aioboto3.Session()
+        s3_endpoint = settings.S3_ENDPOINT_URL if hasattr(settings, 'S3_ENDPOINT_URL') and settings.S3_ENDPOINT_URL else None
+        s3_region = settings.S3_REGION_NAME if hasattr(settings, 'S3_REGION_NAME') and settings.S3_REGION_NAME else None
+        
+        async with session.client("s3", endpoint_url=s3_endpoint, region_name=s3_region) as s3:
+            await s3.upload_fileobj(
+                file.file,
+                storage.bucket,
+                storage_key,
+                ExtraArgs={"ContentType": content_type},
+            )
     except Exception as e:
         raise CustomException(500, f"Upload failed: {str(e)}")
         

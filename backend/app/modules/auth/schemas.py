@@ -61,3 +61,20 @@ class MFARecoveryRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     email: EmailStr
     recovery_code: str
+
+
+class VerifyOTPRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    email: EmailStr
+    code: str = Field(..., min_length=6, max_length=6)
+
+
+class ForgotPasswordRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reset_token: str
+    new_password: str = Field(..., min_length=8, max_length=128)

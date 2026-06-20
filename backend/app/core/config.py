@@ -34,6 +34,17 @@ class Settings(BaseSettings):
         "http://localhost:5175",
     ]
 
+    RESEND_API_KEY: str
+    RESEND_FROM_EMAIL: str
+    APP_NAME: str
+    FRONTEND_URL: str
+    BACKEND_URL: str
+    OTP_EXPIRY_MINUTES: int = 10
+    OTP_RESEND_COOLDOWN_SECONDS: int = 60
+    OTP_MAX_ATTEMPTS: int = 5
+    OTP_RATE_LIMIT_WINDOW_MINUTES: int = 15
+    OTP_RATE_LIMIT_MAX_REQUESTS: int = 10
+
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", case_sensitive=True
     )

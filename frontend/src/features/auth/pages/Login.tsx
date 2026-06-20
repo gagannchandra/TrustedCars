@@ -29,8 +29,8 @@ export default function Login() {
     setAuthError('');
     const result = await login(data.email, data.password);
     if (result.success) {
-      toast.success('Successfully logged in!');
-      navigate('/');
+      toast.success(result.message || 'OTP sent to email!');
+      navigate('/verify-otp', { state: { email: data.email, intent: 'login' } });
     } else {
       setAuthError(result.message || 'Invalid email or password. Try demo credentials below.');
     }

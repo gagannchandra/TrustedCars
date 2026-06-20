@@ -12,6 +12,10 @@ const Cars = lazy(() => import('../../features/cars/Cars'));
 const CarDetail = lazy(() => import('../../features/cars/CarDetail'));
 const Login = lazy(() => import('../../features/auth/pages/Login'));
 const Register = lazy(() => import('../../features/auth/pages/Register'));
+const VerifyOTP = lazy(() => import('../../features/auth/pages/VerifyOTP'));
+const ForgotPassword = lazy(() => import('../../features/auth/pages/ForgotPassword'));
+const VerifyResetPassword = lazy(() => import('../../features/auth/pages/VerifyResetPassword'));
+const ResetPassword = lazy(() => import('../../features/auth/pages/ResetPassword'));
 const Sell = lazy(() => import('../../features/sell/Sell'));
 const Dashboard = lazy(() => import('../../features/dashboard/Dashboard'));
 const AdminPanel = lazy(() => import('../../features/admin/AdminPanel'));
@@ -19,7 +23,7 @@ const SellerListings = lazy(() => import('../../features/sell/pages/SellerListin
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const noNavFooter = ['/login', '/register'].includes(location.pathname);
+  const noNavFooter = ['/login', '/register', '/verify-otp', '/forgot-password', '/verify-reset-password', '/reset-password'].includes(location.pathname);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -52,6 +56,10 @@ export default function App() {
               <Route path="/cars/:id" element={<CarDetail />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/verify-otp" element={<VerifyOTP />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/verify-reset-password" element={<VerifyResetPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/sell" element={<ProtectedRoute><Sell /></ProtectedRoute>} />
               <Route path="/sell/list" element={<ProtectedRoute><SellerListings /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['user', 'admin']}><Dashboard /></ProtectedRoute>} />

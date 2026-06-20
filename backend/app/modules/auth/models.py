@@ -8,6 +8,7 @@ from sqlalchemy import (
     Enum as SQLEnum,
     Index,
     UniqueConstraint,
+    Integer,
 )
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -154,3 +155,25 @@ class Dealership(Base):
         UUID(as_uuid=True), nullable=True
     )
     user: Mapped["User"] = relationship("User", back_populates="dealership")
+
+
+class OTPCode(Base):
+    __tablename__ = "otp_codes"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    email: Mapped[str] = mapped_column(
+        String(255), index=True, nullable=False
+    )
+    type: Mapped[str] = mapped_column(String(50), nullable=False)
+    otp_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    context_data: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+

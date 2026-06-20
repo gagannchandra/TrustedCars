@@ -16,7 +16,12 @@ export function useAuth() {
     isAuthenticated, 
     login: storeLogin, 
     register: storeRegister, 
-    logout: storeLogout 
+    logout: storeLogout,
+    verifyLogin: storeVerifyLogin,
+    verifyRegistration: storeVerifyRegistration,
+    forgotPassword: storeForgotPassword,
+    verifyResetPassword: storeVerifyResetPassword,
+    resetPassword: storeResetPassword
   } = useAuthStore();
 
   const profileQuery = useQuery({
@@ -78,7 +83,12 @@ export function useAuth() {
   });
 
   const login = async (email: string, password: string) => {
-    const result = await storeLogin(email, password);
+    // Only initiates OTP, does not create session yet
+    return await storeLogin(email, password);
+  };
+  
+  const verifyLogin = async (email: string, code: string) => {
+    const result = await storeVerifyLogin(email, code);
     if (result.success) {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['wishlist'] });
@@ -92,7 +102,12 @@ export function useAuth() {
   };
 
   const register = async (data: RegisterPayload) => {
-    const result = await storeRegister(data);
+    // Only initiates OTP, does not create session yet
+    return await storeRegister(data);
+  };
+
+  const verifyRegistration = async (email: string, code: string) => {
+    const result = await storeVerifyRegistration(email, code);
     if (result.success) {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['wishlist'] });
@@ -115,7 +130,12 @@ export function useAuth() {
     wishlistCars: wishlistQuery.data || [],
     isAuthenticated,
     login,
+    verifyLogin,
     register,
+    verifyRegistration,
+    forgotPassword: storeForgotPassword,
+    verifyResetPassword: storeVerifyResetPassword,
+    resetPassword: storeResetPassword,
     logout,
     toggleWishlist,
   };

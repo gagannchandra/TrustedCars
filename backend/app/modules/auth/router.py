@@ -11,6 +11,9 @@ from app.modules.auth.schemas import (
     MFAEnrollResponse,
     MFAVerifyRequest,
     MFARecoveryRequest,
+    VerifyOTPRequest,
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
 )
 from app.modules.auth.service import AuthService
 from app.modules.auth.models import User
@@ -23,7 +26,7 @@ def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
     return AuthService(db)
 
 
-@router.post("/register/user", response_model=UserResponse)
+@router.post("/register/user")
 @limiter.limit("5/minute")
 async def register_user(
     request: Request, req: RegisterUserRequest, service: AuthService = Depends(get_auth_service)
@@ -31,7 +34,7 @@ async def register_user(
     return await service.register_user(req)
 
 
-@router.post("/register/dealer", response_model=UserResponse)
+@router.post("/register/dealer")
 @limiter.limit("5/minute")
 async def register_dealer(
     request: Request, req: RegisterDealerRequest, service: AuthService = Depends(get_auth_service)
@@ -42,26 +45,9 @@ async def register_dealer(
 @router.post("/login")
 @limiter.limit("10/minute")
 async def login(
-    request: Request, response: Response, req: LoginRequest, service: AuthService = Depends(get_auth_service)
+    request: Request, req: LoginRequest, service: AuthService = Depends(get_auth_service)
 ):
-    tokens = await service.login(req)
-    response.set_cookie(
-        key="access_token",
-        value=tokens["access_token"],
-        httponly=True,
-        secure=True,
-        samesite="lax",
-        max_age=30 * 60, # 30 mins
-    )
-    response.set_cookie(
-        key="refresh_token",
-        value=tokens["refresh_token"],
-        httponly=True,
-        secure=True,
-        samesite="lax",
-        max_age=7 * 24 * 60 * 60, # 7 days
-    )
-    return {"detail": "Successfully logged in"}
+    return await service.login(req)
 
 
 @router.post("/mfa/enroll", response_model=MFAEnrollResponse)
@@ -139,3 +125,57 @@ async def logout(
         response.delete_cookie(key="access_token")
         response.delete_cookie(key="refresh_token")
     return {"detail": "Successfully logged out"}
+
+
+@router.post("/verify-registration")
+@limiter.limit("10/minute")
+async def verify_registration(
+    request: Request, response: Response, req: VerifyOTPRequest, service: AuthService = Depends(get_auth_service)
+):
+    tokens = await service.verify_registration(req.email, req.code)
+    response.set_cookie(
+        key="access_token", value=tokens["access_token"], httponly=True, secure=True, samesite="lax", max_age=30 * 60,
+    )
+    response.set_cookie(
+        key="refresh_token", value=tokens["refresh_token"], httponly=True, secure=True, samesite="lax", max_age=7 * 24 * 60 * 60,
+    )
+    return {"detail": "Successfully verified and logged in"}
+
+
+@router.post("/verify-login")
+@limiter.limit("10/minute")
+async def verify_login(
+    request: Request, response: Response, req: VerifyOTPRequest, service: AuthService = Depends(get_auth_service)
+):
+    tokens = await service.verify_login(req.email, req.code)
+    response.set_cookie(
+        key="access_token", value=tokens["access_token"], httponly=True, secure=True, samesite="lax", max_age=30 * 60,
+    )
+    response.set_cookie(
+        key="refresh_token", value=tokens["refresh_token"], httponly=True, secure=True, samesite="lax", max_age=7 * 24 * 60 * 60,
+    )
+    return {"detail": "Successfully logged in"}
+
+
+@router.post("/forgot-password")
+@limiter.limit("5/minute")
+async def forgot_password(
+    request: Request, req: ForgotPasswordRequest, service: AuthService = Depends(get_auth_service)
+):
+    return await service.forgot_password(req.email)
+
+
+@router.post("/verify-reset-password")
+@limiter.limit("10/minute")
+async def verify_reset_password(
+    request: Request, req: VerifyOTPRequest, service: AuthService = Depends(get_auth_service)
+):
+    return await service.verify_reset_password(req.email, req.code)
+
+
+@router.post("/reset-password")
+@limiter.limit("5/minute")
+async def reset_password(
+    request: Request, req: ResetPasswordRequest, service: AuthService = Depends(get_auth_service)
+):
+    return await service.reset_password(req.reset_token, req.new_password)

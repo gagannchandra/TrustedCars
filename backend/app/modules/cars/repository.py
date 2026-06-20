@@ -1,8 +1,10 @@
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy import or_, and_, func, cast, Text
 from uuid import UUID
-from app.modules.cars.models import Car, CarStatusEnum
+from app.modules.cars.models import Car, CarStatusEnum, ModerationStatusEnum
+from app.modules.cars.schemas import CarSearchFilters
 
 
 class CarRepository:
@@ -26,27 +28,36 @@ class CarRepository:
                 Car.id == car_id,
                 Car.deleted_at.is_(None),
                 Car.status == CarStatusEnum.active,
-                Car.moderation_status != "hidden",
+                Car.moderation_status == ModerationStatusEnum.approved.value,
             )
         )
         return result.scalars().first()
 
-    from app.modules.cars.schemas import CarSearchFilters
+    async def get_cars_by_ids(self, car_ids: list[UUID]) -> list[Car]:
+        result = await self.session.execute(
+            select(Car).where(
+                Car.id.in_(car_ids),
+                Car.deleted_at.is_(None),
+                Car.status == CarStatusEnum.active,
+                Car.moderation_status == ModerationStatusEnum.approved.value,
+            )
+        )
+        return list(result.scalars().all())
 
-    async def search_cars(
+    def _build_search_stmt(
         self,
-        filters: "CarSearchFilters",
+        filters: CarSearchFilters,
         dealership_id: UUID | None = None,
         seller_id: UUID | None = None,
     ):
         stmt = select(Car).where(Car.deleted_at.is_(None))
         
         if seller_id or dealership_id:
-            stmt = stmt.where(Car.status != CarStatusEnum.archived)
+            stmt = stmt.where(Car.status.in_([CarStatusEnum.pending, CarStatusEnum.active, CarStatusEnum.sold]))
         else:
             stmt = stmt.where(
                 Car.status == CarStatusEnum.active,
-                Car.moderation_status != "hidden",
+                Car.moderation_status == ModerationStatusEnum.approved.value,
             )
 
         if seller_id:
@@ -55,18 +66,13 @@ class CarRepository:
             stmt = stmt.where(Car.is_featured == filters.is_featured)
 
         if filters.q:
-            from sqlalchemy import or_
-            stmt = stmt.where(
-                or_(
-                    Car.make.ilike(f"{filters.q}%"),
-                    Car.model.ilike(f"{filters.q}%"),
-                    Car.variant.ilike(f"{filters.q}%")
-                )
-            )
+            query_vector = func.plainto_tsquery('english', filters.q)
+            stmt = stmt.where(Car.search_vector.op('@@')(query_vector))
+            
         if filters.make:
-            stmt = stmt.where(Car.make.ilike(f"{filters.make}%"))
+            stmt = stmt.where(func.lower(Car.make).like(f"{filters.make.lower()}%"))
         if filters.model:
-            stmt = stmt.where(Car.model.ilike(f"{filters.model}%"))
+            stmt = stmt.where(func.lower(Car.model).like(f"{filters.model.lower()}%"))
         if filters.year:
             stmt = stmt.where(Car.year == filters.year)
         if filters.min_year:
@@ -78,9 +84,9 @@ class CarRepository:
         if filters.transmission:
             stmt = stmt.where(Car.transmission == filters.transmission)
         if filters.city:
-            stmt = stmt.where(Car.city.ilike(f"{filters.city}%"))
+            stmt = stmt.where(func.lower(Car.city).like(f"{filters.city.lower()}%"))
         if filters.state:
-            stmt = stmt.where(Car.state.ilike(f"{filters.state}%"))
+            stmt = stmt.where(func.lower(Car.state).like(f"{filters.state.lower()}%"))
         if filters.min_price is not None:
             stmt = stmt.where(Car.asking_price >= filters.min_price)
         if filters.max_price is not None:
@@ -96,28 +102,45 @@ class CarRepository:
             stmt = stmt.where(Car.body_type == filters.body_type)
         if filters.ownership_count:
             stmt = stmt.where(Car.ownership_count == filters.ownership_count)
-        
-        # Apply sort
+            
+        return stmt
+
+    def _build_order(self, filters: CarSearchFilters):
         if filters.sort == 'price_asc':
-            stmt = stmt.order_by(Car.asking_price.asc(), Car.id.desc())
+            return [Car.asking_price.asc(), Car.id.desc()]
         elif filters.sort == 'price_desc':
-            stmt = stmt.order_by(Car.asking_price.desc(), Car.id.desc())
+            return [Car.asking_price.desc(), Car.id.desc()]
         elif filters.sort == 'year_desc':
-            stmt = stmt.order_by(Car.year.desc(), Car.id.desc())
+            return [Car.year.desc(), Car.id.desc()]
         elif filters.sort == 'km_asc':
-            stmt = stmt.order_by(Car.odometer_km.asc(), Car.id.desc())
+            return [Car.odometer_km.asc(), Car.id.desc()]
         else:
-            stmt = stmt.order_by(Car.created_at.desc(), Car.id.desc())
+            if filters.q:
+                query_vector = func.plainto_tsquery('english', filters.q)
+                rank = func.ts_rank(Car.search_vector, query_vector)
+                return [rank.desc(), Car.id.desc()]
+            return [Car.created_at.desc(), Car.id.desc()]
 
-        # Select both Car and total count using window function
-        from sqlalchemy import func
-        stmt = stmt.add_columns(func.count().over().label("total_count"))
+    async def search_cars(
+        self,
+        filters: CarSearchFilters,
+        dealership_id: UUID | None = None,
+        seller_id: UUID | None = None,
+    ):
+        base_stmt = self._build_search_stmt(filters, dealership_id, seller_id)
 
-        stmt = stmt.offset(filters.skip).limit(filters.limit)
-        result = await self.session.execute(stmt)
-        rows = result.all()
-        
-        items = [row[0] for row in rows]
-        total = rows[0][1] if rows else 0
-        
+        # Count query uses index-only scan if possible
+        count_stmt = select(func.count()).select_from(base_stmt.subquery())
+        total = await self.session.scalar(count_stmt) or 0
+
+        # Data query
+        data_stmt = (
+            base_stmt
+            .order_by(*self._build_order(filters))
+            .offset(filters.skip)
+            .limit(filters.limit)
+        )
+        result = await self.session.execute(data_stmt)
+        items = list(result.scalars().all())
+
         return {"items": items, "total": total}

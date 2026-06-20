@@ -13,7 +13,7 @@ from sqlalchemy import (
     CheckConstraint,
     text,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column
 import enum
 
@@ -32,6 +32,8 @@ class FuelTypeEnum(str, enum.Enum):
     diesel = "diesel"
     electric = "electric"
     hybrid = "hybrid"
+    cng = "cng"
+    lpg = "lpg"
 
 
 class TransmissionEnum(str, enum.Enum):
@@ -48,6 +50,9 @@ class BodyTypeEnum(str, enum.Enum):
     wagon = "wagon"
     convertible = "convertible"
     van = "van"
+    mpv = "mpv"
+    pickup = "pickup"
+    crossover = "crossover"
 
 
 class ModerationStatusEnum(str, enum.Enum):
@@ -60,15 +65,20 @@ class Car(Base):
     __tablename__ = "cars"
 
     __table_args__ = (
-        Index("ix_cars_status_city", "status", "city", postgresql_where=text("deleted_at IS NULL")),
-        Index("ix_cars_status_make", "status", "make", postgresql_where=text("deleted_at IS NULL")),
-        Index("ix_cars_status_price", "status", "asking_price", postgresql_where=text("deleted_at IS NULL")),
+        Index("ix_cars_active_city", "city", "asking_price", postgresql_where=text("status = 'active' AND moderation_status = 'approved' AND deleted_at IS NULL")),
+        Index("ix_cars_active_make", "make", "asking_price", postgresql_where=text("status = 'active' AND moderation_status = 'approved' AND deleted_at IS NULL")),
+        Index("ix_cars_active_price", "asking_price", postgresql_where=text("status = 'active' AND moderation_status = 'approved' AND deleted_at IS NULL")),
+        Index("ix_cars_active_year", "year", "asking_price", postgresql_where=text("status = 'active' AND moderation_status = 'approved' AND deleted_at IS NULL")),
+        Index("ix_cars_active_created_at", "created_at", postgresql_where=text("status = 'active' AND moderation_status = 'approved' AND deleted_at IS NULL")),
+        Index("ix_cars_active_make_model", "make", "model", postgresql_where=text("status = 'active' AND moderation_status = 'approved' AND deleted_at IS NULL")),
+        Index("ix_cars_make_lower", text("lower(make)"), postgresql_where=text("deleted_at IS NULL")),
+        Index("ix_cars_model_lower", text("lower(model)"), postgresql_where=text("deleted_at IS NULL")),
+        Index("ix_cars_variant_lower", text("lower(variant)"), postgresql_where=text("deleted_at IS NULL")),
+        Index("ix_cars_city_lower", text("lower(city)"), postgresql_where=text("deleted_at IS NULL")),
+        Index("ix_cars_state_lower", text("lower(state)"), postgresql_where=text("deleted_at IS NULL")),
+        Index("ix_cars_dealership_id", "dealership_id"),
+        Index("ix_cars_search_vector", "search_vector", postgresql_using="gin", postgresql_where=text("deleted_at IS NULL")),
         Index("ix_cars_user_id", "user_id"),
-        Index("ix_cars_make_pattern", "make", postgresql_ops={"make": "varchar_pattern_ops"}),
-        Index("ix_cars_model_pattern", "model", postgresql_ops={"model": "varchar_pattern_ops"}),
-        Index("ix_cars_variant_pattern", "variant", postgresql_ops={"variant": "varchar_pattern_ops"}),
-        Index("ix_cars_city_pattern", "city", postgresql_ops={"city": "varchar_pattern_ops"}),
-        Index("ix_cars_state_pattern", "state", postgresql_ops={"state": "varchar_pattern_ops"}),
         CheckConstraint("odometer_km >= 0", name="chk_car_odometer"),
         CheckConstraint("asking_price > 0", name="chk_car_asking_price"),
         CheckConstraint("ownership_count >= 0", name="chk_car_ownership_count"),
@@ -106,6 +116,8 @@ class Car(Base):
     state: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     quality_grade: Mapped[str | None] = mapped_column(String(10), nullable=True)
+
+    search_vector: Mapped[str | None] = mapped_column(TSVECTOR, nullable=True)
 
     status: Mapped[CarStatusEnum] = mapped_column(
         SQLEnum(CarStatusEnum, name="car_status_enum"),

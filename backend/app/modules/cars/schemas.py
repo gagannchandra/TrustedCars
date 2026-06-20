@@ -38,7 +38,7 @@ class CarSearchFilters(BaseModel):
     max_mileage: Optional[int] = None
     sort: Optional[SortOption] = None
     limit: int = Field(20, ge=1, le=100)
-    skip: int = Field(0, ge=0)
+    skip: int = Field(0, ge=0, le=10000)
 
 
 class CarCreateRequest(BaseModel):

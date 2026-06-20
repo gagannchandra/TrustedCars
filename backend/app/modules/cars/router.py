@@ -80,6 +80,15 @@ async def get_car(
     return await service.get_public_car(id)
 
 
+@router.post("/batch", response_model=list[CarResponse])
+async def get_cars_batch(
+    ids: list[UUID],
+    service: CarService = Depends(get_car_service),
+):
+    if not ids:
+        return []
+    return await service.get_cars_by_ids(ids)
+
 @router.get("", response_model=PaginatedCarResponse)
 @limiter.limit("60/minute")
 async def search_cars(

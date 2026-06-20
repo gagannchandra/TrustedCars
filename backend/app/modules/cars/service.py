@@ -159,6 +159,9 @@ class CarService:
         if not dealer:
             raise CustomException(404, "Dealership not found")
 
+    async def get_cars_by_ids(self, car_ids: list[UUID]) -> list[Car]:
+        return await self.repository.get_cars_by_ids(car_ids)
+
     async def search_cars(self, filters, dealership_id: UUID | None = None, seller_id: UUID | None = None):
         return await self.repository.search_cars(filters, dealership_id, seller_id)
 

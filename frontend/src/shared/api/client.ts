@@ -34,14 +34,14 @@ export const carsApi = {
     return res.data;
   },
 
-  getWishlistCars: async (ids: string[]): Promise<Car[]> => {
+    getWishlistCars: async (ids: string[]): Promise<Car[]> => {
     if (!ids || ids.length === 0) return [];
-    const results = await Promise.all(ids.map(id => axiosInstance.get(`/cars/${id}`).then(r => r.data).catch(() => null)));
-    return results.filter(Boolean);
+    const res = await axiosInstance.post('/cars/batch', ids);
+    return res.data;
   },
 
   getMyCars: async (): Promise<Car[]> => {
-    const res = await axiosInstance.get('/cars?seller_id=me');
+    const res = await axiosInstance.get('/cars/mine');
     return res.data.items || [];
   },
 
@@ -51,7 +51,13 @@ export const carsApi = {
   },
 
   getSimilarCars: async (car: Car, limit = 4): Promise<Car[]> => {
-    const res = await axiosInstance.get(`/cars?make=${car.make}&limit=10`);
+    const params = new URLSearchParams({
+        make: car.make,
+        min_year: String(car.year - 2),
+        max_year: String(car.year + 2),
+        limit: String(limit + 1),
+    });
+    const res = await axiosInstance.get(`/cars?${params.toString()}`);
     return res.data.items.filter((c: Car) => c.id !== car.id).slice(0, limit);
   },
 

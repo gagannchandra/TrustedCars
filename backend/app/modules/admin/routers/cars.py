@@ -21,13 +21,25 @@ from fastapi import Query
 async def list_all_cars(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
+    status: str | None = Query(None),
+    q: str | None = Query(None),
+    include_deleted: bool = Query(False),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RequirePermissions([PermissionEnum.APPROVE_CAR])),
 ):
-    from sqlalchemy import func
-    total = await db.scalar(select(func.count()).select_from(Car))
-    result = await db.execute(select(Car).offset(skip).limit(limit))
-    cars = result.scalars().all()
+    from sqlalchemy import func, or_
+    stmt = select(Car)
+    if not include_deleted:
+        stmt = stmt.where(Car.deleted_at.is_(None))
+    if status:
+        stmt = stmt.where(Car.status == status)
+    if q:
+        stmt = stmt.where(
+            or_(func.lower(Car.make).like(f"%{q.lower()}%"), func.lower(Car.model).like(f"%{q.lower()}%"))
+        )
+    total = await db.scalar(select(func.count()).select_from(stmt.subquery()))
+    result = await db.execute(stmt.order_by(Car.created_at.desc()).offset(skip).limit(limit))
+    cars = list(result.scalars().all())
     return {"items": cars, "total": total}
 
 @router.post("/{id}/approve")

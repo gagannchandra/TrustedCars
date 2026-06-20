@@ -48,7 +48,7 @@ async def test_car_moderation_flow(async_client, admin_token_headers, setup_db):
 
     await setup_db.refresh(car)
     assert car.status == CarStatusEnum.active
-    assert car.moderation_status == "approve"
+    assert car.moderation_status == "approved"
 
     # Hide
     res2 = await async_client.post(
@@ -59,8 +59,8 @@ async def test_car_moderation_flow(async_client, admin_token_headers, setup_db):
     assert res2.status_code == 200
 
     await setup_db.refresh(car)
-    assert car.moderation_status == "hide"
-    assert car.previous_moderation_status == "approve"
+    assert car.moderation_status == "hidden"
+    assert car.previous_moderation_status == "approved"
 
     # Restore
     res3 = await async_client.post(
@@ -71,7 +71,7 @@ async def test_car_moderation_flow(async_client, admin_token_headers, setup_db):
     assert res3.status_code == 200
 
     await setup_db.refresh(car)
-    assert car.moderation_status == "approve"
+    assert car.moderation_status == "approved"
     assert car.previous_moderation_status is None
     assert car.status == CarStatusEnum.active
 

@@ -43,6 +43,9 @@ class ReviewsRepository:
         return review
 
     async def update_seller_aggregate(self, seller_id: UUID):
+        lock_query = text("SELECT id FROM users WHERE id = :seller_id FOR UPDATE")
+        await self.session.execute(lock_query, {"seller_id": seller_id})
+
         query = text("""
             UPDATE users
             SET rating = COALESCE((SELECT AVG(rating) FROM reviews WHERE seller_id = :seller_id AND deleted_at IS NULL), 0),

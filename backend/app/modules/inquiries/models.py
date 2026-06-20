@@ -46,9 +46,9 @@ class Inquiry(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
-    car_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
-    buyer_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
-    seller_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    car_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("cars.id", ondelete="CASCADE"), nullable=False)
+    buyer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    seller_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     status: Mapped[InquiryStatusEnum] = mapped_column(
         SQLEnum(InquiryStatusEnum, name="inquiry_status_enum"),
@@ -97,7 +97,7 @@ class InquiryMessage(Base):
     inquiry_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("inquiries.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    sender_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    sender_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     message: Mapped[str] = mapped_column(Text, nullable=False)
 

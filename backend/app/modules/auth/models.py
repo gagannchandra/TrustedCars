@@ -69,7 +69,7 @@ class User(Base):
         "RefreshToken", back_populates="user", cascade="all, delete-orphan"
     )
     dealership: Mapped["Dealership"] = relationship(
-        "Dealership", back_populates="user", uselist=False, cascade="all, delete-orphan"
+        "Dealership", back_populates="user", uselist=False
     )
 
 

@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import DateTime, ForeignKey, Index, text, Integer, String
+from sqlalchemy import DateTime, ForeignKey, Index, text, Integer, String, CheckConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base import Base
@@ -26,6 +26,7 @@ class Review(Base):
             "car_id",
             unique=True,
         ),
+        CheckConstraint("rating >= 1 AND rating <= 5", name="chk_review_rating"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(

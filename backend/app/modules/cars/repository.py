@@ -97,12 +97,6 @@ class CarRepository:
         if filters.ownership_count:
             stmt = stmt.where(Car.ownership_count == filters.ownership_count)
         
-        # Get total count
-        from sqlalchemy import func
-        count_stmt = select(func.count()).select_from(stmt.subquery())
-        total_result = await self.session.execute(count_stmt)
-        total = total_result.scalar() or 0
-
         # Apply sort
         if filters.sort == 'price_asc':
             stmt = stmt.order_by(Car.asking_price.asc(), Car.id.desc())
@@ -115,8 +109,15 @@ class CarRepository:
         else:
             stmt = stmt.order_by(Car.created_at.desc(), Car.id.desc())
 
+        # Select both Car and total count using window function
+        from sqlalchemy import func
+        stmt = stmt.add_columns(func.count().over().label("total_count"))
+
         stmt = stmt.offset(filters.skip).limit(filters.limit)
         result = await self.session.execute(stmt)
-        items = list(result.scalars().all())
+        rows = result.all()
+        
+        items = [row[0] for row in rows]
+        total = rows[0][1] if rows else 0
         
         return {"items": items, "total": total}

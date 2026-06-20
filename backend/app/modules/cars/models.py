@@ -10,6 +10,8 @@ from sqlalchemy import (
     Numeric,
     Index,
     Boolean,
+    CheckConstraint,
+    text,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -48,14 +50,28 @@ class BodyTypeEnum(str, enum.Enum):
     van = "van"
 
 
+class ModerationStatusEnum(str, enum.Enum):
+    approved = "approved"
+    rejected = "rejected"
+    hidden = "hidden"
+
+
 class Car(Base):
     __tablename__ = "cars"
 
     __table_args__ = (
-        Index("ix_cars_status_city", "status", "city"),
-        Index("ix_cars_status_make", "status", "make"),
-        Index("ix_cars_status_price", "status", "asking_price"),
+        Index("ix_cars_status_city", "status", "city", postgresql_where=text("deleted_at IS NULL")),
+        Index("ix_cars_status_make", "status", "make", postgresql_where=text("deleted_at IS NULL")),
+        Index("ix_cars_status_price", "status", "asking_price", postgresql_where=text("deleted_at IS NULL")),
         Index("ix_cars_user_id", "user_id"),
+        Index("ix_cars_make_pattern", "make", postgresql_ops={"make": "varchar_pattern_ops"}),
+        Index("ix_cars_model_pattern", "model", postgresql_ops={"model": "varchar_pattern_ops"}),
+        Index("ix_cars_variant_pattern", "variant", postgresql_ops={"variant": "varchar_pattern_ops"}),
+        Index("ix_cars_city_pattern", "city", postgresql_ops={"city": "varchar_pattern_ops"}),
+        Index("ix_cars_state_pattern", "state", postgresql_ops={"state": "varchar_pattern_ops"}),
+        CheckConstraint("odometer_km >= 0", name="chk_car_odometer"),
+        CheckConstraint("asking_price > 0", name="chk_car_asking_price"),
+        CheckConstraint("ownership_count >= 0", name="chk_car_ownership_count"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -73,10 +89,10 @@ class Car(Base):
     variant: Mapped[str | None] = mapped_column(String(100), nullable=True)
     year: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     fuel_type: Mapped[FuelTypeEnum] = mapped_column(
-        SQLEnum(FuelTypeEnum, name="fuel_type_enum"), nullable=False, index=True
+        SQLEnum(FuelTypeEnum, name="fuel_type_enum"), nullable=False
     )
     transmission: Mapped[TransmissionEnum] = mapped_column(
-        SQLEnum(TransmissionEnum, name="transmission_enum"), nullable=False, index=True
+        SQLEnum(TransmissionEnum, name="transmission_enum"), nullable=False
     )
     body_type: Mapped[BodyTypeEnum] = mapped_column(
         SQLEnum(BodyTypeEnum, name="body_type_enum"), nullable=False

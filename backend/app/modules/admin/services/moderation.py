@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.modules.auth.models import User, Dealership
-from app.modules.cars.models import Car, CarStatusEnum
+from app.modules.cars.models import Car, CarStatusEnum, ModerationStatusEnum
 from app.modules.reviews.models import Review
 from app.modules.inquiries.models import Inquiry, InquiryStatusEnum
 from app.shared.audit.service import AuditService
@@ -272,15 +272,18 @@ class AdminModerationService:
 
         if action_upper in ["APPROVE", "REJECT", "HIDE"]:
             car.previous_moderation_status = car.moderation_status
-            car.moderation_status = action_upper.lower()
             if action_upper == "APPROVE":
+                car.moderation_status = ModerationStatusEnum.approved.value
                 car.status = CarStatusEnum.active
             elif action_upper == "REJECT":
+                car.moderation_status = ModerationStatusEnum.rejected.value
                 car.status = CarStatusEnum.rejected
+            elif action_upper == "HIDE":
+                car.moderation_status = ModerationStatusEnum.hidden.value
         elif action_upper == "RESTORE":
             car.moderation_status = car.previous_moderation_status
             car.previous_moderation_status = None
-            if car.moderation_status == "approve":
+            if car.moderation_status == ModerationStatusEnum.approved.value:
                 car.status = CarStatusEnum.active
             else:
                 car.status = CarStatusEnum.pending

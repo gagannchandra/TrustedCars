@@ -4,12 +4,12 @@ from app.bootstrap.subscribers import setup_subscribers
 import os
 
 async def reconciliation_loop():
-    from app.db.session import async_session_maker
+    from app.db.session import AsyncSessionLocal
     from app.shared.statistics.reconciliation import reconcile_platform_statistics
     import logging
     while True:
         try:
-            async with async_session_maker() as session:
+            async with AsyncSessionLocal() as session:
                 await reconcile_platform_statistics(session)
         except Exception as e:
             logging.getLogger(__name__).error(f"Reconciliation error: {e}")
@@ -25,6 +25,8 @@ async def main():
     finally:
         reconciliation_task.cancel()
         await worker.stop()
+        from app.db.session import engine
+        await engine.dispose()
 
 if __name__ == "__main__":
     if os.getenv("TESTING") != "1":

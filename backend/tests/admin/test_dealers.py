@@ -41,7 +41,7 @@ async def test_dealer_inventory_hide_restore(
         city="NY",
         state="NY",
         status=CarStatusEnum.active,
-        moderation_status="approve",
+        moderation_status="approved",
     )
     setup_db.add(car)
     await setup_db.commit()
@@ -58,7 +58,7 @@ async def test_dealer_inventory_hide_restore(
     await setup_db.refresh(car)
     assert dealership.is_suspended is True
     assert car.moderation_status == "hidden"
-    assert car.previous_moderation_status == "approve"
+    assert car.previous_moderation_status == "approved"
     assert car.status == CarStatusEnum.active  # Lifecycle status unchanged
 
     # Restore
@@ -70,7 +70,7 @@ async def test_dealer_inventory_hide_restore(
     await setup_db.refresh(dealership)
     await setup_db.refresh(car)
     assert dealership.is_suspended is False
-    assert car.moderation_status == "approve"
+    assert car.moderation_status == "approved"
     assert car.previous_moderation_status is None
 
 

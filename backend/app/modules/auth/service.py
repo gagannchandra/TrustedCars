@@ -194,14 +194,24 @@ class AuthService:
                 totp = pyotp.TOTP(secret)
                 
                 redis_key = f"totp_used:{user.id}:{req.mfa_code}"
-                already_used = await redis_client.get(redis_key)
-                if already_used:
-                    raise CustomException(401, "MFA code already used")
+                
+                try:
+                    is_new_code = await redis_client.set(redis_key, "1", nx=True, ex=90)
+                    if not is_new_code:
+                        raise CustomException(401, "MFA code already used")
+                except CustomException:
+                    raise
+                except Exception as e:
+                    import structlog
+                    structlog.get_logger(__name__).error("Redis down during TOTP replay check", error=str(e))
+                    raise CustomException(503, "Authentication service temporarily unavailable")
 
                 if not totp.verify(req.mfa_code):
+                    try:
+                        await redis_client.delete(redis_key)
+                    except Exception:
+                        pass
                     raise CustomException(401, "Invalid MFA code")
-                    
-                await redis_client.set(redis_key, "1", ex=90)
 
         user = await self.repository.get_user_by_id(user_id)
         if not user:
@@ -329,14 +339,23 @@ class AuthService:
         redis_client = await get_redis()
         redis_key = f"totp_used:{current_user.id}:{code}"
         
-        already_used = await redis_client.get(redis_key)
-        if already_used:
-            raise CustomException(status_code=401, detail="MFA code already used")
+        try:
+            is_new_code = await redis_client.set(redis_key, "1", nx=True, ex=90)
+            if not is_new_code:
+                raise CustomException(status_code=401, detail="MFA code already used")
+        except CustomException:
+            raise
+        except Exception as e:
+            import structlog
+            structlog.get_logger(__name__).error("Redis down during TOTP replay check", error=str(e))
+            raise CustomException(503, "Authentication service temporarily unavailable")
 
         if not totp.verify(code):
+            try:
+                await redis_client.delete(redis_key)
+            except Exception:
+                pass
             raise CustomException(status_code=400, detail="Invalid MFA code")
-            
-        await redis_client.set(redis_key, "1", ex=90)
 
         current_user.mfa_enabled = True
         await self.session.commit()

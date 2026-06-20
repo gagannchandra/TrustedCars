@@ -79,16 +79,14 @@ class CarService:
             raise CustomException(404, "Car not found")
 
         if check_ownership:
-            if current_user.role == RoleEnum.dealer:
-                is_auth = await self.dealer_provider.is_dealer_authorized(
-                    current_user.id, car.dealership_id
-                )
-                if not is_auth:
-                    raise CustomException(
-                        403, "Not authorized to edit this dealership's car"
-                    )
-            elif car.user_id != current_user.id:
-                raise CustomException(403, "Not authorized to edit this car")
+            from app.shared.rbac.dependencies import assert_can_edit_resource
+            await assert_can_edit_resource(
+                current_user=current_user,
+                owner_user_id=car.user_id,
+                dealership_id=car.dealership_id,
+                dealer_provider=self.dealer_provider,
+                resource_name="car",
+            )
 
         if car.status == CarStatusEnum.sold:
             raise CustomException(400, "Sold vehicles cannot be modified")
@@ -113,16 +111,14 @@ class CarService:
             raise CustomException(404, "Car not found")
 
         if check_ownership:
-            if current_user.role == RoleEnum.dealer:
-                is_auth = await self.dealer_provider.is_dealer_authorized(
-                    current_user.id, car.dealership_id
-                )
-                if not is_auth:
-                    raise CustomException(
-                        403, "Not authorized to delete this dealership's car"
-                    )
-            elif car.user_id != current_user.id:
-                raise CustomException(403, "Not authorized to delete this car")
+            from app.shared.rbac.dependencies import assert_can_edit_resource
+            await assert_can_edit_resource(
+                current_user=current_user,
+                owner_user_id=car.user_id,
+                dealership_id=car.dealership_id,
+                dealer_provider=self.dealer_provider,
+                resource_name="car",
+            )
 
         car.deleted_at = datetime.now(timezone.utc)
         from app.core.models import DeletedReason
@@ -154,8 +150,8 @@ class CarService:
             raise CustomException(404, "Car not found or unavailable")
         return car
 
-    async def search_cars(self, **kwargs):
-        return await self.repository.search_cars(**kwargs)
+    async def search_cars(self, filters, dealership_id: UUID | None = None):
+        return await self.repository.search_cars(filters, dealership_id)
 
     async def handle_user_deleted(self, user_id: UUID):
         from sqlalchemy import update, select

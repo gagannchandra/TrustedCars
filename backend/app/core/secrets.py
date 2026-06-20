@@ -25,8 +25,30 @@ class SecretManager:
             return os.environ.get(key, default)
 
     def _get_aws_secret(self, key: str, default: Optional[str]) -> Optional[str]:
-        # In a real implementation, use boto3 to fetch from AWS Secrets Manager
-        logger.debug(f"Fetching {key} from AWS Secrets Manager (mocked)")
+        try:
+            import boto3
+            from botocore.exceptions import ClientError
+            import json
+
+            # We assume standard AWS credentials are in the environment (AWS_REGION, AWS_ACCESS_KEY_ID, etc.)
+            region_name = os.environ.get("AWS_REGION", "us-east-1")
+            client = boto3.client("secretsmanager", region_name=region_name)
+
+            response = client.get_secret_value(SecretId=key)
+            if "SecretString" in response:
+                # AWS Secrets Manager often stores JSON. If it's a JSON dict, we try to parse it.
+                # If the key is just a string, we return it.
+                secret_string = response["SecretString"]
+                try:
+                    parsed = json.loads(secret_string)
+                    if isinstance(parsed, dict) and key in parsed:
+                        return parsed[key]
+                    return secret_string
+                except json.JSONDecodeError:
+                    return secret_string
+        except Exception as e:
+            logger.error(f"Failed to fetch {key} from AWS Secrets Manager: {e}")
+            
         return os.environ.get(key, default)
 
     def _get_doppler_secret(self, key: str, default: Optional[str]) -> Optional[str]:

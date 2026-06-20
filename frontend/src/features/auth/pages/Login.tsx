@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Car, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useAuthStore } from '../../../store/authStore';
+import { useAuth } from '../../../shared/hooks/useAuth';
 import { DEMO_CREDENTIALS } from '../../../data/mockData';
 
 const loginSchema = z.object({
@@ -17,7 +17,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuthStore();
+  const { login } = useAuth();
   const [showPass, setShowPass] = useState(false);
   const [authError, setAuthError] = useState('');
   

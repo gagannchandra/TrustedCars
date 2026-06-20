@@ -16,7 +16,7 @@ const queryClient = new QueryClient({
 });
 
 Sentry.init({
-  dsn: "https://placeholder@o0.ingest.sentry.io/0", // Replace with real DSN in prod
+  dsn: import.meta.env.VITE_SENTRY_DSN,
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),

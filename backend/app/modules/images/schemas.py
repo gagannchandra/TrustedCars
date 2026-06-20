@@ -18,6 +18,18 @@ class ImageReorderRequest(BaseModel):
     sort_order: int
 
 
+class PresignedUrlRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    file_extension: str = Field(..., pattern=r"^\.[a-zA-Z0-9]+$")
+    content_type: str = Field(..., pattern=r"^image/[a-zA-Z0-9]+$")
+
+
+class PresignedUrlResponse(BaseModel):
+    upload_url: str
+    storage_key: str
+    public_url: str
+
+
 class ImageResponse(BaseModel):
     id: UUID
     car_id: UUID

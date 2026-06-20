@@ -19,9 +19,6 @@ async def reconcile_platform_statistics(session: AsyncSession):
     stats = await session.scalar(
         select(PlatformStatistics).where(PlatformStatistics.id == 1)
     )
-    if not stats:
-        logger.warning("No PlatformStatistics found during reconciliation.")
-        return
 
     # Count real values
     total_users = await session.scalar(select(func.count()).select_from(User))
@@ -73,61 +70,81 @@ async def reconcile_platform_statistics(session: AsyncSession):
     )
 
     mismatches = []
+    
+    if not stats:
+        mismatches.append("PlatformStatistics row did not exist.")
+    else:
+        if stats.total_users != total_users:
+            mismatches.append(f"total_users: expected {total_users}, got {stats.total_users}")
+        if stats.active_users != active_users:
+            mismatches.append(f"active_users: expected {active_users}, got {stats.active_users}")
+        if stats.suspended_users != suspended_users:
+            mismatches.append(f"suspended_users: expected {suspended_users}, got {stats.suspended_users}")
+        if stats.total_dealers != total_dealers:
+            mismatches.append(f"total_dealers: expected {total_dealers}, got {stats.total_dealers}")
+        if stats.active_dealers != active_dealers:
+            mismatches.append(f"active_dealers: expected {active_dealers}, got {stats.active_dealers}")
+        if stats.suspended_dealers != suspended_dealers:
+            mismatches.append(f"suspended_dealers: expected {suspended_dealers}, got {stats.suspended_dealers}")
+        if stats.pending_cars != pending_cars:
+            mismatches.append(f"pending_cars: expected {pending_cars}, got {stats.pending_cars}")
+        if stats.active_cars != active_cars:
+            mismatches.append(f"active_cars: expected {active_cars}, got {stats.active_cars}")
+        if stats.hidden_cars != hidden_cars:
+            mismatches.append(f"hidden_cars: expected {hidden_cars}, got {stats.hidden_cars}")
+        if stats.total_reviews != total_reviews:
+            mismatches.append(f"total_reviews: expected {total_reviews}, got {stats.total_reviews}")
 
-    if stats.total_users != total_users:
-        mismatches.append(
-            f"total_users: expected {total_users}, got {stats.total_users}"
+    # Upsert the new counts
+    from datetime import datetime, timezone
+    from sqlalchemy.dialects.postgresql import insert
+    
+    now = datetime.now(timezone.utc)
+    stmt = (
+        insert(PlatformStatistics)
+        .values(
+            id=1,
+            total_users=total_users,
+            active_users=active_users,
+            suspended_users=suspended_users,
+            total_dealers=total_dealers,
+            active_dealers=active_dealers,
+            suspended_dealers=suspended_dealers,
+            pending_cars=pending_cars,
+            active_cars=active_cars,
+            hidden_cars=hidden_cars,
+            total_reviews=total_reviews,
+            total_inquiries=0, # Optional: query inquiries if needed, defaulting to 0
+            updated_at=now,
         )
-    if stats.active_users != active_users:
-        mismatches.append(
-            f"active_users: expected {active_users}, got {stats.active_users}"
+        .on_conflict_do_update(
+            index_elements=[PlatformStatistics.id],
+            set_={
+                "total_users": total_users,
+                "active_users": active_users,
+                "suspended_users": suspended_users,
+                "total_dealers": total_dealers,
+                "active_dealers": active_dealers,
+                "suspended_dealers": suspended_dealers,
+                "pending_cars": pending_cars,
+                "active_cars": active_cars,
+                "hidden_cars": hidden_cars,
+                "total_reviews": total_reviews,
+                "updated_at": now,
+            }
         )
-    if stats.suspended_users != suspended_users:
-        mismatches.append(
-            f"suspended_users: expected {suspended_users}, got {stats.suspended_users}"
-        )
-
-    if stats.total_dealers != total_dealers:
-        mismatches.append(
-            f"total_dealers: expected {total_dealers}, got {stats.total_dealers}"
-        )
-    if stats.active_dealers != active_dealers:
-        mismatches.append(
-            f"active_dealers: expected {active_dealers}, got {stats.active_dealers}"
-        )
-    if stats.suspended_dealers != suspended_dealers:
-        mismatches.append(
-            f"suspended_dealers: expected {suspended_dealers}, got {stats.suspended_dealers}"
-        )
-
-    if stats.pending_cars != pending_cars:
-        mismatches.append(
-            f"pending_cars: expected {pending_cars}, got {stats.pending_cars}"
-        )
-    if stats.active_cars != active_cars:
-        mismatches.append(
-            f"active_cars: expected {active_cars}, got {stats.active_cars}"
-        )
-    if stats.hidden_cars != hidden_cars:
-        mismatches.append(
-            f"hidden_cars: expected {hidden_cars}, got {stats.hidden_cars}"
-        )
-
-    if stats.total_reviews != total_reviews:
-        mismatches.append(
-            f"total_reviews: expected {total_reviews}, got {stats.total_reviews}"
-        )
+    )
+    await session.execute(stmt)
 
     if mismatches:
         details = " | ".join(mismatches)
-        logger.warning(f"PlatformStatistics drift detected: {details}")
+        logger.warning(f"PlatformStatistics drift resolved: {details}")
 
-        # System user id UUID for system background tasks
         from uuid import UUID
-
         SYSTEM_USER_ID = UUID("00000000-0000-0000-0000-000000000000")
 
         await AuditService(session).log_action(
-            user_id=SYSTEM_USER_ID, action="STATISTICS_DRIFT_DETECTED", details=details
+            user_id=SYSTEM_USER_ID, action="STATISTICS_DRIFT_RESOLVED", details=details
         )
-        await session.commit()
+        
+    await session.commit()

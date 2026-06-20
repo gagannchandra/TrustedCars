@@ -15,6 +15,7 @@ class AuditLog(Base):
         Index("ix_audit_logs_target_created", "target_id", "created_at", "id"),
         Index("ix_audit_logs_action_created", "action", "created_at", "id"),
         Index("ix_audit_logs_corr_created", "correlation_id", "created_at", "id"),
+        {"postgresql_partition_by": "RANGE (created_at)"},
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -36,5 +37,5 @@ class AuditLog(Base):
         UUID(as_uuid=True), nullable=True, index=True
     )
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), primary_key=True, default=lambda: datetime.now(timezone.utc)
     )

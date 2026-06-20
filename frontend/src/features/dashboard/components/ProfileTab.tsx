@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Settings, Edit, Trash2, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useAuthStore } from '../../../store/authStore';
+import { useAuth } from '../../../shared/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 export default function ProfileTab() {
-  const { user, logout } = useAuthStore();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [profileForm, setProfileForm] = useState({ 
     full_name: user?.full_name || '', 

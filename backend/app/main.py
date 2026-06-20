@@ -26,13 +26,8 @@ from app.modules.wishlist.router import router as wishlist_router
 from app.modules.reviews.router import router as reviews_router, user_reviews_router
 from app.modules.admin.router import router as admin_router
 from app.modules.health.router import router as health_router
-from app.core.subscribers import setup_subscribers
+from app.bootstrap.subscribers import setup_subscribers
 from app.db.session import engine
-
-from app.core.worker import AsyncOutboxWorker
-
-worker = AsyncOutboxWorker()
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -45,14 +40,8 @@ async def lifespan(app: FastAPI):
             profiles_sample_rate=1.0,
         )
     setup_subscribers()
-    import os
-
-    if os.getenv("TESTING") != "1":
-        await worker.start()
     yield
     # Shutdown
-    if os.getenv("TESTING") != "1":
-        await worker.stop()
     from app.db.redis import redis_client
 
     await redis_client.close()
@@ -101,7 +90,7 @@ security = HTTPBasic()
 
 def get_current_metrics_user(credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, "admin")
-    correct_password = secrets.compare_digest(credentials.password, settings.SECRET_KEY)
+    correct_password = secrets.compare_digest(credentials.password, settings.METRICS_PASSWORD)
     if not (correct_username and correct_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

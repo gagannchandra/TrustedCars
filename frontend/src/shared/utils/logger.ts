@@ -6,7 +6,7 @@ class Logger {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
 
-    if (process.env.NODE_ENV !== 'production' || level === 'error') {
+    if (import.meta.env.MODE !== 'production' || level === 'error') {
       switch (level) {
         case 'info':
           console.info(prefix, message, ...args);

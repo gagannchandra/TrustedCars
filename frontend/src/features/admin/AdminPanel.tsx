@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Car, Users, Clock, BarChart3, Settings, ShieldAlert, Shield, Eye, LogOut, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { useAuthStore } from '../../store/authStore';
+import { useAuth } from '../../shared/hooks/useAuth';
 import { carsApi, usersApi } from '../../shared/api/client';
 
 import OverviewTab from './components/OverviewTab';
@@ -21,7 +21,7 @@ const ROLE_CONFIG: Record<string, { className: string; label: string }> = {
 };
 
 export default function AdminPanel() {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('overview');
   const [search, setSearch] = useState('');

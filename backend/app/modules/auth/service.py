@@ -157,7 +157,7 @@ class AuthService:
                     raise CustomException(401, "MFA code required")
                 import pyotp
 
-                secret = self.decrypt_mfa_secret(encrypted_mfa_secret, settings.SECRET_KEY)
+                secret = self.decrypt_mfa_secret(encrypted_mfa_secret, settings.MFA_ENCRYPTION_KEY)
                 totp = pyotp.TOTP(secret)
                 if not totp.verify(req.mfa_code):
                     raise CustomException(401, "Invalid MFA code")
@@ -193,7 +193,7 @@ class AuthService:
         try:
             payload = jwt.decode(
                 refresh_token_plain,
-                settings.SECRET_KEY,
+                settings.JWT_SECRET_KEY,
                 algorithms=[settings.ALGORITHM],
             )
             if payload.get("type") != "refresh":
@@ -240,7 +240,7 @@ class AuthService:
 
         secret = pyotp.random_base32()
 
-        encrypted_secret = self.encrypt_mfa_secret(secret, settings.SECRET_KEY)
+        encrypted_secret = self.encrypt_mfa_secret(secret, settings.MFA_ENCRYPTION_KEY)
 
         current_user.mfa_secret = encrypted_secret
 
@@ -273,7 +273,7 @@ class AuthService:
 
         import pyotp
 
-        secret = self.decrypt_mfa_secret(current_user.mfa_secret, settings.SECRET_KEY)
+        secret = self.decrypt_mfa_secret(current_user.mfa_secret, settings.MFA_ENCRYPTION_KEY)
         totp = pyotp.TOTP(secret)
 
         if not totp.verify(code):
@@ -330,7 +330,7 @@ class AuthService:
         try:
             payload = jwt.decode(
                 refresh_token_plain,
-                settings.SECRET_KEY,
+                settings.JWT_SECRET_KEY,
                 algorithms=[settings.ALGORITHM],
             )
             if payload.get("type") != "refresh":

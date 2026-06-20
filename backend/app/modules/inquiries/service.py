@@ -51,14 +51,18 @@ class InquiryService:
             }
         return data
 
-    def _verify_access(
+    async def _verify_access(
         self, inquiry: Inquiry, current_user: User, check_ownership: bool
     ):
         if not check_ownership:
             return True
-        if inquiry.buyer_id == current_user.id or inquiry.seller_id == current_user.id:
-            return True
-        raise CustomException(403, "Not authorized to access this inquiry")
+        from app.shared.rbac.dependencies import assert_can_edit_resource
+        await assert_can_edit_resource(
+            current_user=current_user,
+            owner_user_ids=[inquiry.buyer_id, inquiry.seller_id],
+            resource_name="inquiry",
+        )
+        return True
 
     async def create_inquiry(self, req: InquiryCreate, current_user: User) -> dict:
         seller_id = await self.car_provider.get_car_seller_id(req.car_id)
@@ -116,7 +120,7 @@ class InquiryService:
         if not inquiry:
             raise CustomException(404, "Inquiry not found")
 
-        self._verify_access(inquiry, current_user, True)
+        await self._verify_access(inquiry, current_user, True)
 
         if inquiry.status != InquiryStatusEnum.open:
             raise CustomException(400, "Cannot send messages to a closed inquiry")
@@ -169,7 +173,7 @@ class InquiryService:
         if not inquiry:
             raise CustomException(404, "Inquiry not found")
 
-        self._verify_access(inquiry, current_user, True)
+        await self._verify_access(inquiry, current_user, True)
 
         total = await self.repository.count_inquiry_messages(inquiry_id)
         messages = await self.repository.list_inquiry_messages(
@@ -187,7 +191,7 @@ class InquiryService:
         if not inquiry:
             raise CustomException(404, "Inquiry not found")
 
-        self._verify_access(inquiry, current_user, True)
+        await self._verify_access(inquiry, current_user, True)
         return self._format_inquiry_response(inquiry, car)
 
     async def close_inquiry(self, inquiry_id: UUID, current_user: User):
@@ -195,7 +199,7 @@ class InquiryService:
         if not inquiry:
             raise CustomException(404, "Inquiry not found")
 
-        self._verify_access(inquiry, current_user, True)
+        await self._verify_access(inquiry, current_user, True)
 
         if inquiry.status != InquiryStatusEnum.open:
             raise CustomException(400, "Inquiry is already closed")
@@ -230,7 +234,7 @@ class InquiryService:
         if not inquiry:
             raise CustomException(404, "Inquiry not found")
 
-        self._verify_access(inquiry, current_user, check_ownership)
+        await self._verify_access(inquiry, current_user, check_ownership)
 
         try:
             inquiry.status = InquiryStatusEnum.open
@@ -259,7 +263,7 @@ class InquiryService:
         if not inquiry:
             raise CustomException(404, "Inquiry not found")
 
-        self._verify_access(inquiry, current_user, check_ownership)
+        await self._verify_access(inquiry, current_user, check_ownership)
 
         try:
             inquiry.deleted_at = datetime.now(timezone.utc)

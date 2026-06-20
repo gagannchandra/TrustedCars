@@ -1,6 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { logger } from '../../shared/utils/logger';
+import * as Sentry from "@sentry/react";
 
 interface Props {
   children?: ReactNode;
@@ -22,6 +23,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     logger.error('Uncaught error:', error, errorInfo);
+    Sentry.captureException(error, { extra: errorInfo as Record<string, unknown> });
   }
 
   public render() {
@@ -48,7 +50,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 Go to Homepage
               </button>
             </div>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <div className="mt-8 p-4 bg-slate-50 rounded-xl text-left overflow-auto border border-slate-200">
                 <p className="text-error font-bold mb-2 text-sm">Error Details (Dev Only):</p>
                 <pre className="text-xs text-slate-700 font-mono whitespace-pre-wrap">{this.state.error.message}</pre>

@@ -22,7 +22,7 @@ async def get_current_user_id(
             raise CustomException(401, "Not authenticated")
     try:
         payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+            token, settings.JWT_SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         if payload.get("type") != "access":
             raise CustomException(401, "Invalid token type")
@@ -53,6 +53,10 @@ async def get_current_user_id(
         if is_suspended:
             raise HTTPException(status_code=403, detail="Account suspended")
 
+        request.state.user_id = user_id
+        from app.core.context import user_id_ctx
+        user_id_ctx.set(user_id)
+        
         return user_id
     except InvalidTokenError:
         raise CustomException(401, "Could not validate credentials")

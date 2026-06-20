@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
 import { carsApi } from '../../shared/api/client';
 import { formatPrice, formatOdometer, getQualityBadgeConfig, calculateEMI, timeAgo } from '../../shared/utils/utils';
-import { useAuthStore } from '../../store/authStore';
+import { useAuth } from '../../shared/hooks/useAuth';
 import CarCard from '../../components/cars/CarCard';
 
 import ImageGallery from './components/ImageGallery';
@@ -24,7 +24,7 @@ const SPEC_LABELS: Record<string, string> = {
 export default function CarDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { wishlist, toggleWishlist, isAuthenticated } = useAuthStore();
+  const { wishlist, toggleWishlist, isAuthenticated } = useAuth();
   const [activeImage, setActiveImage] = useState(0);
   const [showInquiry, setShowInquiry] = useState(false);
   const [showEMI, setShowEMI] = useState(false);

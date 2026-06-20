@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Camera, ChevronRight, ChevronLeft, Shield, Award, Zap, TrendingUp } from 'lucide-react';
-import { useAuthStore } from '../../store/authStore';
+import { useAuth } from '../../shared/hooks/useAuth';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -48,11 +48,12 @@ const STEPS = ['Car Details', 'Condition', 'Photos', 'Pricing', 'Contact'];
 
 export default function Sell() {
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user } = useAuth();
   const [started, setStarted] = useState(false);
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [previewPhotos, setPreviewPhotos] = useState<string[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const methods = useForm<SellFormValues>({
     resolver: zodResolver(sellSchema),
@@ -107,11 +108,33 @@ export default function Sell() {
       const newCar = await carsApi.createCar(payload);
 
       // Upload photos sequentially
-      for (let i = 0; i < previewPhotos.length; i++) {
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        
+        // Extract extension (e.g., .jpg, .png)
+        const match = file.name.match(/\.[0-9a-z]+$/i);
+        const ext = match ? match[0] : '.jpg';
+        
+        // 1. Get presigned URL
+        const presigned = await carsApi.generatePresignedUrl(newCar.id, {
+          file_extension: ext,
+          content_type: file.type || 'image/jpeg'
+        });
+        
+        // 2. Upload to S3
+        await fetch(presigned.upload_url, {
+          method: 'PUT',
+          body: file,
+          headers: {
+            'Content-Type': file.type || 'image/jpeg'
+          }
+        });
+        
+        // 3. Save metadata in backend
         await carsApi.uploadCarImages(newCar.id, {
           car_id: newCar.id,
-          image_url: previewPhotos[i], // Typically this would be a real uploaded URL, using data URL for mock
-          storage_key: `cars/${newCar.id}/img_${i}.jpg`,
+          image_url: presigned.public_url,
+          storage_key: presigned.storage_key,
           sort_order: i,
           is_primary: i === 0
         });
@@ -252,7 +275,7 @@ export default function Sell() {
             <form onSubmit={handleSubmit(onSubmit)}>
               {step === 0 && <VehicleDetailsForm />}
               {step === 1 && <ConditionReportForm />}
-              {step === 2 && <PhotoUploadForm previewPhotos={previewPhotos} setPreviewPhotos={setPreviewPhotos} />}
+              {step === 2 && <PhotoUploadForm previewPhotos={previewPhotos} setPreviewPhotos={setPreviewPhotos} selectedFiles={selectedFiles} setSelectedFiles={setSelectedFiles} />}
               {step === 3 && <PricingForm />}
               {step === 4 && <ContactForm />}
 

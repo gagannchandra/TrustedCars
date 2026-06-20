@@ -4,14 +4,18 @@ import { Upload, X } from 'lucide-react';
 interface PhotoUploadFormProps {
   previewPhotos: string[];
   setPreviewPhotos: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedFiles: File[];
+  setSelectedFiles: React.Dispatch<React.SetStateAction<File[]>>;
 }
 
-export default function PhotoUploadForm({ previewPhotos, setPreviewPhotos }: PhotoUploadFormProps) {
+export default function PhotoUploadForm({ previewPhotos, setPreviewPhotos, selectedFiles, setSelectedFiles }: PhotoUploadFormProps) {
   const [dragOver, setDragOver] = useState(false);
 
   const handlePhotoAdd = (files: FileList | null) => {
     if (!files) return;
-    const urls = Array.from(files).map(f => URL.createObjectURL(f));
+    const fileArray = Array.from(files);
+    const urls = fileArray.map(f => URL.createObjectURL(f));
+    setSelectedFiles(prev => [...prev, ...fileArray].slice(0, 10));
     setPreviewPhotos(prev => [...prev, ...urls].slice(0, 10));
   };
 
@@ -48,7 +52,10 @@ export default function PhotoUploadForm({ previewPhotos, setPreviewPhotos }: Pho
           {previewPhotos.map((url, i) => (
             <div key={i} className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm group">
               <img src={url} alt="" className="w-full h-full object-cover" />
-              <button onClick={() => setPreviewPhotos(p => p.filter((_, j) => j !== i))}
+              <button onClick={() => {
+                setPreviewPhotos(p => p.filter((_, j) => j !== i));
+                setSelectedFiles(f => f.filter((_, j) => j !== i));
+              }}
                 className="absolute top-2 right-2 w-8 h-8 bg-slate-900/80 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-error">
                 <X className="w-4 h-4 text-white" />
               </button>

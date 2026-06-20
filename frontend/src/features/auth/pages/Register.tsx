@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Car, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useAuthStore } from '../../../store/authStore';
+import { useAuth } from '../../../shared/hooks/useAuth';
 
 const registerSchema = z.object({
   full_name: z.string().min(2, 'Full Name must be at least 2 characters'),
@@ -17,7 +17,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function Register() {
   const navigate = useNavigate();
-  const { register: authRegister } = useAuthStore();
+  const { register: authRegister } = useAuth();
   const [showPass, setShowPass] = useState(false);
   const [authError, setAuthError] = useState('');
   

@@ -31,11 +31,15 @@ class ReviewsService:
             user_id, action, target_id, reason, details
         )
 
-    def _verify_access(self, review: Review, current_user: User, check_ownership: bool):
+    async def _verify_access(self, review: Review, current_user: User, check_ownership: bool):
         if not check_ownership:
             return
-        if review.reviewer_id != current_user.id:
-            raise CustomException(403, "Not authorized to access this review")
+        from app.shared.rbac.dependencies import assert_can_edit_resource
+        await assert_can_edit_resource(
+            current_user=current_user,
+            owner_user_ids=review.reviewer_id,
+            resource_name="review",
+        )
 
     async def _get_seller_from_car(self, car_id: UUID) -> User | None:
         car = await self.session.scalar(
@@ -148,7 +152,7 @@ class ReviewsService:
         if not review:
             raise CustomException(404, "Review not found")
 
-        self._verify_access(review, current_user, check_ownership)
+        await self._verify_access(review, current_user, check_ownership)
 
         review.rating = req.rating
         review.comment = req.comment
@@ -185,7 +189,7 @@ class ReviewsService:
         if not review:
             raise CustomException(404, "Review not found")
 
-        self._verify_access(review, current_user, check_ownership)
+        await self._verify_access(review, current_user, check_ownership)
 
         review.deleted_at = datetime.now(timezone.utc)
         try:
@@ -351,5 +355,6 @@ class ReviewsService:
                 .values(deleted_at=now)
             )
             await self.session.execute(upd)
-            for sid in seller_ids:
-                await self.repository.update_seller_aggregate(sid)
+            
+        for sid in seller_ids:
+            await self.repository.update_seller_aggregate(sid)

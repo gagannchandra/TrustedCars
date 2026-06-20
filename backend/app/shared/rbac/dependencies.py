@@ -6,6 +6,7 @@ from app.shared.rbac.mappings import get_role_permissions
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.shared.dependencies.auth import get_current_user
+from app.shared.interfaces.dealers import DealerAuthorizationProvider
 
 
 class RequirePermissions:
@@ -59,3 +60,24 @@ class RequirePermissions:
                 )
 
         return current_user
+
+
+async def assert_can_edit_resource(
+    current_user: User,
+    owner_user_ids,
+    dealership_id=None,
+    dealer_provider: DealerAuthorizationProvider | None = None,
+    resource_name: str = "resource",
+):
+    from app.modules.auth.models import RoleEnum
+    from app.shared.exceptions.handlers import CustomException
+
+    if current_user.role == RoleEnum.dealer and dealership_id and dealer_provider:
+        if not await dealer_provider.is_dealer_authorized(current_user.id, dealership_id):
+            raise CustomException(403, f"Not authorized to edit this dealership's {resource_name}")
+    else:
+        if isinstance(owner_user_ids, list):
+            if current_user.id not in owner_user_ids:
+                raise CustomException(403, f"Not authorized to edit this {resource_name}")
+        elif owner_user_ids != current_user.id:
+            raise CustomException(403, f"Not authorized to edit this {resource_name}")

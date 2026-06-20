@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, MessageSquare, User, LogOut, Car, TrendingUp, Shield, CheckCircle, Star, Plus, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { useAuthStore } from '../../store/authStore';
+import { useAuth } from '../../shared/hooks/useAuth';
 import { carsApi, inquiriesApi, reviewsApi } from '../../shared/api/client';
 
 import OverviewTab from './components/OverviewTab';
@@ -15,7 +15,7 @@ import ProfileTab from './components/ProfileTab';
 type Tab = 'overview' | 'wishlist' | 'garage' | 'inquiries' | 'reviews' | 'profile';
 
 export default function Dashboard() {
-  const { user, isAuthenticated, logout, wishlist } = useAuthStore();
+  const { user, isAuthenticated, logout, wishlist } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('overview');
 

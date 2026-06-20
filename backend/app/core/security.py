@@ -34,7 +34,7 @@ def create_access_token(
         "jti": str(uuid.uuid4()),
     }
     encoded_jwt = jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+        to_encode, settings.JWT_SECRET_KEY, algorithm=settings.ALGORITHM
     )
     return encoded_jwt
 
@@ -58,6 +58,6 @@ def create_refresh_token(
         "jti": str(uuid.uuid4()),
     }
     encoded_jwt = jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+        to_encode, settings.JWT_SECRET_KEY, algorithm=settings.ALGORITHM
     )
     return encoded_jwt

@@ -58,6 +58,11 @@ export const carsApi = {
     // The API expects individual image metadata uploads via POST /cars/{id}/images
     const res = await axiosInstance.post(`/cars/${carId}/images`, payload);
     return res.data;
+  },
+
+  generatePresignedUrl: async (carId: string, payload: { file_extension: string; content_type: string }): Promise<{upload_url: string; storage_key: string; public_url: string}> => {
+    const res = await axiosInstance.post(`/cars/${carId}/images/upload-url`, payload);
+    return res.data;
   }
 };
 

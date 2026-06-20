@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useAuthStore } from '../../store/authStore';
 import toast from 'react-hot-toast';
 
 export const axiosInstance = axios.create({
@@ -50,7 +49,7 @@ axiosInstance.interceptors.response.use(
         } catch (refreshError) {
           isRefreshing = false;
           processQueue(refreshError);
-          useAuthStore.getState().logout();
+          window.dispatchEvent(new CustomEvent('auth:unauthorized'));
           return Promise.reject(refreshError);
         }
       }

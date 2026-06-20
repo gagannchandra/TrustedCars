@@ -44,10 +44,12 @@ class CorrelationIdMiddleware(BaseHTTPMiddleware):
             client_host=request.client.host if request.client else None,
         )
 
-        endpoint = request.url.path
-
         try:
             response = await call_next(request)
+            
+            route = request.scope.get("route")
+            endpoint = route.path if route else request.url.path
+
             duration = time.time() - start_time
             REQUEST_DURATION.labels(method=request.method, endpoint=endpoint).observe(
                 duration
@@ -68,6 +70,8 @@ class CorrelationIdMiddleware(BaseHTTPMiddleware):
             response.headers["X-Correlation-ID"] = corr_id
             return response
         except Exception as e:
+            route = request.scope.get("route")
+            endpoint = route.path if route else request.url.path
             duration = time.time() - start_time
             REQUEST_ERRORS.labels(method=request.method, endpoint=endpoint).inc()
             logger.error(

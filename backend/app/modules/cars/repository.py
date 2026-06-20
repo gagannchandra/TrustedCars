@@ -30,75 +30,59 @@ class CarRepository:
         )
         return result.scalars().first()
 
+    from app.modules.cars.schemas import CarSearchFilters
+
     async def search_cars(
         self,
-        q: str | None,
-        make: str | None,
-        model: str | None,
-        min_year: int | None,
-        max_year: int | None,
-        year: int | None,
-        fuel_type: str | None,
-        transmission: str | None,
-        city: str | None,
-        state: str | None,
-        min_price: float | None,
-        max_price: float | None,
-        min_mileage: int | None,
-        max_mileage: int | None,
-        dealership_id: UUID | None,
-        body_type: str | None,
-        ownership_count: int | None,
-        sort: str | None,
-        limit: int,
-        skip: int = 0,
+        filters: "CarSearchFilters",
+        dealership_id: UUID | None = None,
     ):
         stmt = select(Car).where(
             Car.deleted_at.is_(None), Car.status == CarStatusEnum.active
         )
 
-        if q:
+        if filters.q:
             from sqlalchemy import or_
             stmt = stmt.where(
                 or_(
-                    Car.make.ilike(f"%{q}%"),
-                    Car.model.ilike(f"%{q}%"),
-                    Car.variant.ilike(f"%{q}%")
+                    Car.make.ilike(f"%{filters.q}%"),
+                    Car.model.ilike(f"%{filters.q}%"),
+                    Car.variant.ilike(f"%{filters.q}%")
                 )
             )
-        if make:
-            stmt = stmt.where(Car.make.ilike(f"{make}%"))
-        if model:
-            stmt = stmt.where(Car.model.ilike(f"{model}%"))
-        if year:
-            stmt = stmt.where(Car.year == year)
-        if min_year:
-            stmt = stmt.where(Car.year >= min_year)
-        if max_year:
-            stmt = stmt.where(Car.year <= max_year)
-        if fuel_type:
-            stmt = stmt.where(Car.fuel_type == fuel_type)
-        if transmission:
-            stmt = stmt.where(Car.transmission == transmission)
-        if city:
-            stmt = stmt.where(Car.city.ilike(f"{city}%"))
-        if state:
-            stmt = stmt.where(Car.state.ilike(f"{state}%"))
-        if min_price is not None:
-            stmt = stmt.where(Car.asking_price >= min_price)
-        if max_price is not None:
-            stmt = stmt.where(Car.asking_price <= max_price)
-        if min_mileage is not None:
-            stmt = stmt.where(Car.odometer_km >= min_mileage)
-        if max_mileage is not None:
-            stmt = stmt.where(Car.odometer_km <= max_mileage)
+        if filters.make:
+            stmt = stmt.where(Car.make.ilike(f"{filters.make}%"))
+        if filters.model:
+            stmt = stmt.where(Car.model.ilike(f"{filters.model}%"))
+        if filters.year:
+            stmt = stmt.where(Car.year == filters.year)
+        if filters.min_year:
+            stmt = stmt.where(Car.year >= filters.min_year)
+        if filters.max_year:
+            stmt = stmt.where(Car.year <= filters.max_year)
+        if filters.fuel_type:
+            stmt = stmt.where(Car.fuel_type == filters.fuel_type)
+        if filters.transmission:
+            stmt = stmt.where(Car.transmission == filters.transmission)
+        if filters.city:
+            stmt = stmt.where(Car.city.ilike(f"{filters.city}%"))
+        if filters.state:
+            stmt = stmt.where(Car.state.ilike(f"{filters.state}%"))
+        if filters.min_price is not None:
+            stmt = stmt.where(Car.asking_price >= filters.min_price)
+        if filters.max_price is not None:
+            stmt = stmt.where(Car.asking_price <= filters.max_price)
+        if filters.min_mileage is not None:
+            stmt = stmt.where(Car.odometer_km >= filters.min_mileage)
+        if filters.max_mileage is not None:
+            stmt = stmt.where(Car.odometer_km <= filters.max_mileage)
         if dealership_id:
             stmt = stmt.where(Car.dealership_id == dealership_id)
 
-        if body_type:
-            stmt = stmt.where(Car.body_type == body_type)
-        if ownership_count:
-            stmt = stmt.where(Car.ownership_count == ownership_count)
+        if filters.body_type:
+            stmt = stmt.where(Car.body_type == filters.body_type)
+        if filters.ownership_count:
+            stmt = stmt.where(Car.ownership_count == filters.ownership_count)
         
         # Get total count
         from sqlalchemy import func
@@ -107,18 +91,18 @@ class CarRepository:
         total = total_result.scalar() or 0
 
         # Apply sort
-        if sort == 'price_asc':
+        if filters.sort == 'price_asc':
             stmt = stmt.order_by(Car.asking_price.asc(), Car.id.desc())
-        elif sort == 'price_desc':
+        elif filters.sort == 'price_desc':
             stmt = stmt.order_by(Car.asking_price.desc(), Car.id.desc())
-        elif sort == 'year_desc':
+        elif filters.sort == 'year_desc':
             stmt = stmt.order_by(Car.year.desc(), Car.id.desc())
-        elif sort == 'km_asc':
+        elif filters.sort == 'km_asc':
             stmt = stmt.order_by(Car.odometer_km.asc(), Car.id.desc())
         else:
             stmt = stmt.order_by(Car.created_at.desc(), Car.id.desc())
 
-        stmt = stmt.offset(skip).limit(limit)
+        stmt = stmt.offset(filters.skip).limit(filters.limit)
         result = await self.session.execute(stmt)
         items = list(result.scalars().all())
         

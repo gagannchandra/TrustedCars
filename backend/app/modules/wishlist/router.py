@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
+from app.core.limiter import limiter
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from datetime import datetime
@@ -21,7 +22,9 @@ def get_wishlist_service(session: AsyncSession = Depends(get_db)) -> WishlistSer
 
 
 @router.post("/{car_id}", response_model=WishlistEntryResponse)
+@limiter.limit("60/minute")
 async def add_to_wishlist(
+    request: Request,
     car_id: UUID,
     current_user: User = Depends(get_current_active_user),
     service: WishlistService = Depends(get_wishlist_service),
@@ -30,7 +33,9 @@ async def add_to_wishlist(
 
 
 @router.delete("/{car_id}", status_code=204)
+@limiter.limit("60/minute")
 async def remove_from_wishlist(
+    request: Request,
     car_id: UUID,
     current_user: User = Depends(get_current_active_user),
     service: WishlistService = Depends(get_wishlist_service),

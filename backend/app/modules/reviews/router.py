@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
+from app.core.limiter import limiter
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from datetime import datetime
@@ -23,7 +24,9 @@ def get_reviews_service(session: AsyncSession = Depends(get_db)) -> ReviewsServi
 
 
 @router.post("", response_model=ReviewResponse)
+@limiter.limit("20/minute")
 async def create_review(
+    request: Request,
     req: ReviewCreate,
     current_user: User = Depends(get_current_active_user),
     service: ReviewsService = Depends(get_reviews_service),

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SlidersHorizontal, X, ChevronDown, Search, ArrowUpDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -16,7 +16,7 @@ const SORT_OPTIONS = [
 ];
 
 export default function Cars() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [filters, setFilters] = useState<FilterState>(() => ({
@@ -32,8 +32,18 @@ export default function Cars() {
     km_max: searchParams.get('km_max') ? Number(searchParams.get('km_max')) : undefined,
     ownership: searchParams.get('ownership') ? Number(searchParams.get('ownership')) : undefined,
     sort: searchParams.get('sort') || 'newest',
-    page: 1,
+    page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
   }));
+
+  useEffect(() => {
+    const newParams = new URLSearchParams();
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v !== undefined && v !== '') {
+        newParams.set(k, String(v));
+      }
+    });
+    setSearchParams(newParams, { replace: true });
+  }, [filters, setSearchParams]);
 
   const [searchInput, setSearchInput] = useState(filters.q || '');
 

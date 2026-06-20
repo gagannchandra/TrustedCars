@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
+from app.core.limiter import limiter
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from datetime import datetime
@@ -29,7 +30,9 @@ def get_inquiry_service(
 
 
 @router.post("", response_model=InquiryResponse)
+@limiter.limit("20/minute")
 async def create_inquiry(
+    request: Request,
     req: InquiryCreate,
     current_user: User = Depends(get_current_active_user),
     service: InquiryService = Depends(get_inquiry_service),
@@ -71,7 +74,9 @@ async def list_inquiry_messages(
 
 
 @router.post("/{id}/messages", response_model=MessageResponse)
+@limiter.limit("60/minute")
 async def send_message(
+    request: Request,
     id: UUID,
     req: MessageCreate,
     current_user: User = Depends(get_current_active_user),

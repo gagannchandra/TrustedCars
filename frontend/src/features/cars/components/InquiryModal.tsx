@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, CheckCircle, X } from 'lucide-react';
-import { useAuthStore } from '../../../store/authStore';
+import { useAuth } from '../../../shared/hooks/useAuth';
 import { Car } from '../../../types';
 import { inquiriesApi } from '../../../shared/api/client';
 import toast from 'react-hot-toast';
@@ -13,7 +13,7 @@ interface InquiryModalProps {
 }
 
 export default function InquiryModal({ car, onClose }: InquiryModalProps) {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: user?.full_name || '', phone: user?.phone || '', message: `Hi, I'm interested in the ${car.year} ${car.make} ${car.model}. Is it still available?`, date: '' });
   const [sent, setSent] = useState(false);

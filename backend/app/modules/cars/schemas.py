@@ -10,6 +10,28 @@ from app.modules.cars.models import (
 )
 
 
+class CarSearchFilters(BaseModel):
+    q: Optional[str] = None
+    make: Optional[str] = None
+    model: Optional[str] = None
+    min_year: Optional[int] = None
+    max_year: Optional[int] = None
+    year: Optional[int] = None
+    fuel_type: Optional[FuelTypeEnum] = None
+    transmission: Optional[TransmissionEnum] = None
+    body_type: Optional[BodyTypeEnum] = None
+    ownership_count: Optional[int] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    min_price: Optional[float] = None
+    max_price: Optional[float] = None
+    min_mileage: Optional[int] = None
+    max_mileage: Optional[int] = None
+    sort: Optional[str] = None
+    limit: int = Field(20, ge=1, le=100)
+    skip: int = Field(0, ge=0)
+
+
 class CarCreateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     make: str = Field(..., min_length=2, max_length=100)

@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Car, Heart, Menu, X, ChevronDown, Bell, LogOut, Settings, LayoutDashboard } from 'lucide-react';
-import { useAuthStore } from '../../store/authStore';
+import { useAuth } from '../../shared/hooks/useAuth';
 import toast from 'react-hot-toast';
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 

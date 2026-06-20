@@ -57,7 +57,7 @@ class OutboxEvent(Base):
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), primary_key=True, default=lambda: datetime.now(timezone.utc)
     )
     processed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
@@ -66,6 +66,7 @@ class OutboxEvent(Base):
     __table_args__ = (
         Index("ix_outbox_events_status_next_retry_at", "status", "next_retry_at"),
         Index("ix_outbox_events_status_last_attempt_at", "status", "last_attempt_at"),
+        {"postgresql_partition_by": "RANGE (created_at)"},
     )
 
 

@@ -36,10 +36,19 @@ class CarRepository:
         self,
         filters: "CarSearchFilters",
         dealership_id: UUID | None = None,
+        seller_id: UUID | None = None,
     ):
-        stmt = select(Car).where(
-            Car.deleted_at.is_(None), Car.status == CarStatusEnum.active
-        )
+        stmt = select(Car).where(Car.deleted_at.is_(None))
+        
+        if seller_id or dealership_id:
+            stmt = stmt.where(Car.status != 'archived')
+        else:
+            stmt = stmt.where(Car.status == CarStatusEnum.active)
+
+        if seller_id:
+            stmt = stmt.where(Car.user_id == seller_id)
+        if filters.is_featured is not None:
+            stmt = stmt.where(Car.is_featured == filters.is_featured)
 
         if filters.q:
             from sqlalchemy import or_

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Camera, ChevronRight, ChevronLeft, Shield, Award, Zap, TrendingUp } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import toast from 'react-hot-toast';
 
 import VehicleDetailsForm from './components/VehicleDetailsForm';
 import ConditionReportForm from './components/ConditionReportForm';
@@ -19,6 +20,7 @@ const sellSchema = z.object({
   model: z.string().min(1, 'Model is required'),
   variant: z.string().optional(),
   year: z.string().min(1, 'Year is required'),
+  body_type: z.enum(['sedan', 'suv', 'hatchback', 'mpv', 'coupe', 'pickup']),
   
   // Step 2
   odometer: z.string().min(1, 'Odometer is required'),
@@ -39,6 +41,7 @@ const sellSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   phone: z.string().min(10, 'Valid phone number is required'),
   city: z.string().optional(),
+  state: z.string().optional(),
   contactTime: z.string(),
 });
 
@@ -52,16 +55,21 @@ export default function Sell() {
   const [started, setStarted] = useState(false);
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
-  const [previewPhotos, setPreviewPhotos] = useState<string[]>([]);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [photos, setPhotos] = useState<{file: File; url: string}[]>([]);
+  
+  const photosRef = useRef(photos);
+  useEffect(() => { photosRef.current = photos; }, [photos]);
+  useEffect(() => {
+    return () => photosRef.current.forEach(p => URL.revokeObjectURL(p.url));
+  }, []);
 
   const methods = useForm<SellFormValues>({
     resolver: zodResolver(sellSchema),
     defaultValues: {
-      reg: '', make: '', model: '', variant: '', year: '',
+      reg: '', make: '', model: '', variant: '', year: '', body_type: 'sedan',
       odometer: '', fuel: 'petrol', transmission: 'manual', owners: '1', accident: 'no', color: '',
       price: '', negotiable: true, hasService: false, hasInvoice: false, hasInsurance: false,
-      name: user?.full_name || '', phone: user?.phone || '', city: user?.city || '', contactTime: 'anytime',
+      name: user?.full_name || '', phone: user?.phone || '', city: user?.city || '', state: user?.state || '', contactTime: 'anytime',
     },
     mode: 'onChange'
   });
@@ -70,7 +78,7 @@ export default function Sell() {
 
   const handleNext = async () => {
     let fieldsToValidate: (keyof SellFormValues)[] = [];
-    if (step === 0) fieldsToValidate = ['make', 'model', 'year'];
+    if (step === 0) fieldsToValidate = ['make', 'model', 'year', 'body_type'];
     if (step === 1) fieldsToValidate = ['odometer', 'fuel', 'transmission', 'owners', 'accident'];
     if (step === 3) fieldsToValidate = ['price'];
     
@@ -95,12 +103,12 @@ export default function Sell() {
         year: parseInt(data.year),
         fuel_type: data.fuel,
         transmission: data.transmission,
-        body_type: 'sedan', // Fallback, body_type is missing from form
+        body_type: data.body_type,
         odometer_km: parseInt(data.odometer.replace(/,/g, '')),
         ownership_count: parseInt(data.owners),
         asking_price: parseFloat(data.price.replace(/,/g, '')),
         city: data.city || 'Unknown',
-        state: 'Unknown', // Fallback, state is missing from form
+        state: data.state || 'Unknown',
         description: `Contact: ${data.name} (${data.contactTime}) - ${data.accident === 'yes' ? 'Accident History' : 'No Accidents'}`
       };
 
@@ -108,8 +116,8 @@ export default function Sell() {
       const newCar = await carsApi.createCar(payload);
 
       // Upload photos sequentially
-      for (let i = 0; i < selectedFiles.length; i++) {
-        const file = selectedFiles[i];
+      for (let i = 0; i < photos.length; i++) {
+        const file = photos[i].file;
         
         // Extract extension (e.g., .jpg, .png)
         const match = file.name.match(/\.[0-9a-z]+$/i);
@@ -143,7 +151,7 @@ export default function Sell() {
       setSubmitted(true);
     } catch (err) {
       console.error('Failed to submit listing:', err);
-      alert('Failed to submit listing. Please try again.');
+      toast.error('Failed to submit listing. Please try again.');
     }
   };
 
@@ -275,7 +283,7 @@ export default function Sell() {
             <form onSubmit={handleSubmit(onSubmit)}>
               {step === 0 && <VehicleDetailsForm />}
               {step === 1 && <ConditionReportForm />}
-              {step === 2 && <PhotoUploadForm previewPhotos={previewPhotos} setPreviewPhotos={setPreviewPhotos} selectedFiles={selectedFiles} setSelectedFiles={setSelectedFiles} />}
+              {step === 2 && <PhotoUploadForm photos={photos} setPhotos={setPhotos} />}
               {step === 3 && <PricingForm />}
               {step === 4 && <ContactForm />}
 

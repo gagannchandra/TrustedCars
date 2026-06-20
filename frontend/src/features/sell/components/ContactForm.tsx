@@ -26,6 +26,12 @@ export default function ContactForm() {
         {...register('city')} 
         error={errors.city?.message as string} 
       />
+      <Input 
+        label="State" 
+        placeholder="Your state" 
+        {...register('state')} 
+        error={errors.state?.message as string} 
+      />
       <Select 
         label="Preferred Contact Window" 
         {...register('contactTime')} 

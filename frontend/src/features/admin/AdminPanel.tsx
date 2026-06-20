@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Car, Users, Clock, BarChart3, Settings, ShieldAlert, Shield, Eye, LogOut, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../shared/hooks/useAuth';
-import { carsApi, usersApi } from '../../shared/api/client';
+import { carsApi, adminApi } from '../../shared/api/client';
 
 import OverviewTab from './components/OverviewTab';
 import PendingReviewsTab from './components/PendingReviewsTab';
@@ -30,7 +30,7 @@ export default function AdminPanel() {
   const [bannedUsers, setBannedUsers] = useState<string[]>([]);
 
   const { data: allCars = [], isLoading: loadingCars } = useQuery({ queryKey: ['adminAllCars'], queryFn: carsApi.getAllCarsAdmin, enabled: isAuthenticated && user?.role === 'admin' });
-  const { data: allUsers = [], isLoading: loadingUsers } = useQuery({ queryKey: ['adminAllUsers'], queryFn: usersApi.getAllUsers, enabled: isAuthenticated && user?.role === 'admin' });
+  const { data: allUsers = [], isLoading: loadingUsers } = useQuery({ queryKey: ['adminAllUsers'], queryFn: adminApi.getAllUsers, enabled: isAuthenticated && user?.role === 'admin' });
 
   if (!isAuthenticated || user?.role !== 'admin') {
     return (
@@ -42,9 +42,6 @@ export default function AdminPanel() {
           </div>
           <h2 className="text-2xl font-display font-bold text-slate-900 mb-2 tracking-tight">Restricted Access</h2>
           <p className="text-slate-500 font-medium mb-8 text-sm">Enterprise System Administration requires elevated privileges. Use admin credentials.</p>
-          <div className="bg-slate-50 p-4 rounded-xl text-xs font-mono text-slate-500 mb-8 border border-slate-200">
-            admin@trustedcars.in / Admin@123
-          </div>
           <button onClick={() => navigate('/login')} className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-black transition-colors shadow-md">Authenticate as Admin</button>
         </div>
       </div>

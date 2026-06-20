@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SlidersHorizontal, X, ChevronDown, Search, ArrowUpDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -6,6 +6,7 @@ import { carsApi } from '../../shared/api/client';
 import { FilterState, FuelType, Transmission, BodyType } from '../../types';
 import CarFilters from './components/CarFilters';
 import CarGrid from './components/CarGrid';
+import { Helmet } from 'react-helmet-async';
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest First' },
@@ -19,7 +20,7 @@ export default function Cars() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const [filters, setFilters] = useState<FilterState>(() => ({
+  const filters: FilterState = {
     q: searchParams.get('q') || undefined,
     make: searchParams.get('make') || undefined,
     model: searchParams.get('model') || undefined,
@@ -33,19 +34,13 @@ export default function Cars() {
     ownership: searchParams.get('ownership') ? Number(searchParams.get('ownership')) : undefined,
     sort: searchParams.get('sort') || 'newest',
     page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
-  }));
-
-  useEffect(() => {
-    const newParams = new URLSearchParams();
-    Object.entries(filters).forEach(([k, v]) => {
-      if (v !== undefined && v !== '') {
-        newParams.set(k, String(v));
-      }
-    });
-    setSearchParams(newParams, { replace: true });
-  }, [filters, setSearchParams]);
+  };
 
   const [searchInput, setSearchInput] = useState(filters.q || '');
+
+  useEffect(() => {
+    setSearchInput(searchParams.get('q') || '');
+  }, [searchParams]);
 
   const { data: response = { items: [], total: 0 }, isLoading } = useQuery({
     queryKey: ['cars', filters],
@@ -59,21 +54,31 @@ export default function Cars() {
   const pageCars = filteredCars; // No longer slice client-side
 
   const handleFilterChange = (key: keyof FilterState, value: FilterState[keyof FilterState]) => {
-    setFilters(prev => ({ ...prev, [key]: value, page: key === 'page' ? (value as number) : 1 }));
+    const newParams = new URLSearchParams(searchParams);
+    if (value === undefined || value === '') {
+      newParams.delete(key);
+    } else {
+      newParams.set(key, String(value));
+    }
+    if (key !== 'page') newParams.set('page', '1');
+    setSearchParams(newParams);
     if (key === 'page') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const resetFilters = () => {
-    setFilters({ sort: 'newest', page: 1 });
+    setSearchParams(new URLSearchParams());
     setSearchInput('');
   };
 
   const activeChips = Object.entries(filters).filter(([k, v]) => !['sort', 'page', 'q'].includes(k) && v !== undefined && v !== '');
 
   const removeFilter = (key: keyof FilterState) => {
-    setFilters(prev => { const n = { ...prev }; delete n[key]; return { ...n, page: 1 }; });
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete(key);
+    newParams.set('page', '1');
+    setSearchParams(newParams);
   };
 
   const LABELS: Record<string, (v: string | number) => string> = {
@@ -93,6 +98,9 @@ export default function Cars() {
 
   return (
     <div className="min-h-screen bg-surface pt-16">
+      <Helmet>
+        <title>Explore Inventory - TrustedCars</title>
+      </Helmet>
       {/* Header */}
       <div className="bg-white border-b border-slate-200 sticky top-16 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

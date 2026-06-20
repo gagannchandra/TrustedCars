@@ -6,7 +6,6 @@ import { z } from 'zod';
 import { Car, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../../shared/hooks/useAuth';
-import { DEMO_CREDENTIALS } from '../../../data/mockData';
 
 const loginSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email address'),
@@ -28,12 +27,12 @@ export default function Login() {
 
   const onSubmit = async (data: LoginFormValues) => {
     setAuthError('');
-    const success = await login(data.email, data.password);
-    if (success) {
+    const result = await login(data.email, data.password);
+    if (result.success) {
       toast.success('Successfully logged in!');
       navigate('/');
     } else {
-      setAuthError('Invalid email or password. Try demo credentials below.');
+      setAuthError(result.message || 'Invalid email or password. Try demo credentials below.');
     }
   };
 
@@ -128,23 +127,29 @@ export default function Login() {
           </p>
 
           {/* Demo Credentials */}
-          <div className="mt-10 border border-slate-200 rounded-2xl p-5 bg-white shadow-sm">
-            <p className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-wider">Demo Credentials — Click to fill</p>
-            <div className="space-y-2.5">
-              {DEMO_CREDENTIALS.map(cred => (
-                <button type="button" key={cred.email} onClick={() => fillCredential(cred)}
-                  className="w-full flex items-center justify-between text-left px-4 py-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-colors">
-                  <div>
-                    <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide mr-3 ${cred.role === 'Admin' ? 'bg-purple-100 text-purple-700' : 'bg-primary/10 text-primary'}`}>
-                      {cred.role}
-                    </span>
-                    <span className="text-sm font-medium text-slate-700">{cred.email}</span>
-                  </div>
-                  <span className="text-xs text-slate-400 font-mono font-medium">{cred.password}</span>
-                </button>
-              ))}
+          {import.meta.env.DEV && (
+            <div className="mt-10 border border-slate-200 rounded-2xl p-5 bg-white shadow-sm">
+              <p className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-wider">Demo Credentials — Click to fill</p>
+              <div className="space-y-2.5">
+                {[
+                  { role: 'Admin', email: 'admin@trustedcars.in', password: 'Admin@123' },
+                  { role: 'Standard User', email: 'rahul.sharma@gmail.com', password: 'User@123' },
+                  { role: 'Standard User', email: 'sneha.kapoor@gmail.com', password: 'User@123' },
+                ].map(cred => (
+                  <button type="button" key={cred.email} onClick={() => fillCredential(cred)}
+                    className="w-full flex items-center justify-between text-left px-4 py-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-colors">
+                    <div>
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide mr-3 ${cred.role === 'Admin' ? 'bg-purple-100 text-purple-700' : 'bg-primary/10 text-primary'}`}>
+                        {cred.role}
+                      </span>
+                      <span className="text-sm font-medium text-slate-700">{cred.email}</span>
+                    </div>
+                    <span className="text-xs text-slate-400 font-mono font-medium">{cred.password}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

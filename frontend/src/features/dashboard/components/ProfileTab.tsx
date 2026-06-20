@@ -1,16 +1,35 @@
 import { useState } from 'react';
 import { Settings, Edit, Trash2, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { DEFAULT_AVATAR_URL } from '../../../shared/utils/utils';
 import { useAuth } from '../../../shared/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { axiosInstance } from '../../../shared/api/axiosInstance';
 
 export default function ProfileTab() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [profileForm, setProfileForm] = useState({ 
     full_name: user?.full_name || '', 
     phone: user?.phone || '', 
     city: user?.city || '' 
+  });
+
+  const updateProfileMutation = useMutation({
+    mutationFn: (data: typeof profileForm) => axiosInstance.patch('/users/me', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      toast.success('Profile settings saved successfully!');
+    },
+    onError: () => toast.error('Failed to save profile.'),
+  });
+
+  const updatePasswordMutation = useMutation({
+    mutationFn: () => axiosInstance.post('/auth/reset-password', { email: user?.email }),
+    onSuccess: () => toast.success('Password reset email sent!'),
+    onError: () => toast.error('Failed to send reset email.'),
   });
 
   return (
@@ -27,7 +46,7 @@ export default function ProfileTab() {
 
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8 mb-10">
         <div className="relative shrink-0">
-          <img src={user?.avatar_url} alt={user?.full_name} className="w-28 h-28 rounded-3xl object-cover shadow-sm border border-slate-100" />
+          <img src={user?.avatar_url || DEFAULT_AVATAR_URL} onError={e => e.currentTarget.src = DEFAULT_AVATAR_URL} alt={user?.full_name} className="w-28 h-28 rounded-3xl object-cover shadow-sm border border-slate-100" />
           <button onClick={() => toast.success('Avatar upload dialog opened.')} className="absolute -bottom-2 -right-2 w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg hover:bg-blue-800 transition-colors border-2 border-white">
             <Edit className="w-4 h-4" />
           </button>
@@ -63,10 +82,10 @@ export default function ProfileTab() {
         </div>
         
         <div className="flex flex-wrap gap-4 pt-4">
-          <button onClick={() => toast.success('Profile settings saved successfully!')} className="bg-primary text-white px-8 py-3.5 rounded-xl text-sm font-bold shadow-md hover:bg-blue-800 transition-colors hover:-translate-y-0.5">
+          <button onClick={() => updateProfileMutation.mutate(profileForm)} className="bg-primary text-white px-8 py-3.5 rounded-xl text-sm font-bold shadow-md hover:bg-blue-800 transition-colors hover:-translate-y-0.5">
             Save Changes
           </button>
-          <button onClick={() => toast.success('Password reset email sent!')} className="border-2 border-slate-200 bg-white text-slate-700 px-8 py-3.5 rounded-xl text-sm font-bold hover:bg-slate-50 hover:border-slate-300 transition-colors">
+          <button onClick={() => updatePasswordMutation.mutate()} className="border-2 border-slate-200 bg-white text-slate-700 px-8 py-3.5 rounded-xl text-sm font-bold hover:bg-slate-50 hover:border-slate-300 transition-colors">
             Update Password
           </button>
         </div>

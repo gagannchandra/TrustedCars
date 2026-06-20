@@ -15,6 +15,7 @@ const Register = lazy(() => import('../../features/auth/pages/Register'));
 const Sell = lazy(() => import('../../features/sell/Sell'));
 const Dashboard = lazy(() => import('../../features/dashboard/Dashboard'));
 const AdminPanel = lazy(() => import('../../features/admin/AdminPanel'));
+const SellerListings = lazy(() => import('../../features/sell/pages/SellerListings'));
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -52,7 +53,7 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/sell" element={<ProtectedRoute><Sell /></ProtectedRoute>} />
-              <Route path="/sell/list" element={<ProtectedRoute><Sell /></ProtectedRoute>} />
+              <Route path="/sell/list" element={<ProtectedRoute><SellerListings /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['user', 'admin']}><Dashboard /></ProtectedRoute>} />
               <Route path="/dashboard/:tab" element={<ProtectedRoute allowedRoles={['user', 'admin']}><Dashboard /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminPanel /></ProtectedRoute>} />

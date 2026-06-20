@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { Car, Plus, Eye, Heart, Edit, CheckCircle, Clock, XCircle } from 'lucide-react';
-import toast from 'react-hot-toast';
 import type { Car as CarType } from '../../../types';
 import { formatPrice, formatOdometer } from '../../../shared/utils/utils';
 
@@ -86,9 +85,9 @@ export default function GarageTab({ myCars }: GarageTabProps) {
                           <Link to={`/cars/${car.id}`} className="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
                             <Eye className="w-5 h-5" />
                           </Link>
-                          <button onClick={() => toast.success('Editing functionality coming soon!')} className="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                          <Link to="/sell/list" className="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
                             <Edit className="w-5 h-5" />
-                          </button>
+                          </Link>
                         </div>
                       </td>
                     </tr>

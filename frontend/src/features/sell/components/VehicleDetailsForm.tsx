@@ -1,5 +1,5 @@
 import { useFormContext } from 'react-hook-form';
-import { MAKES } from '../../../data/mockData';
+import { MAKES } from '../../../data/makes';
 import { Input } from '../../../shared/ui/Input';
 import { Select } from '../../../shared/ui/Select';
 
@@ -51,6 +51,20 @@ export default function VehicleDetailsForm() {
           options={[
             { value: '', label: 'Select Year' },
             ...Array.from({ length: 15 }, (_, i) => 2024 - i).map(y => ({ value: y.toString(), label: y.toString() }))
+          ]}
+        />
+        <Select 
+          label="Body Type *" 
+          {...register('body_type')} 
+          error={errors.body_type?.message as string}
+          options={[
+            { value: '', label: 'Select Body Type' },
+            { value: 'sedan', label: 'Sedan' },
+            { value: 'suv', label: 'SUV' },
+            { value: 'hatchback', label: 'Hatchback' },
+            { value: 'mpv', label: 'MPV' },
+            { value: 'coupe', label: 'Coupe' },
+            { value: 'pickup', label: 'Pickup' }
           ]}
         />
       </div>

@@ -1,19 +1,12 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import AppRouter from './app/router/AppRouter';
 import { ErrorBoundary } from './app/providers/ErrorBoundary';
 import * as Sentry from "@sentry/react";
 import './index.css';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000,
-    },
-  },
-});
+import { queryClient } from './shared/api/queryClient';
 
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_DSN,
@@ -21,8 +14,8 @@ Sentry.init({
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
   ],
-  tracesSampleRate: 1.0,
-  tracePropagationTargets: ["localhost", /^https:\/\/yourserver\.io\/api/],
+  tracesSampleRate: import.meta.env.PROD ? 0.1 : 1.0,
+  tracePropagationTargets: ["localhost", /^https:\/\/api\.trustedcars\.in/],
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
 });

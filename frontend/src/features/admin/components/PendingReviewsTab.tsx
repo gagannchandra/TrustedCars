@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { CheckCircle, Eye, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { Car } from '../../../types';
-import { formatPrice, formatOdometer, getQualityBadgeConfig, timeAgo } from '../../../shared/utils/utils';
+import { formatPrice, formatOdometer, timeAgo } from '../../../shared/utils/utils';
 
 interface PendingReviewsTabProps {
   pendingCars: Car[];
@@ -30,7 +30,6 @@ export default function PendingReviewsTab({ pendingCars, setApprovedCars, setRej
       ) : (
         <div className="space-y-6">
           {pendingCars.map(car => {
-            const badge = getQualityBadgeConfig(car.quality_badge);
             return (
               <div key={car.id} className="bg-white rounded-[24px] border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.03)] p-6 transition-all hover:shadow-md">
                 <div className="flex flex-col sm:flex-row gap-6">
@@ -63,9 +62,13 @@ export default function PendingReviewsTab({ pendingCars, setApprovedCars, setRej
                           <p className="text-xs font-medium text-slate-500">Submitted {timeAgo(car.created_at)}</p>
                         </div>
                       </div>
-                      {car.inspection_score && (
-                        <div className={`text-xs font-bold px-3 py-1.5 rounded-lg border ${badge.className}`}>
-                          QC Score: {car.inspection_score}/10
+                      {car.inspection_score !== undefined && (
+                        <div className={`text-xs font-bold px-3 py-1.5 rounded-lg border ${
+                          car.inspection_score < 50 ? 'bg-error/10 text-error border-error/20' : 
+                          car.inspection_score < 70 ? 'bg-warning/10 text-warning border-warning/20' : 
+                          'bg-success/10 text-success border-success/20'
+                        }`}>
+                          QC Score: {car.inspection_score}/100
                         </div>
                       )}
                     </div>

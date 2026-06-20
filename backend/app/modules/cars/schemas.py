@@ -8,6 +8,14 @@ from app.modules.cars.models import (
     TransmissionEnum,
     BodyTypeEnum,
 )
+from enum import Enum
+
+class SortOption(str, Enum):
+    newest = "newest"
+    price_asc = "price_asc"
+    price_desc = "price_desc"
+    year_desc = "year_desc"
+    km_asc = "km_asc"
 
 
 class CarSearchFilters(BaseModel):
@@ -23,11 +31,12 @@ class CarSearchFilters(BaseModel):
     ownership_count: Optional[int] = None
     city: Optional[str] = None
     state: Optional[str] = None
+    is_featured: Optional[bool] = None
     min_price: Optional[float] = None
     max_price: Optional[float] = None
     min_mileage: Optional[int] = None
     max_mileage: Optional[int] = None
-    sort: Optional[str] = None
+    sort: Optional[SortOption] = None
     limit: int = Field(20, ge=1, le=100)
     skip: int = Field(0, ge=0)
 

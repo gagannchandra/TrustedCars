@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Heart, MessageSquare, User, LogOut, Car, TrendingUp, Shield, CheckCircle, Star, Plus, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../shared/hooks/useAuth';
+import { DEFAULT_AVATAR_URL } from '../../shared/utils/utils';
 import { carsApi, inquiriesApi, reviewsApi } from '../../shared/api/client';
+import { Helmet } from 'react-helmet-async';
 
 import OverviewTab from './components/OverviewTab';
 import WishlistTab from './components/WishlistTab';
@@ -15,13 +16,14 @@ import ProfileTab from './components/ProfileTab';
 type Tab = 'overview' | 'wishlist' | 'garage' | 'inquiries' | 'reviews' | 'profile';
 
 export default function Dashboard() {
-  const { user, isAuthenticated, logout, wishlist } = useAuth();
+  const { user, isAuthenticated, logout, wishlistCars } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>('overview');
+  const { tab: urlTab } = useParams<{ tab?: string }>();
+  const tab = (urlTab as Tab) || 'overview';
 
-  const { data: cars = [], isLoading: loadingCars } = useQuery({ queryKey: ['allCars'], queryFn: carsApi.getAllCarsAdmin, enabled: isAuthenticated });
-  const { data: inquiries = [], isLoading: loadingInquiries } = useQuery({ queryKey: ['allInquiries'], queryFn: inquiriesApi.getAllInquiries, enabled: isAuthenticated });
-  const { data: reviews = [], isLoading: loadingReviews } = useQuery({ queryKey: ['allReviews'], queryFn: reviewsApi.getAllReviews, enabled: isAuthenticated });
+  const { data: myCars = [], isLoading: loadingCars } = useQuery({ queryKey: ['myCars'], queryFn: carsApi.getMyCars, enabled: isAuthenticated });
+  const { data: myInquiries = [], isLoading: loadingInquiries } = useQuery({ queryKey: ['myInquiries'], queryFn: inquiriesApi.getMyInquiries, enabled: isAuthenticated });
+  const { data: myReviews = [], isLoading: loadingReviews } = useQuery({ queryKey: ['myReviews'], queryFn: reviewsApi.getMyReviews, enabled: isAuthenticated });
 
   if (!isAuthenticated) {
     return (
@@ -46,11 +48,8 @@ export default function Dashboard() {
     );
   }
 
-  const wishlistCars = cars.filter(c => wishlist.includes(c.id));
-  const myCars = cars.filter(c => c.seller_id === user?.id || c.seller_id === 'u2');
-  const sentInquiries = inquiries.filter(i => i.buyer_id === user?.id || i.buyer_id === 'u5');
-  const receivedInquiries = inquiries.filter(i => i.seller_id === user?.id || i.seller_id === 'u2');
-  const myReviews = reviews.filter(r => r.seller_id === user?.id || r.seller_id === 'u2');
+  const sentInquiries = myInquiries.filter(i => i.buyer_id === user?.id);
+  const receivedInquiries = myInquiries.filter(i => i.seller_id === user?.id);
 
   const TABS = [
     { id: 'overview' as Tab, label: 'Overview', icon: TrendingUp },
@@ -63,6 +62,9 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-surface pt-16">
+      <Helmet>
+        <title>Dashboard - TrustedCars</title>
+      </Helmet>
       {/* Header */}
       <div className="bg-primary text-white pt-12 pb-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1920&q=80')] opacity-5 mix-blend-overlay object-cover"></div>
@@ -71,7 +73,7 @@ export default function Dashboard() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-5">
               <div className="relative">
-                <img src={user?.avatar_url} alt={user?.full_name} className="w-20 h-20 rounded-2xl border-4 border-white/20 shadow-lg object-cover" />
+                <img src={user?.avatar_url || DEFAULT_AVATAR_URL} onError={e => e.currentTarget.src = DEFAULT_AVATAR_URL} alt={user?.full_name} className="w-20 h-20 rounded-2xl border-4 border-white/20 shadow-lg object-cover" />
                 <div className="absolute -bottom-2 -right-2 bg-success text-white w-6 h-6 rounded-full flex items-center justify-center border-2 border-primary shadow-sm">
                   <CheckCircle className="w-3.5 h-3.5" />
                 </div>
@@ -105,7 +107,7 @@ export default function Dashboard() {
                   const Icon = t.icon;
                   const isActive = tab === t.id;
                   return (
-                    <button key={t.id} onClick={() => setTab(t.id)}
+                    <button key={t.id} onClick={() => navigate(`/dashboard/${t.id}`, { replace: true })}
                       className={`w-full flex items-center text-left gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all ${isActive ? 'bg-primary text-white shadow-md shadow-primary/20' : 'text-slate-600 hover:bg-slate-50'}`}>
                       <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                       <span className="truncate">{t.label}</span>

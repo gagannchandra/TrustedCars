@@ -2,6 +2,8 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Car, FilterState, QualityBadge } from '../../types';
 
+export const DEFAULT_AVATAR_URL = 'https://ui-avatars.com/api/?name=User&background=0F4C81&color=fff';
+export const DEFAULT_CAR_IMAGE = 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

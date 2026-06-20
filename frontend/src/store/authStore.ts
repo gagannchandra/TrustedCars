@@ -1,13 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { axiosInstance } from '../shared/api/axiosInstance';
+import { queryClient } from '../shared/api/queryClient';
 
 interface AuthState {
   isAuthenticated: boolean;
   setAuthenticated: (status: boolean) => void;
   logout: () => void;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (data: { email: string; password: string; full_name: string; role: 'user' | 'dealer' }) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{success: boolean; message?: string}>;
+  register: (data: { email: string; password: string; full_name: string; role: 'user' | 'dealer' }) => Promise<{success: boolean; message?: string}>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -22,11 +23,12 @@ export const useAuthStore = create<AuthState>()(
           const res = await axiosInstance.post('/auth/login', { email, password });
           if (res.status === 200) {
             set({ isAuthenticated: true });
-            return true;
+            return { success: true };
           }
-          return false;
-        } catch (error) {
-          return false;
+          return { success: false, message: 'Login failed.' };
+        } catch (error: any) {
+          const msg = error.response?.data?.detail || 'Login failed. Please try again.';
+          return { success: false, message: msg };
         }
       },
 
@@ -42,14 +44,16 @@ export const useAuthStore = create<AuthState>()(
           if (res.data?.id) {
              return await get().login(data.email, data.password);
           }
-          return false;
-        } catch (error) {
-          return false;
+          return { success: false, message: 'Registration failed.' };
+        } catch (error: any) {
+          const msg = error.response?.data?.detail || 'Registration failed. Please try again.';
+          return { success: false, message: msg };
         }
       },
 
       logout: () => {
         set({ isAuthenticated: false });
+        queryClient.clear();
         axiosInstance.post('/auth/logout').catch(() => {});
       },
     }),

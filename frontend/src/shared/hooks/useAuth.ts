@@ -3,11 +3,17 @@ import { axiosInstance } from '../api/axiosInstance';
 import { useAuthStore } from '../../store/authStore';
 import toast from 'react-hot-toast';
 
+interface RegisterPayload {
+  email: string;
+  password: string;
+  full_name: string;
+  role: 'user' | 'dealer';
+}
+
 export function useAuth() {
   const queryClient = useQueryClient();
   const { 
     isAuthenticated, 
-    setAuthenticated, 
     login: storeLogin, 
     register: storeRegister, 
     logout: storeLogout 
@@ -28,7 +34,7 @@ export function useAuth() {
     queryFn: async () => {
       try {
         const res = await axiosInstance.get('/wishlist');
-        return res.data?.items?.map((item: any) => item.car_id) || [];
+        return res.data?.items?.map((item: any) => item.car) || [];
       } catch (e) {
         return [];
       }
@@ -50,16 +56,17 @@ export function useAuth() {
     },
     onMutate: async (carId) => {
       await queryClient.cancelQueries({ queryKey: ['wishlist'] });
-      const previousWishlist = queryClient.getQueryData<string[]>(['wishlist']) || [];
+      const previousWishlist = queryClient.getQueryData<any[]>(['wishlist']) || [];
       
-      queryClient.setQueryData<string[]>(['wishlist'], (old) => {
-        if (!Array.isArray(old)) return [carId];
-        return old.includes(carId) ? old.filter(id => id !== carId) : [...old, carId];
+      queryClient.setQueryData<any[]>(['wishlist'], (old) => {
+        if (!Array.isArray(old)) return [{ id: carId }];
+        const isAdded = old.some(c => c.id === carId);
+        return isAdded ? old.filter(c => c.id !== carId) : [...old, { id: carId }];
       });
 
       return { previousWishlist };
     },
-    onError: (err, carId, context) => {
+    onError: (_, __, context) => {
       toast.error("Failed to update wishlist");
       if (context?.previousWishlist) {
         queryClient.setQueryData(['wishlist'], context.previousWishlist);
@@ -71,12 +78,12 @@ export function useAuth() {
   });
 
   const login = async (email: string, password: string) => {
-    const success = await storeLogin(email, password);
-    if (success) {
+    const result = await storeLogin(email, password);
+    if (result.success) {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['wishlist'] });
     }
-    return success;
+    return result;
   };
 
   const logout = () => {
@@ -84,13 +91,13 @@ export function useAuth() {
     queryClient.clear();
   };
 
-  const register = async (data: any) => {
-    const success = await storeRegister(data);
-    if (success) {
+  const register = async (data: RegisterPayload) => {
+    const result = await storeRegister(data);
+    if (result.success) {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['wishlist'] });
     }
-    return success;
+    return result;
   };
 
   const toggleWishlist = (carId: string) => {
@@ -104,7 +111,8 @@ export function useAuth() {
   return {
     user: profileQuery.data || null,
     isLoading: profileQuery.isLoading,
-    wishlist: wishlistQuery.data || [],
+    wishlist: (wishlistQuery.data || []).map((c: any) => c.id),
+    wishlistCars: wishlistQuery.data || [],
     isAuthenticated,
     login,
     register,

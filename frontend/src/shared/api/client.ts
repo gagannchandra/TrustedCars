@@ -34,9 +34,20 @@ export const carsApi = {
     return res.data;
   },
 
+  getWishlistCars: async (ids: string[]): Promise<Car[]> => {
+    if (!ids || ids.length === 0) return [];
+    const results = await Promise.all(ids.map(id => axiosInstance.get(`/cars/${id}`).then(r => r.data).catch(() => null)));
+    return results.filter(Boolean);
+  },
+
+  getMyCars: async (): Promise<Car[]> => {
+    const res = await axiosInstance.get('/cars?seller_id=me');
+    return res.data.items || [];
+  },
+
   getFeaturedCars: async (): Promise<Car[]> => {
-    const res = await axiosInstance.get('/cars?limit=50&sort=newest');
-    return res.data.items.filter((c: Car) => c.is_featured).slice(0, 6);
+    const res = await axiosInstance.get('/cars?limit=6&sort=newest&is_featured=true');
+    return res.data.items;
   },
 
   getSimilarCars: async (car: Car, limit = 4): Promise<Car[]> => {
@@ -66,9 +77,13 @@ export const carsApi = {
   }
 };
 
-export const usersApi = {
+export const adminApi = {
   getAllUsers: async (): Promise<User[]> => {
     const res = await axiosInstance.get('/admin/users');
+    return res.data;
+  },
+  updateSettings: async (payload: { platform_fee: number; auto_approve: boolean }) => {
+    const res = await axiosInstance.patch('/admin/settings', payload);
     return res.data;
   }
 };
@@ -78,8 +93,20 @@ export const inquiriesApi = {
     const res = await axiosInstance.get('/inquiries');
     return res.data;
   },
+  getMyInquiries: async (): Promise<Inquiry[]> => {
+    const res = await axiosInstance.get('/inquiries/me');
+    return res.data;
+  },
   createInquiry: async (payload: { car_id: string; message: string }): Promise<Inquiry> => {
     const res = await axiosInstance.post('/inquiries', payload);
+    return res.data;
+  },
+  replyInquiry: async (id: string, message: string): Promise<any> => {
+    const res = await axiosInstance.post(`/inquiries/${id}/messages`, { message });
+    return res.data;
+  },
+  closeInquiry: async (id: string): Promise<any> => {
+    const res = await axiosInstance.patch(`/inquiries/${id}`, { status: 'closed' });
     return res.data;
   }
 };
@@ -87,6 +114,10 @@ export const inquiriesApi = {
 export const reviewsApi = {
   getAllReviews: async (): Promise<Review[]> => {
     const res = await axiosInstance.get('/admin/reviews');
+    return res.data;
+  },
+  getMyReviews: async (): Promise<Review[]> => {
+    const res = await axiosInstance.get('/reviews/me');
     return res.data;
   }
 };

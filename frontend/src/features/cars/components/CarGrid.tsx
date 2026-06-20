@@ -10,6 +10,13 @@ interface CarGridProps {
   isLoading?: boolean;
 }
 
+function getPageRange(current: number, total: number) {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  if (current <= 4) return [1, 2, 3, 4, 5, '...', total];
+  if (current >= total - 3) return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+  return [1, '...', current - 1, current, current + 1, '...', total];
+}
+
 export default function CarGrid({ pageCars, page, totalPages, handleFilterChange, resetFilters, isLoading }: CarGridProps) {
   return (
     <div className="flex-1 min-w-0">
@@ -19,7 +26,7 @@ export default function CarGrid({ pageCars, page, totalPages, handleFilterChange
           <p className="text-[#64748B] font-bold animate-pulse">Loading premium vehicles...</p>
         </div>
       ) : pageCars.length === 0 ? (
-        <div className="text-center py-24 bg-white rounded-[24px] border border-[#E2E8F0] shadow-sm">
+        <div className="text-center py-24 bg-white rounded-[24px] border border-[#E2E8F0] shadow-sm min-h-[500px] flex flex-col items-center justify-center">
           <div className="text-6xl mb-6">🚗</div>
           <h3 className="font-display font-bold text-[#0F172A] text-2xl mb-2 tracking-tight">No vehicles found</h3>
           <p className="text-[#64748B] font-medium text-base mb-8">Try adjusting your filters to see more results from our inventory</p>
@@ -41,9 +48,9 @@ export default function CarGrid({ pageCars, page, totalPages, handleFilterChange
                 Previous
               </button>
               <div className="flex gap-1.5 px-2">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-                  <button key={p} onClick={() => handleFilterChange('page', p)}
-                    className={`w-10 h-10 rounded-full text-sm font-bold transition-all ${p === page ? 'bg-primary text-white shadow-md shadow-primary/30' : 'border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 bg-slate-50'}`}>
+                {getPageRange(page, totalPages).map((p, i) => (
+                  <button key={i} onClick={() => typeof p === 'number' && handleFilterChange('page', p)} disabled={p === '...'}
+                    className={`w-10 h-10 rounded-full text-sm font-bold transition-all ${p === page ? 'bg-primary text-white shadow-md shadow-primary/30' : p === '...' ? 'cursor-default text-slate-400 bg-transparent' : 'border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 bg-slate-50'}`}>
                     {p}
                   </button>
                 ))}

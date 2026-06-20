@@ -1,5 +1,6 @@
 import { SlidersHorizontal } from 'lucide-react';
-import { MAKES, CITIES } from '../../../data/mockData';
+import { MAKES } from '../../../data/makes';
+import { CITIES } from '../../../data/cities';
 import { FilterState, FuelType, Transmission, BodyType } from '../../../types';
 
 const FUEL_OPTIONS = [
@@ -26,8 +27,16 @@ interface CarFiltersProps {
   onReset: () => void;
 }
 
+import { useState, useEffect } from 'react';
+
 export default function CarFilters({ filters, onChange, onReset }: CarFiltersProps) {
   const activeCount = Object.entries(filters).filter(([k, v]) => k !== 'sort' && k !== 'page' && v !== undefined && v !== '').length;
+
+  const [localPrice, setLocalPrice] = useState({ min: filters.price_min?.toString() ?? '', max: filters.price_max?.toString() ?? '' });
+  
+  useEffect(() => {
+    setLocalPrice({ min: filters.price_min?.toString() ?? '', max: filters.price_max?.toString() ?? '' });
+  }, [filters.price_min, filters.price_max]);
 
   return (
     <aside className="w-72 shrink-0">
@@ -47,9 +56,9 @@ export default function CarFilters({ filters, onChange, onReset }: CarFiltersPro
           <div>
             <label className="text-sm font-bold text-slate-900 block mb-3">Budget Range</label>
             <div className="flex gap-3">
-              <input type="number" placeholder="Min ₹" value={filters.price_min ?? ''} onChange={e => onChange('price_min', e.target.value ? Number(e.target.value) : undefined)}
+              <input type="number" placeholder="Min ₹" value={localPrice.min} onChange={e => setLocalPrice(p => ({ ...p, min: e.target.value }))} onBlur={() => onChange('price_min', localPrice.min ? Number(localPrice.min) : undefined)}
                 className="flex-1 min-w-0 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-slate-50 focus:bg-white" />
-              <input type="number" placeholder="Max ₹" value={filters.price_max ?? ''} onChange={e => onChange('price_max', e.target.value ? Number(e.target.value) : undefined)}
+              <input type="number" placeholder="Max ₹" value={localPrice.max} onChange={e => setLocalPrice(p => ({ ...p, max: e.target.value }))} onBlur={() => onChange('price_max', localPrice.max ? Number(localPrice.max) : undefined)}
                 className="flex-1 min-w-0 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-slate-50 focus:bg-white" />
             </div>
           </div>

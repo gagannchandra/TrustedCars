@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Heart, MapPin, Eye, Fuel, Gauge, Users, CheckCircle, ShieldCheck } from 'lucide-react';
 import { Car } from '../../types';
-import { formatPrice, formatOdometer, getQualityBadgeConfig, calculateEMI } from '../../shared/utils/utils';
+import { formatPrice, formatOdometer, calculateEMI, DEFAULT_CAR_IMAGE } from '../../shared/utils/utils';
 import { useAuth } from '../../shared/hooks/useAuth';
 
 interface CarCardProps {
@@ -18,7 +18,6 @@ export default function CarCard({ car, compact = false, index = 0 }: CarCardProp
   const { wishlist, toggleWishlist, isAuthenticated } = useAuth();
   const isWishlisted = wishlist.includes(car.id);
   const emi = calculateEMI(car.asking_price * 0.8, 9.5, 60);
-  const primaryImage = car.images?.[0]?.url || 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&q=80';
   const priceDiff = car.market_value ? Math.round(((car.market_value - car.asking_price) / car.market_value) * 100) : 0;
 
   return (
@@ -30,10 +29,11 @@ export default function CarCard({ car, compact = false, index = 0 }: CarCardProp
       <div className="relative aspect-[16/10] overflow-hidden bg-slate-50 shrink-0">
         <Link to={`/cars/${car.id}`} className="block w-full h-full">
           <img
-            src={primaryImage}
+            src={car.images?.[0]?.url || DEFAULT_CAR_IMAGE}
             alt={`${car.year} ${car.make} ${car.model}`}
+            onError={(e) => { e.currentTarget.src = DEFAULT_CAR_IMAGE; }}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-            loading="lazy"
+            loading={index && index > 3 ? 'lazy' : 'eager'}
           />
         </Link>
         <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/40 to-transparent pointer-events-none" />

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Car, Heart, Menu, X, ChevronDown, Bell, LogOut, Settings, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth';
+import { DEFAULT_AVATAR_URL } from '../../shared/utils/utils';
 import toast from 'react-hot-toast';
 
 export default function Navbar() {
@@ -11,6 +12,22 @@ export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+      if (notificationsRef.current && !notificationsRef.current.contains(e.target as Node)) {
+        setNotificationsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -24,8 +41,10 @@ export default function Navbar() {
     return '/dashboard';
   };
 
-  const navItemClass = (path: string) => 
-    `text-sm font-medium transition-colors ${location.pathname.startsWith(path) ? 'text-primary' : 'text-slate-600 hover:text-primary'}`;
+  const navItemClass = (path: string) => {
+    const isActive = path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+    return `text-sm font-medium transition-colors ${isActive ? 'text-primary' : 'text-slate-600 hover:text-primary'}`;
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
@@ -64,7 +83,7 @@ export default function Navbar() {
                 <Link to="/dashboard/wishlist" className="relative p-2 text-slate-500 hover:text-primary transition-colors">
                   <Heart className="w-5 h-5" />
                 </Link>
-                <div className="relative">
+                <div className="relative" ref={notificationsRef}>
                   <button onClick={() => setNotificationsOpen(!notificationsOpen)} className="relative p-2 text-slate-500 hover:text-primary transition-colors">
                     <Bell className="w-5 h-5" />
                     <span className="absolute top-1 right-1 w-2 h-2 bg-error rounded-full border border-white"></span>
@@ -95,12 +114,12 @@ export default function Navbar() {
                     </div>
                   )}
                 </div>
-                <div className="relative">
+                <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors"
                   >
-                    <img src={user?.avatar_url} alt={user?.full_name} className="w-6 h-6 rounded-full" />
+                    <img src={user?.avatar_url || DEFAULT_AVATAR_URL} onError={e => e.currentTarget.src = DEFAULT_AVATAR_URL} alt={user?.full_name} className="w-6 h-6 rounded-full" />
                     <span className="text-sm font-medium text-slate-700 max-w-24 truncate">{user?.full_name.split(' ')[0]}</span>
                     <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                   </button>

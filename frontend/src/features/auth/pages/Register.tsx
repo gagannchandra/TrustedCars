@@ -11,6 +11,7 @@ const registerSchema = z.object({
   full_name: z.string().min(2, 'Full Name must be at least 2 characters'),
   email: z.string().min(1, 'Email is required').email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
+  role: z.enum(['user', 'dealer']),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -23,17 +24,17 @@ export default function Register() {
   
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { full_name: '', email: '', password: '' }
+    defaultValues: { full_name: '', email: '', password: '', role: 'user' }
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
     setAuthError('');
-    const success = await authRegister({ ...data, role: 'user' });
-    if (success) {
+    const result = await authRegister(data);
+    if (result.success) {
       toast.success('Account created successfully!');
       navigate('/');
     } else {
-      setAuthError('Registration failed. Please try again.');
+      setAuthError(result.message || 'Registration failed. Please try again.');
     }
   };
 
@@ -58,6 +59,13 @@ export default function Register() {
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div>
+              <label className="text-sm font-bold text-slate-700 block mb-2">Account Type</label>
+              <select {...register('role')} className="w-full border rounded-xl px-4 py-3.5 text-base outline-none transition-all shadow-sm border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10">
+                <option value="user">Standard User</option>
+                <option value="dealer">Enterprise Dealer</option>
+              </select>
+            </div>
             <div>
               <label className="text-sm font-bold text-slate-700 block mb-2">Full Name</label>
               <input type="text" {...register('full_name')}

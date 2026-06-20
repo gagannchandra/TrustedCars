@@ -2,6 +2,8 @@ import { MessageSquare, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { Inquiry } from '../../../types';
 import { formatPrice, timeAgo } from '../../../shared/utils/utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { inquiriesApi } from '../../../shared/api/client';
 
 interface InquiriesTabProps {
   sentInquiries: Inquiry[];
@@ -9,6 +11,25 @@ interface InquiriesTabProps {
 }
 
 export default function InquiriesTab({ sentInquiries, receivedInquiries }: InquiriesTabProps) {
+  const queryClient = useQueryClient();
+
+  const replyMutation = useMutation({
+    mutationFn: ({ id, message }: { id: string, message: string }) => inquiriesApi.replyInquiry(id, message),
+    onSuccess: () => {
+      toast.success('Reply sent successfully!');
+      queryClient.invalidateQueries({ queryKey: ['inquiries'] });
+    },
+    onError: () => toast.error('Failed to send reply'),
+  });
+
+  const closeMutation = useMutation({
+    mutationFn: (id: string) => inquiriesApi.closeInquiry(id),
+    onSuccess: () => {
+      toast.success('Inquiry closed.');
+      queryClient.invalidateQueries({ queryKey: ['inquiries'] });
+    },
+    onError: () => toast.error('Failed to close inquiry'),
+  });
   return (
     <div>
       <h2 className="font-display font-bold text-2xl text-slate-900 tracking-tight mb-8">Messages & Inquiries</h2>
@@ -100,8 +121,17 @@ export default function InquiriesTab({ sentInquiries, receivedInquiries }: Inqui
                         <div className="flex items-center justify-between mt-auto">
                           <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">{timeAgo(inq.created_at)}</p>
                           <div className="flex gap-2">
-                            <button onClick={() => toast.success('Reply sent successfully!')} className="text-sm bg-primary text-white px-5 py-2 rounded-xl hover:bg-blue-800 font-bold shadow-md transition-colors">Reply</button>
-                            <button onClick={() => toast.success('Inquiry closed.')} className="text-sm border-2 border-slate-200 text-slate-600 px-5 py-2 rounded-xl hover:bg-slate-50 font-bold transition-colors">Close</button>
+                            <button 
+                              disabled={replyMutation.isPending || closeMutation.isPending}
+                              onClick={() => {
+                                const msg = window.prompt("Enter your reply:");
+                                if (msg) replyMutation.mutate({ id: inq.id, message: msg });
+                              }} 
+                              className="text-sm bg-primary text-white px-5 py-2 rounded-xl hover:bg-blue-800 font-bold shadow-md transition-colors disabled:opacity-50">Reply</button>
+                            <button 
+                              disabled={closeMutation.isPending || replyMutation.isPending}
+                              onClick={() => closeMutation.mutate(inq.id)} 
+                              className="text-sm border-2 border-slate-200 text-slate-600 px-5 py-2 rounded-xl hover:bg-slate-50 font-bold transition-colors disabled:opacity-50">Close</button>
                           </div>
                         </div>
                       </div>

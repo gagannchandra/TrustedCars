@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Heart, MapPin, Phone, MessageSquare, Star, Shield, CheckCircle, Calendar, Gauge, Fuel, Users, Eye, Share2, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
 import { carsApi } from '../../shared/api/client';
-import { formatPrice, formatOdometer, getQualityBadgeConfig, calculateEMI, timeAgo } from '../../shared/utils/utils';
+import { formatPrice, formatOdometer, getQualityBadgeConfig, calculateEMI, timeAgo, DEFAULT_AVATAR_URL } from '../../shared/utils/utils';
 import { useAuth } from '../../shared/hooks/useAuth';
 import CarCard from '../../components/cars/CarCard';
 
 import ImageGallery from './components/ImageGallery';
 import InspectionReport from './components/InspectionReport';
-import PriceHistoryChart from './components/PriceHistoryChart';
 import ServiceRecords from './components/ServiceRecords';
 import InquiryModal from './components/InquiryModal';
 import EMIModal from './components/EMIModal';
@@ -120,7 +120,12 @@ export default function CarDetail() {
                     className={`p-3.5 rounded-2xl border-2 transition-all shadow-sm hover:scale-105 ${isWishlisted ? 'bg-error/10 border-error/20 text-error' : 'border-slate-100 bg-white text-slate-400 hover:border-slate-200 hover:text-slate-600'}`}>
                     <Heart className={`w-6 h-6 ${isWishlisted ? 'fill-current' : ''}`} />
                   </button>
-                  <button className="p-3.5 rounded-2xl border-2 border-slate-100 bg-white text-slate-400 hover:border-slate-200 hover:text-slate-600 transition-all shadow-sm hover:scale-105">
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      toast.success('Link copied to clipboard!');
+                    }}
+                    className="p-3.5 rounded-2xl border-2 border-slate-100 bg-white text-slate-400 hover:border-slate-200 hover:text-slate-600 transition-all shadow-sm hover:scale-105">
                     <Share2 className="w-6 h-6" />
                   </button>
                 </div>
@@ -171,7 +176,6 @@ export default function CarDetail() {
             </div>
 
             {inspection && <InspectionReport inspection={inspection} expandedFinding={expandedFinding} setExpandedFinding={setExpandedFinding} />}
-            <PriceHistoryChart car={car} priceDiff={priceDiff} />
             {car.service_records && <ServiceRecords records={car.service_records} />}
 
             {/* Similar Cars */}
@@ -228,7 +232,7 @@ export default function CarDetail() {
                 </div>
                 {car.seller && (
                   <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <img src={car.seller.avatar_url} alt={car.seller.full_name} className="w-12 h-12 rounded-full border-2 border-white shadow-sm" />
+                    <img src={car.seller.avatar_url || DEFAULT_AVATAR_URL} onError={e => e.currentTarget.src = DEFAULT_AVATAR_URL} alt={car.seller.full_name} className="w-12 h-12 rounded-full border-2 border-white shadow-sm" />
                     <div>
                       <div className="text-sm font-bold text-slate-900">{car.seller.full_name}</div>
                       <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 mt-1">

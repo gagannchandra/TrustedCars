@@ -20,6 +20,10 @@ export default function InquiryModal({ car, onClose }: InquiryModalProps) {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
+    if (!form.message.trim() || !form.name.trim() || !form.phone.trim()) {
+      toast.error('Name, phone, and message are required.');
+      return;
+    }
     try {
       setLoading(true);
       await inquiriesApi.createInquiry({

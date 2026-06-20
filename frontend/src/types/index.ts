@@ -1,4 +1,4 @@
-export type UserRole = 'user' | 'admin';
+export type UserRole = 'user' | 'admin' | 'dealer';
 export type CarStatus = 'pending' | 'active' | 'sold' | 'rejected' | 'archived';
 export type FuelType = 'petrol' | 'diesel' | 'electric' | 'cng' | 'hybrid';
 export type Transmission = 'manual' | 'automatic' | 'amt';

@@ -150,8 +150,17 @@ class CarService:
             raise CustomException(404, "Car not found or unavailable")
         return car
 
-    async def search_cars(self, filters, dealership_id: UUID | None = None):
-        return await self.repository.search_cars(filters, dealership_id)
+    async def assert_dealer_exists(self, dealership_id: UUID):
+        from sqlalchemy import select
+        from app.modules.auth.models import Dealership
+        dealer = await self.session.scalar(
+            select(Dealership).where(Dealership.id == dealership_id)
+        )
+        if not dealer:
+            raise CustomException(404, "Dealership not found")
+
+    async def search_cars(self, filters, dealership_id: UUID | None = None, seller_id: UUID | None = None):
+        return await self.repository.search_cars(filters, dealership_id, seller_id)
 
     async def handle_user_deleted(self, user_id: UUID):
         from sqlalchemy import update, select

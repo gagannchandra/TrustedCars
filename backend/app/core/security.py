@@ -7,23 +7,27 @@ from app.core.config import settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
+def verify_password(plain_password: str, hashed_password: str) -> tuple[bool, bool]:
     import hashlib
-    # Try legacy verification first (for existing users)
+    # Check if this is a pre-hashed password (needs migration)
     try:
-        if pwd_context.verify(plain_password, hashed_password):
-            return True
+        pre_hashed = hashlib.sha256(plain_password.encode()).hexdigest()
+        if pwd_context.verify(pre_hashed, hashed_password):
+            return True, True
     except Exception:
         pass
         
-    pre_hashed = hashlib.sha256(plain_password.encode()).hexdigest()
-    return pwd_context.verify(pre_hashed, hashed_password)
+    try:
+        if pwd_context.verify(plain_password, hashed_password):
+            return True, False
+    except Exception:
+        pass
+        
+    return False, False
 
 
 def get_password_hash(password: str) -> str:
-    import hashlib
-    pre_hashed = hashlib.sha256(password.encode()).hexdigest()
-    return pwd_context.hash(pre_hashed)
+    return pwd_context.hash(password)
 
 
 def create_access_token(

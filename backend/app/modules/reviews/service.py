@@ -51,7 +51,12 @@ class ReviewsService:
 
         seller_id = car.user_id
         if not seller_id and car.dealership_id:
-            seller_id = car.dealership_id
+            from app.modules.auth.models import Dealership
+            dealership = await self.session.scalar(
+                select(Dealership).where(Dealership.id == car.dealership_id, Dealership.deleted_at.is_(None))
+            )
+            if dealership:
+                seller_id = dealership.user_id
 
         if not seller_id:
             return None
@@ -151,6 +156,9 @@ class ReviewsService:
         review = await self.repository.get_review_by_id(review_id)
         if not review:
             raise CustomException(404, "Review not found")
+            
+        if review.deleted_at is not None:
+            raise CustomException(400, "Cannot update a deleted review")
 
         await self._verify_access(review, current_user, check_ownership)
 

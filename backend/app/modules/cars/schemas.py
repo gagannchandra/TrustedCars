@@ -19,7 +19,7 @@ class SortOption(str, Enum):
 
 
 class CarSearchFilters(BaseModel):
-    q: Optional[str] = None
+    q: Optional[str] = Field(None, max_length=100)
     make: Optional[str] = None
     model: Optional[str] = None
     min_year: Optional[int] = None
@@ -46,7 +46,7 @@ class CarCreateRequest(BaseModel):
     make: str = Field(..., min_length=2, max_length=100)
     model: str = Field(..., min_length=1, max_length=100)
     variant: Optional[str] = Field(None, max_length=100)
-    year: int = Field(..., ge=1900, le=2100)
+    year: int = Field(..., ge=1900, le=datetime.now().year + 1)
     fuel_type: FuelTypeEnum
     transmission: TransmissionEnum
     body_type: BodyTypeEnum
@@ -63,7 +63,7 @@ class CarUpdateRequest(BaseModel):
     make: Optional[str] = Field(None, min_length=2, max_length=100)
     model: Optional[str] = Field(None, min_length=1, max_length=100)
     variant: Optional[str] = Field(None, max_length=100)
-    year: Optional[int] = Field(None, ge=1900, le=2100)
+    year: Optional[int] = Field(None, ge=1900, le=datetime.now().year + 1)
     fuel_type: Optional[FuelTypeEnum] = None
     transmission: Optional[TransmissionEnum] = None
     body_type: Optional[BodyTypeEnum] = None

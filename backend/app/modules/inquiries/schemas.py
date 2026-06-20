@@ -63,5 +63,4 @@ class InquiryDetailResponse(InquiryResponse):
 class PaginatedMessageResponse(BaseModel):
     items: list[MessageResponse]
     total: int
-    page: int
-    page_size: int
+    next_cursor: datetime | None = None

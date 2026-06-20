@@ -69,7 +69,9 @@ class AdminModerationService:
             await self.session.commit()
         except Exception as e:
             await self.session.rollback()
-            raise CustomException(500, f"Failed to suspend user: {str(e)}")
+            import structlog
+            structlog.get_logger(__name__).error("Failed to suspend user", error=str(e), exc_info=True)
+            raise CustomException(500, "An internal error occurred. Please try again.")
 
     async def restore_user(self, actor: User, target_id: uuid.UUID):
         target = await self.session.get(User, target_id)
@@ -95,7 +97,9 @@ class AdminModerationService:
             await self.session.commit()
         except Exception as e:
             await self.session.rollback()
-            raise CustomException(500, f"Failed to restore user: {str(e)}")
+            import structlog
+            structlog.get_logger(__name__).error("Failed to restore user", error=str(e), exc_info=True)
+            raise CustomException(500, "An internal error occurred. Please try again.")
 
     async def delete_user(self, actor: User, target_id: uuid.UUID):
         target = await self.session.get(User, target_id)
@@ -144,18 +148,19 @@ class AdminModerationService:
         dealer.is_suspended = True
 
         # Suspend inventory by hiding via moderation_layer without altering car.status
-        stmt = select(Car).where(
-            Car.dealership_id == dealer_id, Car.deleted_at.is_(None)
+        from sqlalchemy import update as sa_update
+        now = datetime.now(timezone.utc)
+        await self.session.execute(
+            sa_update(Car)
+            .where(Car.dealership_id == dealer_id, Car.deleted_at.is_(None))
+            .values(
+                previous_moderation_status=Car.moderation_status,
+                moderation_status="hidden",
+                moderated_at=now,
+                moderated_by=actor.id,
+                moderation_reason=f"Dealer suspended: {reason}",
+            )
         )
-        result = await self.session.execute(stmt)
-        cars = result.scalars().all()
-
-        for car in cars:
-            car.previous_moderation_status = car.moderation_status
-            car.moderation_status = "hidden"
-            car.moderated_at = datetime.now(timezone.utc)
-            car.moderated_by = actor.id
-            car.moderation_reason = f"Dealer suspended: {reason}"
 
         try:
             await self._dispatch_and_audit(

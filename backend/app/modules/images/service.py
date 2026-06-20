@@ -105,6 +105,8 @@ class ImageService:
     async def reorder_images(
         self, car_id: UUID, reqs: list[ImageReorderRequest], current_user: User
     ):
+        if len(reqs) > 50:
+            raise CustomException(400, "Too many images to reorder")
         await self._verify_ownership(car_id, current_user)
 
         images = await self.repository.get_images_by_car_id(car_id)

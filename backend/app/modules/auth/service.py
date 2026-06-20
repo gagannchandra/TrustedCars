@@ -47,7 +47,7 @@ class AuthService:
     async def hash_password(self, password: str) -> str:
         return await asyncio.to_thread(get_password_hash, password)
 
-    async def verify_password_async(self, plain: str, hashed: str) -> bool:
+    async def verify_password_async(self, plain: str, hashed: str) -> tuple[bool, bool]:
         return await asyncio.to_thread(verify_password, plain, hashed)
 
     def _get_fernet_key(self, key: str) -> bytes:
@@ -135,14 +135,17 @@ class AuthService:
             failed_attempts = await redis_client.get(lockout_key)
             if failed_attempts and int(failed_attempts) >= 5:
                 raise CustomException(429, "Too many failed login attempts. Please try again later.")
-        except Exception:
-            pass # Redis is down, ignore lockout
+        except CustomException:
+            raise
+        except Exception as e:
+            import structlog
+            structlog.get_logger(__name__).error("Redis down during login lockout check", error=str(e))
+            raise CustomException(503, "Authentication service temporarily unavailable")
         
         user = await self.repository.get_user_by_email(req.email)
         if not user:
             _DUMMY_HASH = "$2b$12$G1O.N2dD8iC4C04N2bN.wOg2/yV2Hl9Xg2O3wY.s2S4uX8q9k0Y6O"
             await self.verify_password_async(req.password, _DUMMY_HASH)
-            await self.session.rollback()
             try:
                 await redis_client.incr(lockout_key)
                 await redis_client.expire(lockout_key, 15 * 60)
@@ -156,15 +159,18 @@ class AuthService:
         mfa_recovery_verified_until = user.mfa_recovery_verified_until
         encrypted_mfa_secret = user.mfa_secret
 
-        await self.session.rollback()
-
-        if not await self.verify_password_async(req.password, hashed_password):
+        is_valid, needs_rehash = await self.verify_password_async(req.password, hashed_password)
+        if not is_valid:
             try:
                 await redis_client.incr(lockout_key)
                 await redis_client.expire(lockout_key, 15 * 60)
             except Exception:
                 pass
             raise CustomException(401, "Invalid credentials")
+
+        if needs_rehash:
+            user.hashed_password = await self.hash_password(req.password)
+            self.session.add(user)
             
         try:
             await redis_client.delete(lockout_key)
@@ -186,8 +192,16 @@ class AuthService:
 
                 secret = self.decrypt_mfa_secret(encrypted_mfa_secret, settings.MFA_ENCRYPTION_KEY)
                 totp = pyotp.TOTP(secret)
+                
+                redis_key = f"totp_used:{user.id}:{req.mfa_code}"
+                already_used = await redis_client.get(redis_key)
+                if already_used:
+                    raise CustomException(401, "MFA code already used")
+
                 if not totp.verify(req.mfa_code):
                     raise CustomException(401, "Invalid MFA code")
+                    
+                await redis_client.set(redis_key, "1", ex=90)
 
         user = await self.repository.get_user_by_id(user_id)
         if not user:
@@ -264,6 +278,14 @@ class AuthService:
         import pyotp
         import secrets
         from app.modules.auth.models import UserMFABackupCode
+        from sqlalchemy import delete
+
+        await self.session.execute(
+            delete(UserMFABackupCode).where(
+                UserMFABackupCode.user_id == current_user.id,
+                UserMFABackupCode.used_at.is_(None),
+            )
+        )
 
         secret = pyotp.random_base32()
 
@@ -302,9 +324,19 @@ class AuthService:
 
         secret = self.decrypt_mfa_secret(current_user.mfa_secret, settings.MFA_ENCRYPTION_KEY)
         totp = pyotp.TOTP(secret)
+        
+        from app.db.redis import get_redis
+        redis_client = await get_redis()
+        redis_key = f"totp_used:{current_user.id}:{code}"
+        
+        already_used = await redis_client.get(redis_key)
+        if already_used:
+            raise CustomException(status_code=401, detail="MFA code already used")
 
         if not totp.verify(code):
             raise CustomException(status_code=400, detail="Invalid MFA code")
+            
+        await redis_client.set(redis_key, "1", ex=90)
 
         current_user.mfa_enabled = True
         await self.session.commit()

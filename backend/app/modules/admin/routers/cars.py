@@ -15,14 +15,20 @@ from app.modules.cars.schemas import PaginatedCarResponse
 
 router = APIRouter(prefix="/cars", tags=["admin-cars"])
 
+from fastapi import Query
+
 @router.get("", response_model=PaginatedCarResponse)
 async def list_all_cars(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RequirePermissions([PermissionEnum.APPROVE_CAR])),
 ):
-    result = await db.execute(select(Car))
+    from sqlalchemy import func
+    total = await db.scalar(select(func.count()).select_from(Car))
+    result = await db.execute(select(Car).offset(skip).limit(limit))
     cars = result.scalars().all()
-    return {"items": cars, "total": len(cars)}
+    return {"items": cars, "total": total}
 
 @router.post("/{id}/approve")
 async def approve_car(

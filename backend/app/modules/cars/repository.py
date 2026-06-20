@@ -26,6 +26,7 @@ class CarRepository:
                 Car.id == car_id,
                 Car.deleted_at.is_(None),
                 Car.status == CarStatusEnum.active,
+                Car.moderation_status != "hidden",
             )
         )
         return result.scalars().first()
@@ -41,9 +42,12 @@ class CarRepository:
         stmt = select(Car).where(Car.deleted_at.is_(None))
         
         if seller_id or dealership_id:
-            stmt = stmt.where(Car.status != 'archived')
+            stmt = stmt.where(Car.status != CarStatusEnum.archived)
         else:
-            stmt = stmt.where(Car.status == CarStatusEnum.active)
+            stmt = stmt.where(
+                Car.status == CarStatusEnum.active,
+                Car.moderation_status != "hidden",
+            )
 
         if seller_id:
             stmt = stmt.where(Car.user_id == seller_id)
@@ -54,9 +58,9 @@ class CarRepository:
             from sqlalchemy import or_
             stmt = stmt.where(
                 or_(
-                    Car.make.ilike(f"%{filters.q}%"),
-                    Car.model.ilike(f"%{filters.q}%"),
-                    Car.variant.ilike(f"%{filters.q}%")
+                    Car.make.ilike(f"{filters.q}%"),
+                    Car.model.ilike(f"{filters.q}%"),
+                    Car.variant.ilike(f"{filters.q}%")
                 )
             )
         if filters.make:

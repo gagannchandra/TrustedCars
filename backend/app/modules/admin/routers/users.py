@@ -14,13 +14,24 @@ from app.modules.auth.schemas import UserResponse
 
 router = APIRouter(prefix="/users", tags=["admin-users"])
 
-@router.get("", response_model=List[UserResponse])
+from fastapi import Query
+from pydantic import BaseModel
+
+class PaginatedUserResponse(BaseModel):
+    items: List[UserResponse]
+    total: int
+
+@router.get("", response_model=PaginatedUserResponse)
 async def list_all_users(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RequirePermissions([PermissionEnum.SUSPEND_USER])), # Reusing moderate permission
 ):
-    result = await db.execute(select(User))
-    return result.scalars().all()
+    from sqlalchemy import func
+    total = await db.scalar(select(func.count()).select_from(User))
+    result = await db.execute(select(User).offset(skip).limit(limit))
+    return {"items": result.scalars().all(), "total": total}
 
 @router.post("/{id}/suspend")
 async def suspend_user(

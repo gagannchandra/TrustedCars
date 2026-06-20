@@ -45,5 +45,4 @@ class ReviewResponse(BaseModel):
 class PaginatedReviewResponse(BaseModel):
     items: list[ReviewResponse]
     total: int
-    page: int
-    page_size: int
+    next_cursor: datetime | None = None

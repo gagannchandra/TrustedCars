@@ -98,6 +98,12 @@ async def generate_presigned_url(
     # Verify the user is authorized to edit the car before granting a presigned URL
     await service._verify_ownership(car_id, current_user)
     
+    allowed_types = {"image/jpeg": [".jpg", ".jpeg"], "image/png": [".png"], "image/webp": [".webp"]}
+    if req.content_type not in allowed_types:
+        raise CustomException(400, "Invalid content type. Only JPEG, PNG, and WebP are allowed.")
+    if not any(req.file_extension in exts for exts in allowed_types.values()):
+        raise CustomException(400, "Invalid file extension.")
+    
     return storage.generate_presigned_upload_url(
         file_extension=req.file_extension,
         content_type=req.content_type
@@ -124,7 +130,10 @@ async def direct_image_upload(
     
     # In a real system, you'd use aioboto3 to stream the file.boto3 is sync so we read it all into memory here
     # Since we are using S3 presigned URLs mostly, this is a fallback.
-    file_bytes = await file.read()
+    MAX_IMAGE_SIZE = 10 * 1024 * 1024
+    file_bytes = await file.read(MAX_IMAGE_SIZE + 1)
+    if len(file_bytes) > MAX_IMAGE_SIZE:
+        raise CustomException(413, "File too large. Maximum size is 10MB.")
     
     if content_type == "image/jpeg" and not file_bytes.startswith(b"\xff\xd8\xff"):
         raise CustomException(400, "Invalid image content")
@@ -135,8 +144,9 @@ async def direct_image_upload(
     
     storage_key = f"{uuid.uuid4()}{ext}"
     try:
-        # storage.s3_client is a synchronous boto3 client.
-        storage.s3_client.put_object(
+        import asyncio
+        await asyncio.to_thread(
+            storage.s3_client.put_object,
             Bucket=storage.bucket,
             Key=storage_key,
             Body=file_bytes,

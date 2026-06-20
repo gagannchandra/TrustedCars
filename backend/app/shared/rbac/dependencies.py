@@ -71,6 +71,11 @@ async def assert_can_edit_resource(
 ):
     from app.modules.auth.models import RoleEnum
     from app.shared.exceptions.handlers import CustomException
+    from app.shared.rbac.mappings import get_role_permissions
+    from app.shared.rbac.permissions import PermissionEnum
+
+    if PermissionEnum.MODERATE_ANY in get_role_permissions(current_user.role):
+        return
 
     if current_user.role == RoleEnum.dealer and dealership_id and dealer_provider:
         if not await dealer_provider.is_dealer_authorized(current_user.id, dealership_id):

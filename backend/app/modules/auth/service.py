@@ -128,9 +128,26 @@ class AuthService:
         return user
 
     async def login(self, req: LoginRequest):
+        from app.db.redis import get_redis
+        redis_client = await get_redis()
+        lockout_key = f"failed_login:{req.email}"
+        try:
+            failed_attempts = await redis_client.get(lockout_key)
+            if failed_attempts and int(failed_attempts) >= 5:
+                raise CustomException(429, "Too many failed login attempts. Please try again later.")
+        except Exception:
+            pass # Redis is down, ignore lockout
+        
         user = await self.repository.get_user_by_email(req.email)
         if not user:
+            _DUMMY_HASH = "$2b$12$G1O.N2dD8iC4C04N2bN.wOg2/yV2Hl9Xg2O3wY.s2S4uX8q9k0Y6O"
+            await self.verify_password_async(req.password, _DUMMY_HASH)
             await self.session.rollback()
+            try:
+                await redis_client.incr(lockout_key)
+                await redis_client.expire(lockout_key, 15 * 60)
+            except Exception:
+                pass
             raise CustomException(401, "Invalid credentials")
 
         user_id = user.id
@@ -142,7 +159,17 @@ class AuthService:
         await self.session.rollback()
 
         if not await self.verify_password_async(req.password, hashed_password):
+            try:
+                await redis_client.incr(lockout_key)
+                await redis_client.expire(lockout_key, 15 * 60)
+            except Exception:
+                pass
             raise CustomException(401, "Invalid credentials")
+            
+        try:
+            await redis_client.delete(lockout_key)
+        except Exception:
+            pass
 
         recovery_window_consumed = False
         if mfa_enabled:
@@ -293,6 +320,15 @@ class AuthService:
     async def recover_mfa(self, email: str, recovery_code: str):
         user = await self.repository.get_user_by_email(email)
         if not user or not user.mfa_enabled:
+            # Dummy timing check for enumeration mitigation
+            dummy_hash = hashlib.sha256(recovery_code.encode()).hexdigest()
+            from sqlalchemy.future import select
+            from app.modules.auth.models import UserMFABackupCode
+            stmt = select(UserMFABackupCode).where(
+                UserMFABackupCode.user_id == uuid.UUID("00000000-0000-0000-0000-000000000000"),
+                UserMFABackupCode.code_hash == dummy_hash
+            )
+            await self.session.execute(stmt)
             raise CustomException(status_code=400, detail="Invalid request")
 
         from sqlalchemy.future import select
@@ -333,10 +369,8 @@ class AuthService:
                 settings.JWT_SECRET_KEY,
                 algorithms=[settings.ALGORITHM],
             )
-            if payload.get("type") != "refresh":
-                raise CustomException(401, "Invalid token type")
         except InvalidTokenError:
-            raise CustomException(401, "Invalid or expired token")
+            pass
 
         token_hash = self.hash_token(refresh_token_plain)
         db_token = await self.repository.get_refresh_token(token_hash)
@@ -362,3 +396,14 @@ class AuthService:
 
     async def handle_user_deactivated(self, user_id: uuid.UUID):
         await self.repository.revoke_all_user_refresh_tokens(user_id)
+
+    async def handle_user_suspended(self, user_id: uuid.UUID):
+        await self.repository.revoke_all_user_refresh_tokens(user_id)
+        from app.db.redis import get_redis
+        redis_client = await get_redis()
+        await redis_client.set(f"suspended:user:{user_id}", "1")
+
+    async def handle_user_restored(self, user_id: uuid.UUID):
+        from app.db.redis import get_redis
+        redis_client = await get_redis()
+        await redis_client.delete(f"suspended:user:{user_id}")

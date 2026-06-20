@@ -29,6 +29,20 @@ async def on_user_deactivated(session, user_id):
     await CarService(session, AuthDealerProvider(session)).handle_user_deactivated(uid)
 
 
+async def on_user_suspended(session, user_id):
+    from uuid import UUID
+
+    uid = UUID(str(user_id)) if isinstance(user_id, str) else user_id
+    await AuthService(session).handle_user_suspended(uid)
+
+
+async def on_user_restored(session, user_id):
+    from uuid import UUID
+
+    uid = UUID(str(user_id)) if isinstance(user_id, str) else user_id
+    await AuthService(session).handle_user_restored(uid)
+
+
 async def on_car_deleted(session, car_id):
     from uuid import UUID
 
@@ -55,5 +69,7 @@ def setup_subscribers():
     event_bus.subscribe("USER_DEACTIVATED", on_user_deactivated)
     event_bus.subscribe("CAR_SOFT_DELETED", on_car_deleted)
     event_bus.subscribe("CARS_BULK_SOFT_DELETED", on_cars_bulk_deleted)
+    event_bus.subscribe("USER_SUSPENDED", on_user_suspended)
+    event_bus.subscribe("USER_RESTORED", on_user_restored)
 
     _subscribers_configured = True

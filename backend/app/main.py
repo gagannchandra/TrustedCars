@@ -59,9 +59,10 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
 # Set up CORS
-from app.core.middleware import CorrelationIdMiddleware
+from app.core.middleware import CorrelationIdMiddleware, SecurityHeadersMiddleware
 
 app.add_middleware(CorrelationIdMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,

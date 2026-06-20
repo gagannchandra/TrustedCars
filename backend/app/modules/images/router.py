@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from app.db.session import get_db
+from app.modules.images.schemas import (
     ImageCreateRequest,
     ImageReorderRequest,
     ImageResponse,
@@ -116,11 +117,21 @@ async def direct_image_upload(
     await service._verify_ownership(car_id, current_user)
     
     content_type = file.content_type or "image/jpeg"
+    allowed_types = {"image/jpeg", "image/png", "image/webp"}
+    if content_type not in allowed_types:
+        raise CustomException(400, "Invalid content type. Only JPEG, PNG, and WebP are allowed.")
     ext = mimetypes.guess_extension(content_type) or ".jpg"
     
     # In a real system, you'd use aioboto3 to stream the file.boto3 is sync so we read it all into memory here
     # Since we are using S3 presigned URLs mostly, this is a fallback.
     file_bytes = await file.read()
+    
+    if content_type == "image/jpeg" and not file_bytes.startswith(b"\xff\xd8\xff"):
+        raise CustomException(400, "Invalid image content")
+    elif content_type == "image/png" and not file_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise CustomException(400, "Invalid image content")
+    elif content_type == "image/webp" and not (file_bytes.startswith(b"RIFF") and file_bytes[8:12] == b"WEBP"):
+        raise CustomException(400, "Invalid image content")
     
     storage_key = f"{uuid.uuid4()}{ext}"
     try:

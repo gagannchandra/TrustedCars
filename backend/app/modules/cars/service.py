@@ -82,7 +82,7 @@ class CarService:
             from app.shared.rbac.dependencies import assert_can_edit_resource
             await assert_can_edit_resource(
                 current_user=current_user,
-                owner_user_id=car.user_id,
+                owner_user_ids=car.user_id,
                 dealership_id=car.dealership_id,
                 dealer_provider=self.dealer_provider,
                 resource_name="car",
@@ -114,7 +114,7 @@ class CarService:
             from app.shared.rbac.dependencies import assert_can_edit_resource
             await assert_can_edit_resource(
                 current_user=current_user,
-                owner_user_id=car.user_id,
+                owner_user_ids=car.user_id,
                 dealership_id=car.dealership_id,
                 dealer_provider=self.dealer_provider,
                 resource_name="car",

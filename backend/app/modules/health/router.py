@@ -30,7 +30,9 @@ async def readiness_check(db: AsyncSession = Depends(get_db)):
         await db.execute(text("SELECT 1"))
         health_status["database"] = "ok"
     except Exception as e:
-        health_status["database"] = f"failed: {str(e)}"
+        import structlog
+        structlog.get_logger(__name__).error("Health check DB error", error=str(e))
+        health_status["database"] = "failed"
         is_ready = False
 
     # 2. Check Redis
@@ -40,7 +42,9 @@ async def readiness_check(db: AsyncSession = Depends(get_db)):
         await redis_client.close()
         health_status["redis"] = "ok"
     except Exception as e:
-        health_status["redis"] = f"failed: {str(e)}"
+        import structlog
+        structlog.get_logger(__name__).error("Health check Redis error", error=str(e))
+        health_status["redis"] = "failed"
         is_ready = False
 
     # 3. Check Worker
@@ -59,8 +63,10 @@ async def readiness_check(db: AsyncSession = Depends(get_db)):
         version = result.scalar()
         health_status["migrations"] = f"ok (current: {version})"
     except Exception as e:
+        import structlog
+        structlog.get_logger(__name__).error("Health check Migrations error", error=str(e))
         # If the table doesn't exist or query fails, migrations are likely pending
-        health_status["migrations"] = f"failed: {str(e)}"
+        health_status["migrations"] = "failed"
         is_ready = False
 
     if not is_ready:
@@ -71,7 +77,3 @@ async def readiness_check(db: AsyncSession = Depends(get_db)):
 
     return health_status
 
-
-@router.get("/health/error")
-async def error_check():
-    raise ValueError("This is a test exception to verify Sentry and Monitoring.")

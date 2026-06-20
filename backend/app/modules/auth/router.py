@@ -47,7 +47,7 @@ async def login(
     tokens = await service.login(req)
     response.set_cookie(
         key="access_token",
-        value=tokens.access_token,
+        value=tokens["access_token"],
         httponly=True,
         secure=True,
         samesite="lax",
@@ -55,7 +55,7 @@ async def login(
     )
     response.set_cookie(
         key="refresh_token",
-        value=tokens.refresh_token,
+        value=tokens["refresh_token"],
         httponly=True,
         secure=True,
         samesite="lax",
@@ -85,8 +85,9 @@ async def verify_mfa(
 
 
 @router.post("/mfa/recovery")
+@limiter.limit("10/minute")
 async def recover_mfa(
-    req: MFARecoveryRequest, service: AuthService = Depends(get_auth_service)
+    request: Request, req: MFARecoveryRequest, service: AuthService = Depends(get_auth_service)
 ):
     """Consume an MFA backup code to open a temporary login window."""
     await service.recover_mfa(req.email, req.recovery_code)
@@ -108,7 +109,7 @@ async def refresh(
     tokens = await service.refresh(refresh_token)
     response.set_cookie(
         key="access_token",
-        value=tokens.access_token,
+        value=tokens["access_token"],
         httponly=True,
         secure=True,
         samesite="lax",
@@ -116,7 +117,7 @@ async def refresh(
     )
     response.set_cookie(
         key="refresh_token",
-        value=tokens.refresh_token,
+        value=tokens["refresh_token"],
         httponly=True,
         secure=True,
         samesite="lax",
@@ -131,8 +132,10 @@ async def logout(
     refresh_token: str | None = Cookie(None),
     service: AuthService = Depends(get_auth_service),
 ):
-    if refresh_token:
-        await service.logout(refresh_token)
-    response.delete_cookie(key="access_token")
-    response.delete_cookie(key="refresh_token")
+    try:
+        if refresh_token:
+            await service.logout(refresh_token)
+    finally:
+        response.delete_cookie(key="access_token")
+        response.delete_cookie(key="refresh_token")
     return {"detail": "Successfully logged out"}

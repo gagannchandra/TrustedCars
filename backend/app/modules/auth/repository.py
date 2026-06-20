@@ -12,7 +12,7 @@ class AuthRepository:
     async def get_user_by_email(self, email: str) -> User | None:
         result = await self.session.execute(
             select(User).where(
-                User.email == email, User.is_active, User.deleted_at.is_(None)
+                User.email == email, User.is_active, User.deleted_at.is_(None), User.is_suspended.is_(False)
             )
         )
         return result.scalars().first()
@@ -20,7 +20,7 @@ class AuthRepository:
     async def get_user_by_id(self, user_id: UUID) -> User | None:
         result = await self.session.execute(
             select(User).where(
-                User.id == user_id, User.is_active, User.deleted_at.is_(None)
+                User.id == user_id, User.is_active, User.deleted_at.is_(None), User.is_suspended.is_(False)
             )
         )
         return result.scalars().first()

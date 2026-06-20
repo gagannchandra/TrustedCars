@@ -15,11 +15,7 @@ async def get_current_user_id(
 ) -> str:
     token = request.cookies.get("access_token")
     if not token:
-        auth_header = request.headers.get("Authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header.split(" ")[1]
-        else:
-            raise CustomException(401, "Not authenticated")
+        raise CustomException(401, "Not authenticated")
     try:
         payload = jwt.decode(
             token, settings.JWT_SECRET_KEY, algorithms=[settings.ALGORITHM]
@@ -47,7 +43,7 @@ async def get_current_user_id(
             )
             repo = AuthRepository(db)
             user = await repo.get_user_by_id(UUID(user_id))
-            if user and user.deleted_at is not None:
+            if user and (user.deleted_at is not None or user.is_suspended):
                 is_suspended = True
 
         if is_suspended:
@@ -67,8 +63,8 @@ async def get_current_active_user(
 ) -> User:
     repo = AuthRepository(db)
     user = await repo.get_user_by_id(UUID(user_id))
-    if not user or not user.is_active or user.deleted_at is not None:
-        raise CustomException(401, "User is inactive or deleted")
+    if not user or not user.is_active or user.deleted_at is not None or user.is_suspended:
+        raise CustomException(401, "User is inactive, deleted, or suspended")
     return user
 
 

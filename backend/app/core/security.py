@@ -8,11 +8,22 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    import hashlib
+    # Try legacy verification first (for existing users)
+    try:
+        if pwd_context.verify(plain_password, hashed_password):
+            return True
+    except Exception:
+        pass
+        
+    pre_hashed = hashlib.sha256(plain_password.encode()).hexdigest()
+    return pwd_context.verify(pre_hashed, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    import hashlib
+    pre_hashed = hashlib.sha256(password.encode()).hexdigest()
+    return pwd_context.hash(pre_hashed)
 
 
 def create_access_token(

@@ -63,8 +63,8 @@ export default function App() {
               <Route path="/sell" element={<ProtectedRoute><Sell /></ProtectedRoute>} />
               <Route path="/sell/edit/:id" element={<ProtectedRoute><Sell /></ProtectedRoute>} />
               <Route path="/sell/list" element={<ProtectedRoute><SellerListings /></ProtectedRoute>} />
-              <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['user', 'admin']}><Dashboard /></ProtectedRoute>} />
-              <Route path="/dashboard/:tab" element={<ProtectedRoute allowedRoles={['user', 'admin']}><Dashboard /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['user', 'dealer', 'admin']}><Dashboard /></ProtectedRoute>} />
+              <Route path="/dashboard/:tab" element={<ProtectedRoute allowedRoles={['user', 'dealer', 'admin']}><Dashboard /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminPanel /></ProtectedRoute>} />
               <Route path="*" element={
                 <div className="min-h-screen flex items-center justify-center bg-gray-50">

@@ -157,7 +157,7 @@ export const inquiriesApi = {
     return res.data;
   },
   closeInquiry: async (id: string): Promise<any> => {
-    const res = await axiosInstance.patch(`/inquiries/${id}`, { status: 'closed' });
+    const res = await axiosInstance.patch(`/inquiries/${id}/close`);
     return res.data;
   }
 };
@@ -169,6 +169,6 @@ export const reviewsApi = {
   },
   getMyReviews: async (): Promise<Review[]> => {
     const res = await axiosInstance.get('/reviews/me');
-    return res.data;
+    return res.data.items;
   }
 };

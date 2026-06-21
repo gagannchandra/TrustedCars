@@ -136,7 +136,7 @@ export default function Login() {
               </div>
               {errors.password && <p className="text-error text-xs font-bold mt-1.5 animate-in slide-in-from-top-1">{errors.password.message}</p>}
               <div className="text-right mt-3">
-                <a href="#" className="text-sm font-bold text-primary hover:text-blue-800 transition-colors focus:outline-none focus:underline">Forgot password?</a>
+                <Link to="/forgot-password" className="text-sm font-bold text-primary hover:text-blue-800 transition-colors focus:outline-none focus:underline">Forgot password?</Link>
               </div>
             </div>
             <button type="submit" disabled={isSubmitting}

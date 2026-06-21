@@ -159,7 +159,7 @@ export default function Sell() {
         has_service_history: data.hasService,
         has_invoice: data.hasInvoice,
         has_insurance: data.hasInsurance,
-        is_negotiable: data.negotiable,
+        price_negotiable: data.negotiable,
         accident_history: data.accident === 'yes'
       };
 
@@ -169,7 +169,7 @@ export default function Sell() {
         await carsApi.updateCar(id, payload);
       } else {
         const newCar = await carsApi.createCar(payload);
-        carId = carId!;
+        carId = newCar.id;
       }
 
       // Upload photos sequentially

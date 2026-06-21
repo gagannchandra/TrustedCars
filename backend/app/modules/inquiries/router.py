@@ -40,6 +40,19 @@ async def create_inquiry(
     return await service.create_inquiry(req, current_user)
 
 
+@router.get("/me", response_model=list[InquiryResponse])
+@limiter.limit("30/minute")
+async def get_my_inquiries(
+    request: Request,
+    cursor: Optional[datetime] = Query(None),
+    limit: int = Query(50, ge=1, le=100),
+    current_user: User = Depends(get_current_active_user),
+    service: InquiryService = Depends(get_inquiry_service),
+):
+    buyer_inqs = await service.list_user_inquiries(current_user, False, cursor, limit)
+    seller_inqs = await service.list_user_inquiries(current_user, True, cursor, limit)
+    return buyer_inqs + seller_inqs
+
 @router.get("", response_model=list[InquiryResponse])
 @limiter.limit("30/minute")
 async def list_user_inquiries(

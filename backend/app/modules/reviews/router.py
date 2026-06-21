@@ -34,6 +34,18 @@ async def create_review(
     return await service.create_review(req, current_user)
 
 
+@router.get("/me", response_model=PaginatedReviewResponse)
+@limiter.limit("30/minute")
+async def get_my_reviews(
+    request: Request,
+    cursor: Optional[datetime] = Query(None),
+    limit: int = Query(50, ge=1, le=100),
+    current_user: User = Depends(get_current_active_user),
+    service: ReviewsService = Depends(get_reviews_service),
+):
+    # Retrieve reviews where current_user is the seller
+    return await service.list_seller_reviews(current_user.id, cursor, limit)
+
 @router.get("/{id}", response_model=ReviewResponse)
 @limiter.limit("60/minute")
 async def get_review(request: Request, id: UUID, service: ReviewsService = Depends(get_reviews_service)):

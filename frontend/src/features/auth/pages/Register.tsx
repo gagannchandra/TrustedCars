@@ -43,7 +43,7 @@ export default function Register() {
     const result = await authRegister(submitData as any);
     if (result.success) {
       toast.success('Account created successfully!');
-      navigate('/');
+      navigate('/verify-otp', { state: { email: data.email, intent: 'register' } });
     } else {
       setAuthError(result.message || 'Registration failed. Please try again.');
     }

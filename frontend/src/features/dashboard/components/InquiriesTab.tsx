@@ -17,7 +17,7 @@ export default function InquiriesTab({ sentInquiries, receivedInquiries }: Inqui
     mutationFn: ({ id, message }: { id: string, message: string }) => inquiriesApi.replyInquiry(id, message),
     onSuccess: () => {
       toast.success('Reply sent successfully!');
-      queryClient.invalidateQueries({ queryKey: ['inquiries'] });
+      queryClient.invalidateQueries({ queryKey: ['myInquiries'] });
     },
     onError: () => toast.error('Failed to send reply'),
   });
@@ -26,7 +26,7 @@ export default function InquiriesTab({ sentInquiries, receivedInquiries }: Inqui
     mutationFn: (id: string) => inquiriesApi.closeInquiry(id),
     onSuccess: () => {
       toast.success('Inquiry closed.');
-      queryClient.invalidateQueries({ queryKey: ['inquiries'] });
+      queryClient.invalidateQueries({ queryKey: ['myInquiries'] });
     },
     onError: () => toast.error('Failed to close inquiry'),
   });

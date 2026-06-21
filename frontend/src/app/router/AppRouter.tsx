@@ -61,6 +61,7 @@ export default function App() {
               <Route path="/verify-reset-password" element={<VerifyResetPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/sell" element={<ProtectedRoute><Sell /></ProtectedRoute>} />
+              <Route path="/sell/edit/:id" element={<ProtectedRoute><Sell /></ProtectedRoute>} />
               <Route path="/sell/list" element={<ProtectedRoute><SellerListings /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['user', 'admin']}><Dashboard /></ProtectedRoute>} />
               <Route path="/dashboard/:tab" element={<ProtectedRoute allowedRoles={['user', 'admin']}><Dashboard /></ProtectedRoute>} />

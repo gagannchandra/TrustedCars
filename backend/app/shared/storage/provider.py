@@ -10,10 +10,13 @@ from app.shared.exceptions.handlers import CustomException
 logger = logging.getLogger(__name__)
 
 class StorageProvider:
-    def generate_presigned_upload_url(self, file_extension: str, content_type: str) -> dict:
+    def get_public_url(self, storage_key: str) -> str:
         raise NotImplementedError
 
-    def get_public_url(self, storage_key: str) -> str:
+    def delete_object(self, storage_key: str) -> None:
+        raise NotImplementedError
+
+    def delete_objects(self, storage_keys: list[str]) -> None:
         raise NotImplementedError
 
 
@@ -30,32 +33,27 @@ class S3StorageProvider(StorageProvider):
             config=Config(signature_version="s3v4"),
         )
 
-    def generate_presigned_upload_url(self, file_extension: str, content_type: str) -> dict:
-        """
-        Generates a presigned URL that the frontend can use to upload a file directly to S3.
-        Returns the upload URL, the generated storage_key, and the public URL.
-        """
-        storage_key = f"{uuid.uuid4()}{file_extension}"
-        
+    def delete_object(self, storage_key: str) -> None:
         try:
-            presigned_url = self.s3_client.generate_presigned_url(
-                "put_object",
-                Params={
-                    "Bucket": self.bucket,
-                    "Key": storage_key,
-                    "ContentType": content_type,
-                },
-                ExpiresIn=3600,  # URL valid for 1 hour
-            )
+            self.s3_client.delete_object(Bucket=self.bucket, Key=storage_key)
         except ClientError as e:
-            logger.error(f"Failed to generate presigned URL: {e}")
-            raise CustomException(500, "Failed to generate upload URL")
+            logger.error(f"Failed to delete object {storage_key}: {e}")
 
-        return {
-            "upload_url": presigned_url,
-            "storage_key": storage_key,
-            "public_url": self.get_public_url(storage_key)
-        }
+    def delete_objects(self, storage_keys: list[str]) -> None:
+        if not storage_keys:
+            return
+        
+        chunk_size = 1000
+        for i in range(0, len(storage_keys), chunk_size):
+            chunk = storage_keys[i:i + chunk_size]
+            delete_params = {
+                "Objects": [{"Key": key} for key in chunk],
+                "Quiet": True
+            }
+            try:
+                self.s3_client.delete_objects(Bucket=self.bucket, Delete=delete_params)
+            except ClientError as e:
+                logger.error(f"Failed to delete objects chunk: {e}")
 
     def get_public_url(self, storage_key: str) -> str:
         """

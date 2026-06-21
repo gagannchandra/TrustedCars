@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Upload, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface PhotoUploadFormProps {
   photos: {file: File; url: string}[];
@@ -11,9 +12,15 @@ export default function PhotoUploadForm({ photos, setPhotos }: PhotoUploadFormPr
 
   const handlePhotoAdd = (files: FileList | null) => {
     if (!files) return;
-    const fileArray = Array.from(files);
+    const fileArray = Array.from(files).filter(f => {
+      if (f.size > 10 * 1024 * 1024) {
+        toast.error(`File ${f.name} is too large. Max size is 10MB.`);
+        return false;
+      }
+      return true;
+    });
     const newPhotos = fileArray.map(f => ({ file: f, url: URL.createObjectURL(f) }));
-    setPhotos(prev => [...prev, ...newPhotos].slice(0, 10));
+    setPhotos(prev => [...prev, ...newPhotos].slice(0, 20));
   };
 
   return (
@@ -28,7 +35,7 @@ export default function PhotoUploadForm({ photos, setPhotos }: PhotoUploadFormPr
           <Upload className="w-8 h-8 text-primary" />
         </div>
         <p className="font-display font-bold text-xl text-slate-900 mb-2">Drop photos here or click to upload</p>
-        <p className="text-sm font-medium text-slate-500">Supports JPG, PNG · Max 10MB per photo · Up to 10 photos</p>
+        <p className="text-sm font-medium text-slate-500">Supports JPG, PNG · Max 10MB per photo · Up to 20 photos</p>
         <input id="photoInput" type="file" accept="image/*" multiple className="hidden" onChange={e => handlePhotoAdd(e.target.files)} />
       </div>
 
@@ -37,8 +44,8 @@ export default function PhotoUploadForm({ photos, setPhotos }: PhotoUploadFormPr
         <p className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-4">Required Angles for Enterprise Listing</p>
         <div className="flex flex-wrap gap-2.5">
           {['Front', 'Rear', 'Left Side', 'Right Side', 'Dashboard', 'Odometer', 'Engine'].map(angle => (
-            <span key={angle} className={`text-xs font-bold px-3.5 py-1.5 rounded-full border transition-all ${photos.length > 0 ? 'bg-success/10 text-success border-success/20' : 'bg-white text-slate-500 border-slate-200 shadow-sm'}`}>
-              {photos.length > 0 ? '✓' : '○'} {angle}
+            <span key={angle} className="text-xs font-bold px-3.5 py-1.5 rounded-full border transition-all bg-white text-slate-500 border-slate-200 shadow-sm">
+              ○ {angle}
             </span>
           ))}
         </div>

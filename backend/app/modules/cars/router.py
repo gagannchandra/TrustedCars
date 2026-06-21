@@ -7,7 +7,7 @@ from fastapi import Response
 from app.db.session import get_db
 from app.modules.cars.schemas import CarCreateRequest, CarUpdateRequest, CarResponse, PaginatedCarResponse, CarSearchFilters
 from app.modules.cars.service import CarService
-from app.shared.dependencies.auth import get_current_active_user
+from app.shared.dependencies.auth import get_current_active_user, get_current_user_optional
 from app.shared.interfaces.dealers import DealerAuthorizationProvider
 from app.core.dependencies import get_dealer_provider
 from app.modules.auth.models import User
@@ -75,9 +75,24 @@ async def get_my_cars(
 async def get_car(
     request: Request,
     id: UUID, 
+    current_user: User | None = Depends(get_current_user_optional),
     service: CarService = Depends(get_car_service)
 ):
-    return await service.get_public_car(id)
+    from app.modules.cars.models import CarStatusEnum, ModerationStatusEnum
+    from app.shared.exceptions.handlers import CustomException
+    
+    try:
+        car = await service.get_car(id)
+    except CustomException:
+        raise CustomException(404, "Car not found or unavailable")
+        
+    if car.status == CarStatusEnum.active and car.moderation_status == ModerationStatusEnum.approved.value:
+        return car
+        
+    if current_user and current_user.id == car.user_id:
+        return car
+        
+    raise CustomException(404, "Car not found or unavailable")
 
 
 @router.post("/batch", response_model=list[CarResponse])

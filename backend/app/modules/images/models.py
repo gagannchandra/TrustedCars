@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 from sqlalchemy import String, DateTime, ForeignKey, Integer, Boolean
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Index
 
 from app.db.base import Base
@@ -31,6 +31,8 @@ class CarImage(Base):
     car_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("cars.id", ondelete="CASCADE"), nullable=False, index=True
     )
+    
+    car: Mapped["Car"] = relationship("Car", back_populates="images")
     image_url: Mapped[str] = mapped_column(String(500), nullable=False)
     storage_key: Mapped[str] = mapped_column(
         String(255), nullable=False, unique=True, index=True

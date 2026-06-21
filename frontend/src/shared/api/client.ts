@@ -71,14 +71,23 @@ export const carsApi = {
     return res.data;
   },
 
-  uploadCarImages: async (carId: string, payload: { car_id: string; image_url: string; storage_key: string; sort_order: number; is_primary: boolean }): Promise<any> => {
-    // The API expects individual image metadata uploads via POST /cars/{id}/images
-    const res = await axiosInstance.post(`/cars/${carId}/images`, payload);
+  updateCar: async (id: string, payload: any): Promise<Car> => {
+    const res = await axiosInstance.put(`/cars/${id}`, payload);
     return res.data;
   },
 
-  generatePresignedUrl: async (carId: string, payload: { file_extension: string; content_type: string }): Promise<{upload_url: string; storage_key: string; public_url: string}> => {
-    const res = await axiosInstance.post(`/cars/${carId}/images/upload-url`, payload);
+  deleteCar: async (id: string): Promise<void> => {
+    await axiosInstance.delete(`/cars/${id}`);
+  },
+
+  uploadCarImagesDirect: async (carId: string, file: File): Promise<any> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await axiosInstance.post(`/cars/${carId}/images/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return res.data;
   }
 };

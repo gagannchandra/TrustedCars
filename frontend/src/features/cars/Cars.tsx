@@ -30,6 +30,8 @@ export default function Cars() {
     body_type: searchParams.get('body_type') as BodyType || undefined,
     price_min: searchParams.get('price_min') ? Number(searchParams.get('price_min')) : undefined,
     price_max: searchParams.get('price_max') ? Number(searchParams.get('price_max')) : undefined,
+    min_year: searchParams.get('year_min') ? Number(searchParams.get('year_min')) : undefined,
+    max_year: searchParams.get('year_max') ? Number(searchParams.get('year_max')) : undefined,
     km_max: searchParams.get('km_max') ? Number(searchParams.get('km_max')) : undefined,
     ownership: searchParams.get('ownership') ? Number(searchParams.get('ownership')) : undefined,
     sort: searchParams.get('sort') || 'newest',

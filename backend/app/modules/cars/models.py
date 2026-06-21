@@ -14,7 +14,7 @@ from sqlalchemy import (
     text,
 )
 from sqlalchemy.dialects.postgresql import UUID, TSVECTOR
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 
 from app.db.base import Base
@@ -39,6 +39,7 @@ class FuelTypeEnum(str, enum.Enum):
 class TransmissionEnum(str, enum.Enum):
     manual = "manual"
     automatic = "automatic"
+    amt = "amt"
 
 
 class BodyTypeEnum(str, enum.Enum):
@@ -122,6 +123,18 @@ class Car(Base):
     state: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     quality_grade: Mapped[str | None] = mapped_column(String(10), nullable=True)
+
+    registration_number: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    color: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    has_service_history: Mapped[bool] = mapped_column(Boolean, default=False)
+    has_invoice: Mapped[bool] = mapped_column(Boolean, default=False)
+    has_insurance: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_negotiable: Mapped[bool] = mapped_column(Boolean, default=False)
+    accident_history: Mapped[bool] = mapped_column(Boolean, default=False)
+    
+    images: Mapped[list["CarImage"]] = relationship(
+        "CarImage", back_populates="car", cascade="all, delete-orphan", primaryjoin="Car.id == CarImage.car_id"
+    )
 
     search_vector: Mapped[str | None] = mapped_column(TSVECTOR, nullable=True)
 

@@ -10,7 +10,7 @@ from app.modules.images.schemas import (
     PresignedUrlResponse,
 )
 from app.modules.images.service import ImageService
-from app.shared.dependencies.auth import get_current_active_user
+from app.shared.dependencies.auth import get_current_active_user, get_current_user_optional
 from app.modules.auth.models import User
 from app.shared.interfaces.cars import CarOwnershipProvider
 from app.core.dependencies import get_car_provider
@@ -20,31 +20,30 @@ from fastapi import UploadFile, File
 from app.shared.storage.dependencies import get_storage_provider
 from app.shared.storage.provider import StorageProvider
 
+import aioboto3
+from app.core.config import settings
+
 router = APIRouter(tags=["Images"])
 car_images_router = APIRouter(tags=["Car Images"])
+s3_session = aioboto3.Session()
 
 
 def get_image_service(
     session: AsyncSession = Depends(get_db),
     car_provider: CarOwnershipProvider = Depends(get_car_provider),
+    storage: StorageProvider = Depends(get_storage_provider),
 ) -> ImageService:
-    return ImageService(session, car_provider)
+    return ImageService(session, car_provider, storage)
 
-
-@router.post("", response_model=ImageResponse)
-async def upload_image_metadata(
-    req: ImageCreateRequest,
-    current_user: User = Depends(get_current_active_user),
-    service: ImageService = Depends(get_image_service),
-):
-    return await service.upload_image_metadata(req, current_user)
 
 
 @router.get("/car/{car_id}", response_model=list[ImageResponse])
 async def get_car_images(
-    car_id: UUID, service: ImageService = Depends(get_image_service)
+    car_id: UUID, 
+    current_user: User | None = Depends(get_current_user_optional),
+    service: ImageService = Depends(get_image_service)
 ):
-    return await service.get_car_images(car_id)
+    return await service.get_car_images(car_id, current_user)
 
 
 @router.put("/{image_id}/primary", response_model=ImageResponse)
@@ -75,39 +74,6 @@ async def delete_image(
     await service.delete_image(image_id, current_user)
 
 
-@car_images_router.post("/{car_id}/images", response_model=ImageResponse)
-async def upload_image_metadata_for_car(
-    car_id: UUID,
-    req: ImageCreateRequest,
-    current_user: User = Depends(get_current_active_user),
-    service: ImageService = Depends(get_image_service),
-):
-    if req.car_id != car_id:
-        raise CustomException(400, "URL car_id does not match request body")
-    return await service.upload_image_metadata(req, current_user)
-
-
-@car_images_router.post("/{car_id}/images/upload-url", response_model=PresignedUrlResponse)
-async def generate_presigned_url(
-    car_id: UUID,
-    req: PresignedUrlRequest,
-    current_user: User = Depends(get_current_active_user),
-    service: ImageService = Depends(get_image_service),
-    storage: StorageProvider = Depends(get_storage_provider),
-):
-    # Verify the user is authorized to edit the car before granting a presigned URL
-    await service._verify_ownership(car_id, current_user)
-    
-    allowed_types = {"image/jpeg": [".jpg", ".jpeg"], "image/png": [".png"], "image/webp": [".webp"]}
-    if req.content_type not in allowed_types:
-        raise CustomException(400, "Invalid content type. Only JPEG, PNG, and WebP are allowed.")
-    if not any(req.file_extension in exts for exts in allowed_types.values()):
-        raise CustomException(400, "Invalid file extension.")
-    
-    return storage.generate_presigned_upload_url(
-        file_extension=req.file_extension,
-        content_type=req.content_type
-    )
 
 @car_images_router.post("/{car_id}/images/upload", response_model=ImageResponse)
 async def direct_image_upload(
@@ -119,9 +85,10 @@ async def direct_image_upload(
 ):
     import uuid
     import mimetypes
-    import aioboto3
-    from app.core.config import settings
     
+    if getattr(file, "size", 0) and file.size > 10 * 1024 * 1024:
+        raise CustomException(400, "File size exceeds 10MB limit")
+        
     await service._verify_ownership(car_id, current_user)
     
     content_type = file.content_type or "image/jpeg"
@@ -142,11 +109,10 @@ async def direct_image_upload(
     
     storage_key = f"{uuid.uuid4()}{ext}"
     try:
-        session = aioboto3.Session()
         s3_endpoint = settings.S3_ENDPOINT_URL if hasattr(settings, 'S3_ENDPOINT_URL') and settings.S3_ENDPOINT_URL else None
         s3_region = settings.S3_REGION_NAME if hasattr(settings, 'S3_REGION_NAME') and settings.S3_REGION_NAME else None
         
-        async with session.client("s3", endpoint_url=s3_endpoint, region_name=s3_region) as s3:
+        async with s3_session.client("s3", endpoint_url=s3_endpoint, region_name=s3_region) as s3:
             await s3.upload_fileobj(
                 file.file,
                 storage.bucket,
@@ -170,6 +136,8 @@ async def direct_image_upload(
 
 @car_images_router.get("/{car_id}/images", response_model=list[ImageResponse])
 async def get_images_for_car(
-    car_id: UUID, service: ImageService = Depends(get_image_service)
+    car_id: UUID, 
+    current_user: User | None = Depends(get_current_user_optional),
+    service: ImageService = Depends(get_image_service)
 ):
-    return await service.get_car_images(car_id)
+    return await service.get_car_images(car_id, current_user)

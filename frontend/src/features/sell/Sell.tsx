@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { CheckCircle, Camera, ChevronRight, ChevronLeft, Shield, Award, Zap, TrendingUp } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -50,9 +51,11 @@ type SellFormValues = z.infer<typeof sellSchema>;
 const STEPS = ['Car Details', 'Condition', 'Photos', 'Pricing', 'Contact'];
 
 export default function Sell() {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
-  const [started, setStarted] = useState(false);
+  const isEditMode = !!id;
+  const [started, setStarted] = useState(isEditMode);
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [photos, setPhotos] = useState<{file: File; url: string}[]>([]);
@@ -74,6 +77,44 @@ export default function Sell() {
     mode: 'onChange'
   });
 
+  const { data: existingCar, isLoading } = useQuery({
+    queryKey: ['car', id],
+    queryFn: async () => {
+      const { carsApi } = await import('../../shared/api/client');
+      return carsApi.getCarById(id!);
+    },
+    enabled: isEditMode
+  });
+
+  useEffect(() => {
+    if (existingCar) {
+      methods.reset({
+        reg: existingCar.registration_number || '',
+        make: existingCar.make || '',
+        model: existingCar.model || '',
+        variant: existingCar.variant || '',
+        year: String(existingCar.year) || '',
+        body_type: existingCar.body_type as any || 'sedan',
+        odometer: String(existingCar.odometer_km) || '',
+        fuel: existingCar.fuel_type as any || 'petrol',
+        transmission: existingCar.transmission as any || 'manual',
+        owners: String(existingCar.ownership_count) || '1',
+        accident: existingCar.accident_history ? 'yes' : 'no',
+        color: existingCar.color || '',
+        price: String(existingCar.asking_price) || '',
+        negotiable: existingCar.is_negotiable || false,
+        hasService: existingCar.has_service_history || false,
+        hasInvoice: existingCar.has_invoice || false,
+        hasInsurance: existingCar.has_insurance || false,
+        name: user?.full_name || '',
+        phone: user?.phone || '',
+        city: existingCar.city || user?.city || '',
+        state: existingCar.state || user?.state || '',
+        contactTime: 'anytime'
+      });
+    }
+  }, [existingCar, methods, user]);
+
   const { trigger, handleSubmit } = methods;
 
   const handleNext = async () => {
@@ -83,6 +124,10 @@ export default function Sell() {
     if (step === 3) fieldsToValidate = ['price'];
     
     if (step === 2) {
+      if (photos.length === 0) {
+        toast.error("Please upload at least one photo.");
+        return;
+      }
       setStep(s => s + 1);
       return;
     }
@@ -95,7 +140,7 @@ export default function Sell() {
 
   const onSubmit = async (data: SellFormValues) => {
     try {
-      // Map SellFormValues to CarCreateRequest
+      // Map SellFormValues to CarCreateRequest/CarUpdateRequest
       const payload = {
         make: data.make,
         model: data.model,
@@ -109,43 +154,28 @@ export default function Sell() {
         asking_price: parseFloat(data.price.replace(/,/g, '')),
         city: data.city || 'Unknown',
         state: data.state || 'Unknown',
-        description: `Contact: ${data.name} (${data.contactTime}) - ${data.accident === 'yes' ? 'Accident History' : 'No Accidents'}`
+        registration_number: data.reg || undefined,
+        color: data.color || undefined,
+        has_service_history: data.hasService,
+        has_invoice: data.hasInvoice,
+        has_insurance: data.hasInsurance,
+        is_negotiable: data.negotiable,
+        accident_history: data.accident === 'yes'
       };
 
       const { carsApi } = await import('../../shared/api/client');
-      const newCar = await carsApi.createCar(payload);
+      let carId = id;
+      if (isEditMode && id) {
+        await carsApi.updateCar(id, payload);
+      } else {
+        const newCar = await carsApi.createCar(payload);
+        carId = carId!;
+      }
 
       // Upload photos sequentially
       for (let i = 0; i < photos.length; i++) {
         const file = photos[i].file;
-        
-        // Extract extension (e.g., .jpg, .png)
-        const match = file.name.match(/\.[0-9a-z]+$/i);
-        const ext = match ? match[0] : '.jpg';
-        
-        // 1. Get presigned URL
-        const presigned = await carsApi.generatePresignedUrl(newCar.id, {
-          file_extension: ext,
-          content_type: file.type || 'image/jpeg'
-        });
-        
-        // 2. Upload to S3
-        await fetch(presigned.upload_url, {
-          method: 'PUT',
-          body: file,
-          headers: {
-            'Content-Type': file.type || 'image/jpeg'
-          }
-        });
-        
-        // 3. Save metadata in backend
-        await carsApi.uploadCarImages(newCar.id, {
-          car_id: newCar.id,
-          image_url: presigned.public_url,
-          storage_key: presigned.storage_key,
-          sort_order: i,
-          is_primary: i === 0
-        });
+        await carsApi.uploadCarImagesDirect(carId!, file);
       }
 
       setSubmitted(true);
@@ -154,6 +184,8 @@ export default function Sell() {
       toast.error('Failed to submit listing. Please try again.');
     }
   };
+
+  if (isLoading) return <div className="min-h-screen pt-24 text-center">Loading...</div>;
 
   if (!started) {
     return (

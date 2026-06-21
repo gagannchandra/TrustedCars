@@ -95,6 +95,10 @@ class CarService:
 
         for key, value in update_data.items():
             setattr(car, key, value)
+            
+        # Reset moderation status on edit
+        car.status = CarStatusEnum.pending
+        car.moderation_status = None
 
         await self._log_audit(
             current_user.id, "UPDATE_CAR", car.id, None, f"Updated car {car.id}"

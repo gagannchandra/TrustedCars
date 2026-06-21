@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional
+from typing import Optional, List, Any
 from uuid import UUID
 from datetime import datetime
 from app.modules.cars.models import (
@@ -9,6 +9,7 @@ from app.modules.cars.models import (
     BodyTypeEnum,
 )
 from enum import Enum
+from app.modules.images.schemas import ImageResponse
 
 class SortOption(str, Enum):
     newest = "newest"
@@ -56,6 +57,13 @@ class CarCreateRequest(BaseModel):
     city: str = Field(..., min_length=2, max_length=100)
     state: str = Field(..., min_length=2, max_length=100)
     description: Optional[str] = None
+    registration_number: Optional[str] = None
+    color: Optional[str] = None
+    has_service_history: bool = False
+    has_invoice: bool = False
+    has_insurance: bool = False
+    is_negotiable: bool = False
+    accident_history: bool = False
 
 
 class CarUpdateRequest(BaseModel):
@@ -73,6 +81,13 @@ class CarUpdateRequest(BaseModel):
     city: Optional[str] = Field(None, min_length=2, max_length=100)
     state: Optional[str] = Field(None, min_length=2, max_length=100)
     description: Optional[str] = None
+    registration_number: Optional[str] = None
+    color: Optional[str] = None
+    has_service_history: Optional[bool] = None
+    has_invoice: Optional[bool] = None
+    has_insurance: Optional[bool] = None
+    is_negotiable: Optional[bool] = None
+    accident_history: Optional[bool] = None
 
 
 class CarResponse(BaseModel):
@@ -92,10 +107,17 @@ class CarResponse(BaseModel):
     city: str
     state: str
     description: Optional[str]
-    quality_grade: Optional[str]
+    registration_number: Optional[str]
+    color: Optional[str]
+    has_service_history: bool
+    has_invoice: bool
+    has_insurance: bool
+    is_negotiable: bool
+    accident_history: bool
     status: CarStatusEnum
     created_at: datetime
     updated_at: datetime
+    images: List[ImageResponse] = []
 
     model_config = {"from_attributes": True}
 

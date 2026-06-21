@@ -10,11 +10,14 @@ from app.shared.audit.service import AuditService
 from app.shared.exceptions.handlers import CustomException
 
 
+from app.shared.storage.provider import StorageProvider
+
 class ImageService:
-    def __init__(self, session: AsyncSession, car_provider: CarOwnershipProvider):
+    def __init__(self, session: AsyncSession, car_provider: CarOwnershipProvider, storage: StorageProvider):
         self.repository = ImageRepository(session)
         self.session = session
         self.car_provider = car_provider
+        self.storage = storage
 
     async def _log_audit(
         self,
@@ -78,7 +81,24 @@ class ImageService:
                 400, "Duplicate storage_key or primary image conflict"
             )
 
-    async def get_car_images(self, car_id: UUID) -> list[CarImage]:
+    async def get_car_images(self, car_id: UUID, current_user: User | None = None) -> list[CarImage]:
+        from app.modules.cars.models import Car, CarStatusEnum, ModerationStatusEnum
+        from sqlalchemy import select
+        car = await self.session.scalar(select(Car).where(Car.id == car_id, Car.deleted_at.is_(None)))
+        if not car:
+            raise CustomException(404, "Images not found or unavailable")
+        
+        is_visible = (car.status == CarStatusEnum.active and car.moderation_status == ModerationStatusEnum.approved.value)
+        is_owner = False
+        if current_user:
+            try:
+                is_owner = await self.car_provider.verify_user_can_edit_car(car_id, current_user)
+            except Exception:
+                pass
+                
+        if not is_visible and not is_owner:
+            raise CustomException(404, "Images not found or unavailable")
+            
         return await self.repository.get_images_by_car_id(car_id)
 
     async def set_primary_image(self, image_id: UUID, current_user: User) -> CarImage:
@@ -160,10 +180,17 @@ class ImageService:
             current_user.id, "DELETE_IMAGE", image_id, None, f"Deleted image {image_id}"
         )
         await self.session.commit()
+        
+        # Physically delete from storage
+        self.storage.delete_object(image.storage_key)
 
     async def handle_car_deleted(self, car_id: UUID):
         from sqlalchemy import update
         from datetime import datetime, timezone
+
+        images = await self.repository.get_images_by_car_id(car_id)
+        if not images:
+            return
 
         now = datetime.now(timezone.utc)
         stmt = (
@@ -172,15 +199,25 @@ class ImageService:
             .values(deleted_at=now)
         )
         await self.session.execute(stmt)
+        
+        # Physically delete from storage
+        storage_keys = [img.storage_key for img in images]
+        self.storage.delete_objects(storage_keys)
 
     async def handle_cars_bulk_deleted(self, car_ids: list[str]):
         if not car_ids:
             return
-        from sqlalchemy import update
+        from sqlalchemy import update, select
         from datetime import datetime, timezone
 
         now = datetime.now(timezone.utc)
         uuids = [UUID(cid) for cid in car_ids]
+        
+        # Fetch all storage keys before soft deleting
+        stmt_fetch = select(CarImage.storage_key).where(CarImage.car_id.in_(uuids), CarImage.deleted_at.is_(None))
+        result = await self.session.execute(stmt_fetch)
+        storage_keys = result.scalars().all()
+        
         chunk_size = 1000
         for i in range(0, len(uuids), chunk_size):
             chunk = uuids[i : i + chunk_size]
@@ -190,3 +227,6 @@ class ImageService:
                 .values(deleted_at=now)
             )
             await self.session.execute(stmt)
+            
+        if storage_keys:
+            self.storage.delete_objects(list(storage_keys))

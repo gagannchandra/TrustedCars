@@ -1,9 +1,24 @@
 import { useQuery } from '@tanstack/react-query';
 import { carsApi } from '../../../shared/api/client';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
 import { Car, Plus, ExternalLink, Calendar, MapPin, Edit, Trash2 } from 'lucide-react';
 
 export default function SellerListings() {
+  const queryClient = useQueryClient();
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this listing?")) {
+      try {
+        await carsApi.deleteCar(id);
+        toast.success("Listing deleted successfully");
+        queryClient.invalidateQueries({ queryKey: ['myCars'] });
+      } catch (err) {
+        toast.error("Failed to delete listing");
+      }
+    }
+  };
+
   const { data: myCars = [], isLoading } = useQuery({
     queryKey: ['myCars'],
     queryFn: carsApi.getMyCars,
@@ -77,10 +92,10 @@ export default function SellerListings() {
                     <Link to={`/cars/${car.id}`} className="flex-1 inline-flex justify-center items-center gap-1.5 px-4 py-2 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors">
                       <ExternalLink className="w-4 h-4" /> View
                     </Link>
-                    <button className="flex-1 inline-flex justify-center items-center gap-1.5 px-4 py-2 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors">
+                    <Link to={`/sell/edit/${car.id}`} className="flex-1 inline-flex justify-center items-center gap-1.5 px-4 py-2 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors">
                       <Edit className="w-4 h-4" /> Edit
-                    </button>
-                    <button className="inline-flex justify-center items-center px-4 py-2 border border-error/20 bg-error/5 rounded-lg text-sm font-bold text-error hover:bg-error/10 transition-colors">
+                    </Link>
+                    <button onClick={() => handleDelete(car.id)} className="inline-flex justify-center items-center px-4 py-2 border border-error/20 bg-error/5 rounded-lg text-sm font-bold text-error hover:bg-error/10 transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>

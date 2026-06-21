@@ -18,7 +18,7 @@ class CarRepository:
 
     async def get_car_by_id(self, car_id: UUID) -> Car | None:
         result = await self.session.execute(
-            select(Car).where(Car.id == car_id, Car.deleted_at.is_(None))
+            select(Car).options(selectinload(Car.images)).where(Car.id == car_id, Car.deleted_at.is_(None))
         )
         return result.scalars().first()
 
@@ -50,9 +50,9 @@ class CarRepository:
         dealership_id: UUID | None = None,
         seller_id: UUID | None = None,
     ):
-        stmt = select(Car).where(Car.deleted_at.is_(None))
+        stmt = select(Car).options(selectinload(Car.images)).where(Car.deleted_at.is_(None))
         
-        if seller_id or dealership_id:
+        if seller_id:
             stmt = stmt.where(Car.status.in_([CarStatusEnum.pending, CarStatusEnum.active, CarStatusEnum.sold]))
         else:
             stmt = stmt.where(

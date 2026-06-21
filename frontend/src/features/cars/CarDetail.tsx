@@ -10,8 +10,6 @@ import { useAuth } from '../../shared/hooks/useAuth';
 import CarCard from '../../components/cars/CarCard';
 
 import ImageGallery from './components/ImageGallery';
-import InspectionReport from './components/InspectionReport';
-import ServiceRecords from './components/ServiceRecords';
 import InquiryModal from './components/InquiryModal';
 import EMIModal from './components/EMIModal';
 
@@ -28,8 +26,7 @@ export default function CarDetail() {
   const [activeImage, setActiveImage] = useState(0);
   const [showInquiry, setShowInquiry] = useState(false);
   const [showEMI, setShowEMI] = useState(false);
-  const [expandedFinding, setExpandedFinding] = useState<string | null>(null);
-
+  
   const { data: car, isLoading } = useQuery({
     queryKey: ['car', id],
     queryFn: () => carsApi.getCarById(id!),
@@ -60,11 +57,10 @@ export default function CarDetail() {
   );
 
   const isWishlisted = wishlist.includes(car.id);
-  const badge = getQualityBadgeConfig(car.quality_badge);
+  const badge = null;
   const images = car.images || [];
-  const inspection = car.inspection;
-  const emi = calculateEMI(car.asking_price * 0.8, 9.5, 60);
-  const priceDiff = car.market_value ? Math.round(((car.market_value - car.asking_price) / car.market_value) * 100) : 0;
+    const emi = calculateEMI(car.asking_price * 0.8, 9.5, 60);
+  
 
   return (
     <div className="min-h-screen bg-surface pt-16">
@@ -175,9 +171,7 @@ export default function CarDetail() {
               </div>
             </div>
 
-            {inspection && <InspectionReport inspection={inspection} expandedFinding={expandedFinding} setExpandedFinding={setExpandedFinding} />}
-            {car.service_records && <ServiceRecords records={car.service_records} />}
-
+                        
             {/* Similar Cars */}
             {similarCars.length > 0 && (
               <div className="pt-8">
@@ -198,11 +192,7 @@ export default function CarDetail() {
               {/* Price */}
               <div className="mb-8">
                 <div className="font-display font-bold text-4xl text-slate-900 tracking-tight mb-2">{formatPrice(car.asking_price)}</div>
-                {priceDiff >= 5 && (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-success px-3 py-1.5 rounded-full shadow-sm">
-                    <CheckCircle className="w-3.5 h-3.5" />Great Price
-                  </span>
-                )}
+
                 <div className="text-sm font-medium text-slate-500 mt-3">Estimated EMI from <span className="font-bold text-slate-800">{formatPrice(emi)}/mo</span></div>
               </div>
 

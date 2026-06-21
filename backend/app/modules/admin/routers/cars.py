@@ -1,5 +1,5 @@
 import uuid
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.modules.auth.models import User
@@ -12,10 +12,10 @@ from typing import List
 from sqlalchemy import select
 from app.modules.cars.models import Car
 from app.modules.cars.schemas import PaginatedCarResponse
+from app.core.limiter import limiter, get_user_or_ip
 
 router = APIRouter(prefix="/cars", tags=["admin-cars"])
 
-from fastapi import Query
 
 @router.get("", response_model=PaginatedCarResponse)
 async def list_all_cars(
@@ -42,6 +42,7 @@ async def list_all_cars(
     cars = list(result.scalars().all())
     return {"items": cars, "total": total}
 
+
 @router.post("/{id}/approve")
 async def approve_car(
     id: uuid.UUID,
@@ -56,7 +57,9 @@ async def approve_car(
 
 
 @router.post("/{id}/reject")
+@limiter.limit("10/minute", key_func=get_user_or_ip)
 async def reject_car(
+    request: Request,
     id: uuid.UUID,
     req: ModerateCarRequest,
     db: AsyncSession = Depends(get_db),
@@ -69,7 +72,9 @@ async def reject_car(
 
 
 @router.post("/{id}/hide")
+@limiter.limit("10/minute", key_func=get_user_or_ip)
 async def hide_car(
+    request: Request,
     id: uuid.UUID,
     req: ModerateCarRequest,
     db: AsyncSession = Depends(get_db),

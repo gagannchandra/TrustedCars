@@ -93,6 +93,20 @@ class PlatformStatistics(Base):
     )
 
 
+class PlatformSettings(Base):
+    __tablename__ = "platform_settings"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
+    platform_fee: Mapped[float] = mapped_column(default=2.5, nullable=False)
+    auto_approve: Mapped[bool] = mapped_column(default=True, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+
+
 class ProcessedEvent(Base):
     __tablename__ = "processed_events"
 

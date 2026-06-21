@@ -85,6 +85,9 @@ async def generic_exception_handler(request, exc):
         content={"detail": "Internal server error. Please try again later."},
     )
 
+from app.shared.audit.router import router as audit_router
+from app.modules.admin.routers.settings import router as settings_router
+
 app.include_router(health_router, tags=["health"])
 
 security = HTTPBasic()
@@ -128,3 +131,5 @@ app.include_router(
 app.include_router(reviews_router)
 app.include_router(user_reviews_router)
 app.include_router(admin_router, prefix=f"{settings.API_V1_STR}/admin", tags=["admin"])
+app.include_router(audit_router, prefix=f"{settings.API_V1_STR}")
+app.include_router(settings_router, prefix=f"{settings.API_V1_STR}/admin")

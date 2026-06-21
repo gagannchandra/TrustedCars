@@ -43,6 +43,10 @@ class UserResponse(BaseModel):
     created_at: datetime
     mfa_enabled: bool = False
 
+class AdminUserResponse(UserResponse):
+    is_suspended: bool
+    deleted_at: datetime | None = None
+
     model_config = {"from_attributes": True}
 
 

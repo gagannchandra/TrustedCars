@@ -57,6 +57,25 @@ class AdminModerationService:
 
         target.is_suspended = True
 
+        if target.role.value == "dealer":
+            from sqlalchemy import update as sa_update
+            stmt = select(Dealership).where(Dealership.user_id == target.id, Dealership.deleted_at.is_(None))
+            result = await self.session.execute(stmt)
+            dealer = result.scalars().first()
+            if dealer:
+                now = datetime.now(timezone.utc)
+                await self.session.execute(
+                    sa_update(Car)
+                    .where(Car.dealership_id == dealer.id, Car.deleted_at.is_(None))
+                    .values(
+                        previous_moderation_status=Car.moderation_status,
+                        moderation_status=ModerationStatusEnum.hidden.value,
+                        moderated_at=now,
+                        moderated_by=actor.id,
+                        moderation_reason=f"Dealer suspended: {reason}",
+                    )
+                )
+
         try:
             await self._dispatch_and_audit(
                 actor.id,
@@ -127,7 +146,9 @@ class AdminModerationService:
             await self.session.commit()
         except Exception as e:
             await self.session.rollback()
-            raise CustomException(500, f"Failed to delete user: {str(e)}")
+            import structlog
+            structlog.get_logger(__name__).error("Failed to delete user", error=str(e), exc_info=True)
+            raise CustomException(500, "An internal error occurred. Please try again.")
 
     # ------------------
     # DEALERS
@@ -155,7 +176,7 @@ class AdminModerationService:
             .where(Car.dealership_id == dealer_id, Car.deleted_at.is_(None))
             .values(
                 previous_moderation_status=Car.moderation_status,
-                moderation_status="hidden",
+                moderation_status=ModerationStatusEnum.hidden.value,
                 moderated_at=now,
                 moderated_by=actor.id,
                 moderation_reason=f"Dealer suspended: {reason}",
@@ -174,7 +195,9 @@ class AdminModerationService:
             await self.session.commit()
         except Exception as e:
             await self.session.rollback()
-            raise CustomException(500, f"Failed to suspend dealer: {str(e)}")
+            import structlog
+            structlog.get_logger(__name__).error("Failed to suspend dealer", error=str(e), exc_info=True)
+            raise CustomException(500, "An internal error occurred. Please try again.")
 
     async def restore_dealer(self, actor: User, dealer_id: uuid.UUID):
         dealer = await self.session.get(Dealership, dealer_id)
@@ -194,7 +217,7 @@ class AdminModerationService:
         # Restore inventory explicitly hidden by this suspension
         stmt = select(Car).where(
             Car.dealership_id == dealer_id,
-            Car.moderation_status == "hidden",
+            Car.moderation_status == ModerationStatusEnum.hidden.value,
             Car.deleted_at.is_(None),
         )
         result = await self.session.execute(stmt)
@@ -219,7 +242,9 @@ class AdminModerationService:
             await self.session.commit()
         except Exception as e:
             await self.session.rollback()
-            raise CustomException(500, f"Failed to restore dealer: {str(e)}")
+            import structlog
+            structlog.get_logger(__name__).error("Failed to restore dealer", error=str(e), exc_info=True)
+            raise CustomException(500, "An internal error occurred. Please try again.")
 
     async def delete_dealer(self, actor: User, dealer_id: uuid.UUID):
         dealer = await self.session.get(Dealership, dealer_id)
@@ -250,7 +275,9 @@ class AdminModerationService:
             await self.session.commit()
         except Exception as e:
             await self.session.rollback()
-            raise CustomException(500, f"Failed to delete dealer: {str(e)}")
+            import structlog
+            structlog.get_logger(__name__).error("Failed to delete dealer", error=str(e), exc_info=True)
+            raise CustomException(500, "An internal error occurred. Please try again.")
 
     # ------------------
     # CARS
@@ -288,6 +315,8 @@ class AdminModerationService:
             else:
                 car.status = CarStatusEnum.pending
         elif action_upper == "FEATURE":
+            if car.moderation_status != ModerationStatusEnum.approved.value:
+                raise CustomException(409, "Only approved cars can be featured")
             car.is_featured = True
         else:
             raise CustomException(400, "Invalid car moderation action")
@@ -317,7 +346,9 @@ class AdminModerationService:
             await self.session.commit()
         except Exception as e:
             await self.session.rollback()
-            raise CustomException(500, f"Failed to moderate car: {str(e)}")
+            import structlog
+            structlog.get_logger(__name__).error("Failed to moderate car", error=str(e), exc_info=True)
+            raise CustomException(500, "An internal error occurred. Please try again.")
 
     # ------------------
     # REVIEWS
@@ -358,7 +389,9 @@ class AdminModerationService:
             await self.session.commit()
         except Exception as e:
             await self.session.rollback()
-            raise CustomException(500, f"Failed to delete review: {str(e)}")
+            import structlog
+            structlog.get_logger(__name__).error("Failed to delete review", error=str(e), exc_info=True)
+            raise CustomException(500, "An internal error occurred. Please try again.")
 
     async def restore_review(self, actor: User, review_id: uuid.UUID):
         from app.modules.reviews.service import ReviewsService
@@ -416,7 +449,9 @@ class AdminModerationService:
             await self.session.commit()
         except Exception as e:
             await self.session.rollback()
-            raise CustomException(500, f"Failed to close inquiry: {str(e)}")
+            import structlog
+            structlog.get_logger(__name__).error("Failed to close inquiry", error=str(e), exc_info=True)
+            raise CustomException(500, "An internal error occurred. Please try again.")
 
     async def archive_inquiry(self, actor: User, inquiry_id: uuid.UUID):
         inquiry = await self.session.get(Inquiry, inquiry_id)
@@ -447,4 +482,6 @@ class AdminModerationService:
             await self.session.commit()
         except Exception as e:
             await self.session.rollback()
-            raise CustomException(500, f"Failed to archive inquiry: {str(e)}")
+            import structlog
+            structlog.get_logger(__name__).error("Failed to archive inquiry", error=str(e), exc_info=True)
+            raise CustomException(500, "An internal error occurred. Please try again.")

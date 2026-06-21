@@ -1,13 +1,25 @@
 import { Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '../../../shared/api/client';
 
 export default function SystemSettingsTab() {
   const queryClient = useQueryClient();
   const [fee, setFee] = useState(2.5);
   const [autoApprove, setAutoApprove] = useState(true);
+
+  const { data: settings } = useQuery({
+    queryKey: ['adminSettings'],
+    queryFn: adminApi.getSettings
+  });
+
+  useEffect(() => {
+    if (settings) {
+      setFee(settings.platform_fee);
+      setAutoApprove(settings.auto_approve);
+    }
+  }, [settings]);
 
   const mutation = useMutation({
     mutationFn: () => adminApi.updateSettings({ platform_fee: fee, auto_approve: autoApprove }),
@@ -19,6 +31,7 @@ export default function SystemSettingsTab() {
       toast.error('Failed to save configuration');
     }
   });
+
   return (
     <div className="bg-white rounded-[24px] border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-12">
       <div className="flex items-center gap-4 mb-8 pb-8 border-b border-slate-100">

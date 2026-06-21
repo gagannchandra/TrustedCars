@@ -93,12 +93,48 @@ export const carsApi = {
 };
 
 export const adminApi = {
-  getAllUsers: async (): Promise<User[]> => {
+  getAllUsers: async (): Promise<any> => {
     const res = await axiosInstance.get('/admin/users');
+    return res.data;
+  },
+  suspendUser: async (id: string, reason: string): Promise<any> => {
+    const res = await axiosInstance.post(`/admin/users/${id}/suspend`, { reason });
+    return res.data;
+  },
+  restoreUser: async (id: string): Promise<any> => {
+    const res = await axiosInstance.post(`/admin/users/${id}/restore`);
+    return res.data;
+  },
+  getSettings: async (): Promise<{ platform_fee: number; auto_approve: boolean }> => {
+    const res = await axiosInstance.get('/admin/settings');
     return res.data;
   },
   updateSettings: async (payload: { platform_fee: number; auto_approve: boolean }) => {
     const res = await axiosInstance.patch('/admin/settings', payload);
+    return res.data;
+  },
+  getDashboardStats: async (): Promise<any> => {
+    const res = await axiosInstance.get('/admin/dashboard/statistics');
+    return res.data;
+  },
+  approveCar: async (id: string, reason: string): Promise<any> => {
+    const res = await axiosInstance.post(`/admin/cars/${id}/approve`, { reason });
+    return res.data;
+  },
+  rejectCar: async (id: string, reason: string): Promise<any> => {
+    const res = await axiosInstance.post(`/admin/cars/${id}/reject`, { reason });
+    return res.data;
+  },
+  getDealers: async (): Promise<any> => {
+    const res = await axiosInstance.get('/admin/dealers');
+    return res.data;
+  },
+  suspendDealer: async (id: string, reason: string): Promise<any> => {
+    const res = await axiosInstance.post(`/admin/dealers/${id}/suspend`, { reason });
+    return res.data;
+  },
+  restoreDealer: async (id: string): Promise<any> => {
+    const res = await axiosInstance.post(`/admin/dealers/${id}/restore`);
     return res.data;
   }
 };

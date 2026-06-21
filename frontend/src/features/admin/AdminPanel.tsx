@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Car, Users, Clock, BarChart3, Settings, ShieldAlert, Shield, Eye, LogOut, Loader2 } from 'lucide-react';
+import { Car, Users, Clock, BarChart3, Settings, ShieldAlert, Shield, Eye, LogOut, Loader2, Store } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../shared/hooks/useAuth';
 import { carsApi, adminApi } from '../../shared/api/client';
@@ -10,13 +10,16 @@ import PendingReviewsTab from './components/PendingReviewsTab';
 import InventoryRegistryTab from './components/InventoryRegistryTab';
 import UserDirectoryTab from './components/UserDirectoryTab';
 import SystemSettingsTab from './components/SystemSettingsTab';
+import DealerRegistryTab from './components/DealerRegistryTab';
 
-type Tab = 'overview' | 'pending' | 'listings' | 'users' | 'settings';
+type Tab = 'overview' | 'pending' | 'listings' | 'users' | 'dealers' | 'settings';
 
 const ROLE_CONFIG: Record<string, { className: string; label: string }> = {
   admin: { className: 'bg-error/10 text-error border border-error/20', label: 'Administrator' },
-  seller: { className: 'bg-success/10 text-success border border-success/20', label: 'Enterprise Seller' },
-  buyer: { className: 'bg-primary/10 text-primary border border-primary/20', label: 'Verified Buyer' },
+  superadmin: { className: 'bg-error/20 text-error border border-error/30', label: 'Super Administrator' },
+  dealer: { className: 'bg-success/10 text-success border border-success/20', label: 'Dealer' },
+  support_agent: { className: 'bg-primary/10 text-primary border border-primary/20', label: 'Support Agent' },
+  content_moderator: { className: 'bg-warning/10 text-warning border border-warning/20', label: 'Content Moderator' },
   user: { className: 'bg-slate-100 text-slate-700 border border-slate-200', label: 'Standard User' },
 };
 
@@ -25,14 +28,16 @@ export default function AdminPanel() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('overview');
   const [search, setSearch] = useState('');
-  const [approvedCars, setApprovedCars] = useState<string[]>([]);
-  const [rejectedCars, setRejectedCars] = useState<string[]>([]);
-  const [bannedUsers, setBannedUsers] = useState<string[]>([]);
 
-  const { data: allCars = [], isLoading: loadingCars } = useQuery({ queryKey: ['adminAllCars'], queryFn: carsApi.getAllCarsAdmin, enabled: isAuthenticated && user?.role === 'admin' });
-  const { data: allUsers = [], isLoading: loadingUsers } = useQuery({ queryKey: ['adminAllUsers'], queryFn: adminApi.getAllUsers, enabled: isAuthenticated && user?.role === 'admin' });
+  const { data: dashboardStats, isLoading: loadingStats } = useQuery({ queryKey: ['adminStats'], queryFn: adminApi.getDashboardStats, enabled: isAuthenticated && (user?.role === 'admin' || user?.role === 'superadmin') });
+  const { data: allCars = [], isLoading: loadingCars } = useQuery({ queryKey: ['adminAllCars'], queryFn: carsApi.getAllCarsAdmin, enabled: isAuthenticated && (user?.role === 'admin' || user?.role === 'superadmin') });
+  const { data: allUsersResponse, isLoading: loadingUsers } = useQuery({ queryKey: ['adminAllUsers'], queryFn: adminApi.getAllUsers, enabled: isAuthenticated && (user?.role === 'admin' || user?.role === 'superadmin') });
+  const { data: allDealersResponse, isLoading: loadingDealers } = useQuery({ queryKey: ['adminAllDealers'], queryFn: adminApi.getDealers, enabled: isAuthenticated && (user?.role === 'admin' || user?.role === 'superadmin') });
 
-  if (!isAuthenticated || user?.role !== 'admin') {
+  const allUsers = allUsersResponse?.items || [];
+  const allDealers = allDealersResponse?.items || [];
+
+  if (!isAuthenticated || (user?.role !== 'admin' && user?.role !== 'superadmin')) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface">
         <div className="text-center bg-white p-12 rounded-[32px] shadow-2xl border border-slate-100 max-w-md w-full relative overflow-hidden">
@@ -48,7 +53,7 @@ export default function AdminPanel() {
     );
   }
 
-  if (loadingCars || loadingUsers) {
+  if (loadingCars || loadingUsers || loadingStats || loadingDealers) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface pt-16">
         <Loader2 className="w-12 h-12 text-primary animate-spin" />
@@ -56,18 +61,17 @@ export default function AdminPanel() {
     );
   }
 
-  const pendingCars = allCars.filter(c => !approvedCars.includes(c.id) && !rejectedCars.includes(c.id) && (c.status === 'pending' || c.id === 'c1'));
-  const activeCars = allCars.filter(c => c.status === 'active' && approvedCars.includes(c.id) || (c.status === 'active' && !rejectedCars.includes(c.id)));
+  const pendingCars = allCars.filter(c => c.status === 'pending');
   const filteredCars = allCars.filter(c => c.make.toLowerCase().includes(search.toLowerCase()) || c.model.toLowerCase().includes(search.toLowerCase()) || c.id.toLowerCase().includes(search.toLowerCase()));
   const filteredUsers = allUsers.filter(u => u.full_name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase()));
 
   const stats = {
-    total: allCars.length,
-    active: activeCars.length,
-    pending: pendingCars.length,
-    users: allUsers.length,
-    soldToday: 3,
-    totalRevenue: '₹2.4 Cr',
+    total: dashboardStats?.total_cars || allCars.length,
+    active: dashboardStats?.active_cars || allCars.filter(c => c.status === 'active').length,
+    pending: dashboardStats?.pending_cars || pendingCars.length,
+    users: dashboardStats?.total_users || allUsers.length,
+    soldToday: dashboardStats?.sold_today || 0,
+    totalRevenue: dashboardStats?.total_revenue || '₹0',
   };
 
   const TABS = [
@@ -75,6 +79,7 @@ export default function AdminPanel() {
     { id: 'pending' as Tab, label: `Pending Reviews (${pendingCars.length})`, icon: Clock },
     { id: 'listings' as Tab, label: `Inventory Registry (${allCars.length})`, icon: Car },
     { id: 'users' as Tab, label: `User Directory (${allUsers.length})`, icon: Users },
+    { id: 'dealers' as Tab, label: `Dealer Network (${allDealers.length})`, icon: Store },
     { id: 'settings' as Tab, label: 'System Settings', icon: Settings },
   ];
 
@@ -92,7 +97,7 @@ export default function AdminPanel() {
                 <h1 className="font-display font-bold text-3xl tracking-tight">Enterprise Operations</h1>
               </div>
               <p className="text-slate-400 font-medium text-sm flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-success animate-pulse" /> System Online • Superadmin: {user?.full_name}
+                <span className="w-2 h-2 rounded-full bg-success animate-pulse" /> System Online • {user?.role.toUpperCase()}: {user?.full_name}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -131,9 +136,10 @@ export default function AdminPanel() {
           {/* Content */}
           <div className="flex-1 min-w-0">
             {tab === 'overview' && <OverviewTab pendingCars={pendingCars} stats={stats} setTab={setTab} />}
-            {tab === 'pending' && <PendingReviewsTab pendingCars={pendingCars} setApprovedCars={setApprovedCars} setRejectedCars={setRejectedCars} />}
-            {tab === 'listings' && <InventoryRegistryTab filteredCars={filteredCars} approvedCars={approvedCars} rejectedCars={rejectedCars} search={search} setSearch={setSearch} setApprovedCars={setApprovedCars} setRejectedCars={setRejectedCars} />}
-            {tab === 'users' && <UserDirectoryTab filteredUsers={filteredUsers} bannedUsers={bannedUsers} search={search} setSearch={setSearch} setBannedUsers={setBannedUsers} roleConfig={ROLE_CONFIG} />}
+            {tab === 'pending' && <PendingReviewsTab pendingCars={pendingCars} />}
+            {tab === 'listings' && <InventoryRegistryTab filteredCars={filteredCars} search={search} setSearch={setSearch} />}
+            {tab === 'users' && <UserDirectoryTab filteredUsers={filteredUsers} search={search} setSearch={setSearch} roleConfig={ROLE_CONFIG} />}
+            {tab === 'dealers' && <DealerRegistryTab allDealers={allDealers} search={search} setSearch={setSearch} />}
             {tab === 'settings' && <SystemSettingsTab />}
           </div>
         </div>

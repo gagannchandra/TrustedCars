@@ -3,18 +3,40 @@ import { Search, Eye, CheckCircle, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { Car } from '../../../types';
 import { formatPrice } from '../../../shared/utils/utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { adminApi } from '../../../shared/api/client';
 
 interface InventoryRegistryTabProps {
   filteredCars: Car[];
-  approvedCars: string[];
-  rejectedCars: string[];
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
-  setApprovedCars: React.Dispatch<React.SetStateAction<string[]>>;
-  setRejectedCars: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export default function InventoryRegistryTab({ filteredCars, approvedCars, rejectedCars, search, setSearch, setApprovedCars, setRejectedCars }: InventoryRegistryTabProps) {
+export default function InventoryRegistryTab({ filteredCars, search, setSearch }: InventoryRegistryTabProps) {
+  const queryClient = useQueryClient();
+
+  const approveMutation = useMutation({
+    mutationFn: (id: string) => adminApi.approveCar(id, 'Quick approved via admin panel'),
+    onSuccess: () => {
+      toast.success('Approved');
+      queryClient.invalidateQueries({ queryKey: ['adminAllCars'] });
+    },
+    onError: () => {
+      toast.error('Failed to approve');
+    }
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: (id: string) => adminApi.rejectCar(id, 'Quick rejected via admin panel'),
+    onSuccess: () => {
+      toast.success('Rejected');
+      queryClient.invalidateQueries({ queryKey: ['adminAllCars'] });
+    },
+    onError: () => {
+      toast.error('Failed to reject');
+    }
+  });
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -42,10 +64,8 @@ export default function InventoryRegistryTab({ filteredCars, approvedCars, rejec
             </thead>
             <tbody className="divide-y divide-slate-50">
               {filteredCars.map(car => {
-                const isApproved = approvedCars.includes(car.id);
-                const isRejected = rejectedCars.includes(car.id);
-                const statusLabel = isApproved ? 'Active' : isRejected ? 'Rejected' : car.status.charAt(0).toUpperCase() + car.status.slice(1);
-                const statusClass = isApproved ? 'bg-success/10 text-success border border-success/20' : isRejected ? 'bg-error/10 text-error border border-error/20' : car.status === 'active' ? 'bg-success/10 text-success border border-success/20' : 'bg-warning/10 text-warning border border-warning/20';
+                const statusLabel = car.status.charAt(0).toUpperCase() + car.status.slice(1);
+                const statusClass = car.status === 'active' ? 'bg-success/10 text-success border border-success/20' : car.status === 'rejected' ? 'bg-error/10 text-error border border-error/20' : 'bg-warning/10 text-warning border border-warning/20';
                 
                 return (
                   <tr key={car.id} className="hover:bg-slate-50 transition-colors">
@@ -74,12 +94,18 @@ export default function InventoryRegistryTab({ filteredCars, approvedCars, rejec
                         <Link to={`/cars/${car.id}`} className="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="View Listing">
                           <Eye className="w-5 h-5" />
                         </Link>
-                        {!isApproved && !isRejected && car.status !== 'active' && (
+                        {car.status !== 'active' && car.status !== 'rejected' && (
                           <>
-                            <button onClick={() => { setApprovedCars(prev => [...prev, car.id]); toast.success('Approved'); }} className="p-2 text-slate-400 hover:text-success hover:bg-success/10 rounded-lg transition-colors" title="Quick Approve">
+                            <button 
+                              disabled={approveMutation.isPending || rejectMutation.isPending}
+                              onClick={() => approveMutation.mutate(car.id)} 
+                              className="p-2 text-slate-400 hover:text-success hover:bg-success/10 rounded-lg transition-colors disabled:opacity-50" title="Quick Approve">
                               <CheckCircle className="w-5 h-5" />
                             </button>
-                            <button onClick={() => { setRejectedCars(prev => [...prev, car.id]); toast.error('Rejected'); }} className="p-2 text-slate-400 hover:text-error hover:bg-error/10 rounded-lg transition-colors" title="Quick Reject">
+                            <button 
+                              disabled={approveMutation.isPending || rejectMutation.isPending}
+                              onClick={() => rejectMutation.mutate(car.id)} 
+                              className="p-2 text-slate-400 hover:text-error hover:bg-error/10 rounded-lg transition-colors disabled:opacity-50" title="Quick Reject">
                               <XCircle className="w-5 h-5" />
                             </button>
                           </>

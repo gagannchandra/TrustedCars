@@ -33,26 +33,21 @@ class RequirePermissions:
                 # Log SECURITY_VIOLATION using AuditService
                 # We can dispatch it to the event bus or call AuditService directly
                 # However, AuditService might need session, so we can dispatch an event
-                from app.core.events import event_bus
+                from app.shared.audit.service import AuditService
 
-                # We'll just raise 403, and ideally middleware or exception handlers log it.
-                # To be explicit, we can dispatch it:
-                from app.core.context import correlation_id_ctx, request_id_ctx
-
-                req_id = request_id_ctx.get()
-                corr_id = correlation_id_ctx.get()
-
-                await event_bus.publish(
-                    "audit.log_created",
-                    session=db,
+                await AuditService(db).log_action(
+                    user_id=current_user.id,
                     action="SECURITY_VIOLATION",
-                    actor_id=str(current_user.id),
-                    target_resource_id=None,
-                    resource_type="endpoint",
-                    details={"required": perm.value, "path": request.url.path},
-                    request_id=req_id,
-                    correlation_id=corr_id,
+                    target_id=None,
+                    reason=None,
+                    details=f"Missing permission {perm.value} for {request.url.path}",
                 )
+                try:
+                    await db.commit()
+                except Exception:
+                    await db.rollback()
+                    import structlog
+                    structlog.get_logger(__name__).error("Failed to persist SECURITY_VIOLATION audit log")
 
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,

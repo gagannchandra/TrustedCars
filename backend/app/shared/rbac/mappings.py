@@ -23,8 +23,6 @@ ROLE_PERMISSIONS: dict[RoleEnum, Set[PermissionEnum]] = {
         PermissionEnum.RESTORE_REVIEW,
         PermissionEnum.CLOSE_INQUIRY,
         PermissionEnum.ARCHIVE_INQUIRY,
-        PermissionEnum.REOPEN_INQUIRY,
-        PermissionEnum.DELETE_INQUIRY,
     },
     RoleEnum.support_agent: {
         PermissionEnum.VIEW_ADMIN_DASHBOARD,

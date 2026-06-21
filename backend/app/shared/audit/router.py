@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
+import uuid
 
 from app.db.session import get_db
 from app.shared.rbac.dependencies import RequirePermissions
@@ -14,10 +15,10 @@ router = APIRouter(prefix="/admin/audit-logs", tags=["Admin Audit Logs"])
 
 @router.get("", response_model=PaginatedAuditLogResponse)
 async def get_audit_logs(
-    actor_id: Optional[str] = Query(None),
-    target_id: Optional[str] = Query(None),
+    actor_id: Optional[uuid.UUID] = Query(None),
+    target_id: Optional[uuid.UUID] = Query(None),
     action: Optional[str] = Query(None),
-    correlation_id: Optional[str] = Query(None),
+    correlation_id: Optional[uuid.UUID] = Query(None),
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
     cursor: Optional[str] = Query(None),

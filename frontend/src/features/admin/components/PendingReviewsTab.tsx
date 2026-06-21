@@ -3,14 +3,38 @@ import { CheckCircle, Eye, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { Car } from '../../../types';
 import { formatPrice, formatOdometer, timeAgo } from '../../../shared/utils/utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { adminApi } from '../../../shared/api/client';
 
 interface PendingReviewsTabProps {
   pendingCars: Car[];
-  setApprovedCars: React.Dispatch<React.SetStateAction<string[]>>;
-  setRejectedCars: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export default function PendingReviewsTab({ pendingCars, setApprovedCars, setRejectedCars }: PendingReviewsTabProps) {
+export default function PendingReviewsTab({ pendingCars }: PendingReviewsTabProps) {
+  const queryClient = useQueryClient();
+
+  const approveMutation = useMutation({
+    mutationFn: (id: string) => adminApi.approveCar(id, 'Approved via admin QC queue'),
+    onSuccess: () => {
+      toast.success('Listing approved and published!');
+      queryClient.invalidateQueries({ queryKey: ['adminAllCars'] });
+    },
+    onError: () => {
+      toast.error('Failed to approve listing');
+    }
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: (id: string) => adminApi.rejectCar(id, 'Rejected via admin QC queue'),
+    onSuccess: () => {
+      toast.success('Listing rejected.');
+      queryClient.invalidateQueries({ queryKey: ['adminAllCars'] });
+    },
+    onError: () => {
+      toast.error('Failed to reject listing');
+    }
+  });
+
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
@@ -74,12 +98,16 @@ export default function PendingReviewsTab({ pendingCars, setApprovedCars, setRej
                     </div>
 
                     <div className="mt-auto flex flex-wrap gap-3">
-                      <button onClick={() => { setApprovedCars(prev => [...prev, car.id]); toast.success('Listing approved and published!'); }}
-                        className="flex items-center gap-2 text-sm bg-success hover:bg-green-600 text-white px-6 py-2.5 rounded-xl font-bold transition-colors shadow-md hover:-translate-y-0.5">
+                      <button 
+                        disabled={approveMutation.isPending || rejectMutation.isPending}
+                        onClick={() => approveMutation.mutate(car.id)}
+                        className="flex items-center gap-2 text-sm bg-success hover:bg-green-600 text-white px-6 py-2.5 rounded-xl font-bold transition-colors shadow-md hover:-translate-y-0.5 disabled:opacity-50">
                         <CheckCircle className="w-4 h-4" /> Approve Listing
                       </button>
-                      <button onClick={() => { setRejectedCars(prev => [...prev, car.id]); toast.error('Listing rejected.'); }}
-                        className="flex items-center gap-2 text-sm bg-error hover:bg-red-600 text-white px-6 py-2.5 rounded-xl font-bold transition-colors shadow-md hover:-translate-y-0.5">
+                      <button 
+                        disabled={approveMutation.isPending || rejectMutation.isPending}
+                        onClick={() => rejectMutation.mutate(car.id)}
+                        className="flex items-center gap-2 text-sm bg-error hover:bg-red-600 text-white px-6 py-2.5 rounded-xl font-bold transition-colors shadow-md hover:-translate-y-0.5 disabled:opacity-50">
                         <XCircle className="w-4 h-4" /> Reject
                       </button>
                       <Link to={`/cars/${car.id}`} className="flex items-center gap-2 text-sm border-2 border-slate-200 text-slate-700 px-6 py-2.5 rounded-xl hover:bg-slate-50 font-bold transition-colors ml-auto">

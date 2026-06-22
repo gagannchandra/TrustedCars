@@ -166,7 +166,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-slate-100 px-4 py-4 shadow-lg">
+        <div className="md:hidden absolute top-full left-0 right-0 bg-white border-t border-slate-100 px-4 py-4 shadow-lg max-h-[calc(100vh-64px)] overflow-y-auto">
           {isAuthenticated && (
             <Link to={getDashboardPath()} onClick={() => setMobileOpen(false)} className="block text-slate-700 hover:text-primary py-2 text-sm font-medium">Dashboard</Link>
           )}

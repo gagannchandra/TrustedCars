@@ -201,12 +201,12 @@ export default function Sell() {
             <div className="inline-flex items-center gap-2 bg-success/20 border border-success/30 text-success text-sm font-bold px-5 py-2.5 rounded-full mb-8 backdrop-blur-sm uppercase tracking-wide">
               <Zap className="w-4 h-4" /> Sell Your Vehicle in 3 Easy Steps
             </div>
-            <h1 className="font-display font-bold text-5xl sm:text-6xl text-white mb-6 leading-[1.1] tracking-tight">
+            <h1 className="font-display font-bold text-4xl sm:text-5xl lg:text-6xl text-white mb-4 sm:mb-6 leading-[1.1] tracking-tight">
               Get the <span className="text-transparent bg-clip-text bg-gradient-to-r from-success to-teal-200">Maximum Value</span><br />for Your Premium Car
             </h1>
-            <p className="text-white/80 text-xl mb-12 max-w-2xl mx-auto font-medium">Free 200-point inspection · Data-driven valuation · Connect directly with verified enterprise buyers in under 72 hours.</p>
+            <p className="text-white/80 text-lg sm:text-xl mb-8 sm:mb-12 max-w-2xl mx-auto font-medium px-2">Free 200-point inspection · Data-driven valuation · Connect directly with verified enterprise buyers in under 72 hours.</p>
             <button onClick={() => { if (!isAuthenticated) navigate('/register'); else setStarted(true); }}
-              className="bg-success hover:bg-green-600 text-white font-bold text-xl px-12 py-5 rounded-full transition-all shadow-lg hover:shadow-success/30 hover:-translate-y-1">
+              className="w-full sm:w-auto bg-success hover:bg-green-600 text-white font-bold text-lg sm:text-xl px-8 sm:px-12 py-4 sm:py-5 rounded-xl sm:rounded-full transition-all shadow-lg hover:shadow-success/30 hover:-translate-y-1">
               Start Evaluation — It's Free
             </button>
             <p className="text-white/60 text-sm font-medium mt-6">No hidden fees · Zero broker commissions · 12,000+ successful transactions</p>
@@ -248,19 +248,19 @@ export default function Sell() {
                 { value: '99%', label: 'Satisfied Enterprise Sellers' },
                 { value: '150+', label: 'Verified Cities Covered' },
               ].map(stat => (
-                <div key={stat.label} className="bg-white rounded-[24px] p-8 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                  <div className="font-display font-bold text-5xl text-primary mb-3 tracking-tighter">{stat.value}</div>
-                  <div className="text-sm font-bold text-slate-500 uppercase tracking-wide">{stat.label}</div>
+                <div key={stat.label} className="bg-white rounded-[24px] p-6 sm:p-8 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                  <div className="font-display font-bold text-4xl sm:text-5xl text-primary mb-2 sm:mb-3 tracking-tighter">{stat.value}</div>
+                  <div className="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wide">{stat.label}</div>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <div className="text-center py-20 bg-white">
-          <h2 className="font-display font-bold text-4xl text-slate-900 mb-8 tracking-tight">Ready to sell your premium vehicle?</h2>
+        <div className="text-center py-16 sm:py-20 bg-white px-4">
+          <h2 className="font-display font-bold text-3xl sm:text-4xl text-slate-900 mb-6 sm:mb-8 tracking-tight">Ready to sell your premium vehicle?</h2>
           <button onClick={() => { if (!isAuthenticated) navigate('/register'); else setStarted(true); }}
-            className="bg-primary hover:bg-blue-800 text-white font-bold px-12 py-5 rounded-full transition-all shadow-lg hover:shadow-primary/30 text-lg hover:-translate-y-1">
+            className="w-full sm:w-auto bg-primary hover:bg-blue-800 text-white font-bold px-8 sm:px-12 py-4 sm:py-5 rounded-xl sm:rounded-full transition-all shadow-lg hover:shadow-primary/30 text-lg hover:-translate-y-1">
             Create Your Listing Now
           </button>
         </div>
@@ -270,13 +270,13 @@ export default function Sell() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-surface flex items-center justify-center p-6 pt-24">
-        <div className="bg-white rounded-[32px] p-12 max-w-lg w-full text-center shadow-2xl border border-slate-100">
-          <div className="w-24 h-24 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-success/20">
-            <CheckCircle className="w-12 h-12 text-success" />
+      <div className="min-h-screen bg-surface flex items-center justify-center p-4 sm:p-6 pt-20 sm:pt-24">
+        <div className="bg-white rounded-[24px] sm:rounded-[32px] p-8 sm:p-12 max-w-lg w-full text-center shadow-2xl border border-slate-100">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 border border-success/20">
+            <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-success" />
           </div>
-          <h2 className="font-display font-bold text-4xl text-slate-900 mb-4 tracking-tight">Listing Submitted!</h2>
-          <p className="text-slate-600 font-medium text-lg mb-4">Your vehicle has been submitted for enterprise review.</p>
+          <h2 className="font-display font-bold text-3xl sm:text-4xl text-slate-900 mb-4 tracking-tight">Listing Submitted!</h2>
+          <p className="text-slate-600 font-medium text-base sm:text-lg mb-4">Your vehicle has been submitted for enterprise review.</p>
           <div className="bg-slate-50 p-4 rounded-2xl mb-10 text-sm font-medium text-slate-500 border border-slate-100">
             Our team will review your submission and schedule the 200-point inspection. You will receive a confirmation email shortly.
           </div>
@@ -290,7 +290,7 @@ export default function Sell() {
   }
 
   return (
-    <div className="min-h-screen bg-surface py-12 pt-28">
+    <div className="min-h-screen bg-surface py-8 sm:py-12 pt-24 sm:pt-28">
       <div className="max-w-3xl mx-auto px-4">
         {/* Progress */}
         <div className="mb-10">
@@ -301,15 +301,15 @@ export default function Sell() {
           <div className="h-2.5 bg-slate-200 rounded-full overflow-hidden shadow-inner">
             <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
           </div>
-          <div className="flex justify-between mt-3 px-1">
+          <div className="flex justify-between mt-3 px-1 overflow-x-auto gap-4 hide-scrollbar">
             {STEPS.map((s, i) => (
-              <span key={s} className={`text-[10px] font-bold uppercase tracking-wider ${i <= step ? 'text-primary' : 'text-slate-400'}`}>{s}</span>
+              <span key={s} className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap ${i <= step ? 'text-primary' : 'text-slate-400'}`}>{s}</span>
             ))}
           </div>
         </div>
 
-        <div className="bg-white rounded-[32px] border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.06)] p-8 sm:p-12">
-          <h2 className="font-display font-bold text-3xl text-slate-900 mb-8 tracking-tight">{STEPS[step]}</h2>
+        <div className="bg-white rounded-[24px] sm:rounded-[32px] border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.06)] p-6 sm:p-8 md:p-12">
+          <h2 className="font-display font-bold text-2xl sm:text-3xl text-slate-900 mb-6 sm:mb-8 tracking-tight">{STEPS[step]}</h2>
 
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -320,19 +320,19 @@ export default function Sell() {
               {step === 4 && <ContactForm />}
 
               {/* Navigation */}
-              <div className="flex justify-between items-center mt-12 pt-8 border-t border-slate-100">
+              <div className="flex flex-col-reverse sm:flex-row justify-between items-stretch sm:items-center mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-slate-100 gap-4 sm:gap-0">
                 <button type="button" onClick={() => setStep(s => s - 1)} disabled={step === 0}
-                  className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors uppercase tracking-wide px-4 py-2">
+                  className="flex items-center justify-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors uppercase tracking-wide px-4 py-3 sm:py-2 bg-slate-50 sm:bg-transparent rounded-xl sm:rounded-none">
                   <ChevronLeft className="w-4 h-4" /> Previous
                 </button>
                 {step < STEPS.length - 1 ? (
                   <button type="button" onClick={handleNext}
-                    className="flex items-center gap-3 bg-slate-900 hover:bg-black text-white font-bold px-8 py-4 rounded-xl text-base transition-all shadow-md">
+                    className="flex justify-center items-center gap-3 bg-slate-900 hover:bg-black text-white font-bold px-8 py-4 rounded-xl text-base transition-all shadow-md">
                     Next Step <ChevronRight className="w-5 h-5" />
                   </button>
                 ) : (
                   <button type="submit"
-                    className="flex items-center gap-3 bg-primary hover:bg-blue-800 text-white font-bold px-8 py-4 rounded-xl text-base transition-all shadow-lg hover:shadow-primary/30">
+                    className="flex justify-center items-center gap-3 bg-primary hover:bg-blue-800 text-white font-bold px-8 py-4 rounded-xl text-base transition-all shadow-lg hover:shadow-primary/30">
                     <CheckCircle className="w-5 h-5" /> Submit for Inspection
                   </button>
                 )}

@@ -19,13 +19,13 @@ export default function HowItWorks() {
   return (
     <section className="py-24 bg-white border-y border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 sm:mb-16">
           <p className="text-primary font-bold tracking-wide text-sm mb-2 uppercase">Simple & Transparent</p>
-          <h2 className="font-display font-bold text-4xl text-slate-900 tracking-tight">The Enterprise Process</h2>
+          <h2 className="font-display font-bold text-3xl sm:text-4xl text-slate-900 tracking-tight">The Enterprise Process</h2>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-16 lg:gap-24">
           {/* Buyer */}
-          <div className="bg-surface rounded-3xl p-8 sm:p-12 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+          <div className="bg-surface rounded-3xl p-6 sm:p-8 md:p-12 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <div className="flex items-center gap-3 mb-10">
               <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center border border-slate-100">
                 <Search className="w-6 h-6 text-primary" />
@@ -51,7 +51,7 @@ export default function HowItWorks() {
           </div>
 
           {/* Seller */}
-          <div className="bg-surface rounded-3xl p-8 sm:p-12 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+          <div className="bg-surface rounded-3xl p-6 sm:p-8 md:p-12 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <div className="flex items-center gap-3 mb-10">
               <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center border border-slate-100">
                 <Zap className="w-6 h-6 text-success" />

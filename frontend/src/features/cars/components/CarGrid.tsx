@@ -36,27 +36,27 @@ export default function CarGrid({ pageCars, page, totalPages, handleFilterChange
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
             {pageCars.map((car, index) => <CarCard key={car.id} car={car} index={index} />)}
           </div>
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-12">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-2 mt-8 sm:mt-12">
               <button disabled={page <= 1} onClick={() => handleFilterChange('page', page - 1)}
-                className="px-5 py-2.5 border border-slate-200 rounded-full text-sm font-bold text-slate-700 hover:bg-white hover:border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-all bg-slate-50">
+                className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 rounded-xl sm:rounded-full text-sm font-bold text-slate-700 hover:bg-white hover:border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-all bg-slate-50">
                 Previous
               </button>
-              <div className="flex gap-1.5 px-2">
+              <div className="flex flex-wrap justify-center gap-1.5 px-2">
                 {getPageRange(page, totalPages).map((p, i) => (
                   <button key={i} onClick={() => typeof p === 'number' && handleFilterChange('page', p)} disabled={p === '...'}
-                    className={`w-10 h-10 rounded-full text-sm font-bold transition-all ${p === page ? 'bg-primary text-white shadow-md shadow-primary/30' : p === '...' ? 'cursor-default text-slate-400 bg-transparent' : 'border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 bg-slate-50'}`}>
+                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full text-sm font-bold transition-all ${p === page ? 'bg-primary text-white shadow-md shadow-primary/30' : p === '...' ? 'cursor-default text-slate-400 bg-transparent' : 'border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 bg-slate-50'}`}>
                     {p}
                   </button>
                 ))}
               </div>
               <button disabled={page >= totalPages} onClick={() => handleFilterChange('page', page + 1)}
-                className="px-5 py-2.5 border border-slate-200 rounded-full text-sm font-bold text-slate-700 hover:bg-white hover:border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-all bg-slate-50">
+                className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 rounded-xl sm:rounded-full text-sm font-bold text-slate-700 hover:bg-white hover:border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-all bg-slate-50">
                 Next
               </button>
             </div>

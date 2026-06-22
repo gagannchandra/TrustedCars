@@ -106,10 +106,10 @@ export default function Cars() {
       {/* Header */}
       <div className="bg-white border-b border-slate-200 sticky top-16 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h1 className="font-display font-bold text-3xl text-slate-900 tracking-tight">Explore Inventory <span className="text-slate-400 font-medium text-lg ml-2">{response.total} vehicles</span></h1>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <h1 className="font-display font-bold text-2xl sm:text-3xl text-slate-900 tracking-tight">Explore Inventory <span className="text-slate-400 font-medium text-base sm:text-lg ml-2">{response.total} vehicles</span></h1>
             
-            <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full md:w-auto">
               {/* Search */}
               <div className="relative flex-1 sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />

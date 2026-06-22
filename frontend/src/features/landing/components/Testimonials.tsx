@@ -14,13 +14,13 @@ export default function Testimonials() {
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-teal-500/20 rounded-full blur-[100px]" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 sm:mb-16">
           <p className="text-teal-300 font-bold tracking-wide text-sm mb-2 uppercase">Client Success</p>
-          <h2 className="font-display font-bold text-4xl text-white tracking-tight">Trusted by Thousands</h2>
+          <h2 className="font-display font-bold text-3xl sm:text-4xl text-white tracking-tight">Trusted by Thousands</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {TESTIMONIALS.map((t, i) => (
-            <div key={i} className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 hover:bg-white/15 transition-colors shadow-xl">
+            <div key={i} className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-6 sm:p-8 hover:bg-white/15 transition-colors shadow-xl">
               <div className="flex gap-1 mb-6">
                 {Array.from({ length: t.rating }).map((_, j) => (
                   <Star key={j} className="w-5 h-5 text-warning fill-current" />

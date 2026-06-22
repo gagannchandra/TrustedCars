@@ -24,12 +24,12 @@ export default function FeaturedCars() {
   return (
     <section className="py-24 bg-surface">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-end justify-between mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-12 gap-4">
           <div>
             <p className="text-primary font-bold tracking-wide text-sm mb-2 uppercase">Handpicked for You</p>
-            <h2 className="font-display font-bold text-4xl text-slate-900 tracking-tight">Featured Collection</h2>
+            <h2 className="font-display font-bold text-3xl sm:text-4xl text-slate-900 tracking-tight">Featured Collection</h2>
           </div>
-          <button onClick={() => navigate('/cars')} className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-blue-800 transition-colors bg-white px-5 py-2.5 rounded-full shadow-sm border border-slate-200">
+          <button onClick={() => navigate('/cars')} className="w-full sm:w-auto flex items-center justify-center gap-2 text-sm font-semibold text-primary hover:text-blue-800 transition-colors bg-white px-5 py-3 sm:py-2.5 rounded-xl sm:rounded-full shadow-sm border border-slate-200">
             View Inventory <ChevronRight className="w-4 h-4" />
           </button>
         </div>

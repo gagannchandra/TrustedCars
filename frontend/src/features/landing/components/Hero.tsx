@@ -36,7 +36,7 @@ export default function Hero() {
         </div>
 
         {/* Headline */}
-        <h1 className="font-display font-extrabold text-5xl sm:text-6xl lg:text-7xl text-white leading-[1.1] mb-8 tracking-tight max-w-4xl">
+        <h1 className="font-display font-extrabold text-4xl sm:text-5xl lg:text-7xl text-white leading-[1.1] mb-6 sm:mb-8 tracking-tight max-w-4xl">
           Buy & Sell Cars<br />
           <span className="text-[#BAE6FD]">With Absolute Trust</span>
         </h1>
@@ -47,8 +47,8 @@ export default function Hero() {
         </p>
 
         {/* Search Bar - Premium Pill Shape */}
-        <form onSubmit={handleSearch} className="w-full max-w-4xl bg-white rounded-full p-2.5 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] flex flex-col sm:flex-row gap-2 border-2 border-white/10 relative z-20">
-          <div className="flex items-center gap-4 flex-1 px-6">
+        <form onSubmit={handleSearch} className="w-full max-w-4xl bg-white rounded-2xl sm:rounded-full p-2.5 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] flex flex-col sm:flex-row gap-2 border-2 border-white/10 relative z-20">
+          <div className="flex items-center gap-4 flex-1 px-4 sm:px-6">
             <Search className="w-6 h-6 text-slate-400 shrink-0" />
             <input
               type="text"
@@ -59,7 +59,7 @@ export default function Hero() {
             />
           </div>
           <div className="hidden sm:block w-px h-10 bg-slate-200 self-center"></div>
-          <div className="flex items-center gap-3 px-6 sm:w-64">
+          <div className="flex items-center gap-3 px-4 sm:px-6 sm:w-64 border-t border-slate-100 sm:border-0 pt-2 sm:pt-0 mt-2 sm:mt-0">
             <MapPin className="w-6 h-6 text-slate-400 shrink-0" />
             <select
               value={searchCity}
@@ -70,7 +70,7 @@ export default function Hero() {
               {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-          <button type="submit" className="bg-[#10B981] hover:bg-[#059669] text-white font-bold px-10 py-4 rounded-full text-lg transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] whitespace-nowrap font-display tracking-wide">
+          <button type="submit" className="w-full sm:w-auto bg-[#10B981] hover:bg-[#059669] text-white font-bold px-10 py-4 rounded-xl sm:rounded-full text-lg transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] whitespace-nowrap font-display tracking-wide">
             Explore Inventory
           </button>
         </form>
@@ -97,18 +97,18 @@ export default function Hero() {
       {/* Trust Bar */}
       <div className="absolute bottom-0 left-0 right-0 bg-[#082A4F]/80 backdrop-blur-xl border-t border-white/5 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-x divide-white/10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 sm:gap-y-0 gap-x-4 sm:gap-x-6 text-center divide-x-0 md:divide-x divide-white/10">
             {[
               { icon: <CheckCircle className="w-5 h-5 text-[#10B981]" />, label: '200-Point Inspected' },
               { icon: <ShieldCheck className="w-5 h-5 text-[#10B981]" />, label: 'Comprehensive Warranty' },
               { icon: <Lock className="w-5 h-5 text-[#10B981]" />, label: 'Secure Transactions' },
               { icon: <Award className="w-5 h-5 text-[#10B981]" />, label: 'Verified Ownership' },
             ].map((stat, i) => (
-              <div key={i} className="flex flex-col items-center gap-2 px-4">
+              <div key={i} className="flex flex-col items-center gap-2 px-2 sm:px-4">
                 <div className="flex items-center justify-center bg-white/5 w-10 h-10 rounded-full mb-1 border border-white/5 shadow-inner">
                   {stat.icon}
                 </div>
-                <div className="text-sm text-white/90 font-bold tracking-wide font-display">{stat.label}</div>
+                <div className="text-xs sm:text-sm text-white/90 font-bold tracking-wide font-display">{stat.label}</div>
               </div>
             ))}
           </div>

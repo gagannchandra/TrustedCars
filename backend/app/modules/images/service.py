@@ -13,7 +13,12 @@ from app.shared.exceptions.handlers import CustomException
 from app.shared.storage.provider import StorageProvider
 
 class ImageService:
-    def __init__(self, session: AsyncSession, car_provider: CarOwnershipProvider, storage: StorageProvider):
+    def __init__(
+        self,
+        session: AsyncSession,
+        car_provider: CarOwnershipProvider | None = None,
+        storage: StorageProvider | None = None,
+    ):
         self.repository = ImageRepository(session)
         self.session = session
         self.car_provider = car_provider

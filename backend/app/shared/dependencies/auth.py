@@ -69,3 +69,34 @@ async def get_current_active_user(
 
 
 get_current_user = get_current_active_user
+
+
+async def get_current_user_optional(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    """
+    Non-throwing auth dependency. Returns the authenticated User if a valid
+    access_token cookie is present, otherwise returns None.
+    Used for endpoints that are public but show extra data to logged-in users
+    (e.g., car detail page showing edit controls to the owner).
+    """
+    token = request.cookies.get("access_token")
+    if not token:
+        return None
+    try:
+        payload = jwt.decode(
+            token, settings.JWT_SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        if payload.get("type") != "access":
+            return None
+        user_id = payload.get("sub")
+        if not user_id:
+            return None
+        repo = AuthRepository(db)
+        user = await repo.get_user_by_id(UUID(str(user_id)))
+        if user and user.is_active and user.deleted_at is None and not user.is_suspended:
+            return user
+        return None
+    except (InvalidTokenError, Exception):
+        return None

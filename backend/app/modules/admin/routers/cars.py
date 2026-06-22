@@ -34,8 +34,12 @@ async def list_all_cars(
     if status:
         stmt = stmt.where(Car.status == status)
     if q:
+        q_safe = q.lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
         stmt = stmt.where(
-            or_(func.lower(Car.make).like(f"%{q.lower()}%"), func.lower(Car.model).like(f"%{q.lower()}%"))
+            or_(
+                func.lower(Car.make).like(f"%{q_safe}%", escape="\\"),
+                func.lower(Car.model).like(f"%{q_safe}%", escape="\\"),
+            )
         )
     total = await db.scalar(select(func.count()).select_from(stmt.subquery()))
     result = await db.execute(stmt.order_by(Car.created_at.desc()).offset(skip).limit(limit))

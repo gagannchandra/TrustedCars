@@ -2,6 +2,7 @@ from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import or_, and_, func, cast, Text
+from sqlalchemy.orm import selectinload
 from uuid import UUID
 from app.modules.cars.models import Car, CarStatusEnum, ModerationStatusEnum
 from app.modules.cars.schemas import CarSearchFilters

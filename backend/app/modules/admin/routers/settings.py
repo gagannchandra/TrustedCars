@@ -32,15 +32,8 @@ async def get_settings(
 async def update_settings(
     req: UpdateSettingsRequest,
     db: AsyncSession = Depends(get_db),
-    # Need to be superadmin, we'll enforce via a specific hierarchy check or add MANAGE_PLATFORM_SETTINGS permission.
-    # We will just use SUPERADMIN role directly, or rely on a newly defined permission (but we don't want to define a new one if we don't have to). Let's use VIEW_ADMIN_DASHBOARD but enforce superadmin role.
-    current_user: User = Depends(RequirePermissions([PermissionEnum.VIEW_ADMIN_DASHBOARD])),
+    current_user: User = Depends(RequirePermissions([PermissionEnum.MANAGE_SETTINGS])),
 ):
-    from app.modules.auth.models import RoleEnum
-    from app.shared.exceptions.handlers import CustomException
-    if current_user.role != RoleEnum.superadmin:
-        raise CustomException(403, "Only superadmin can manage platform settings")
-
     settings = await db.get(PlatformSettings, 1)
     if not settings:
         settings = PlatformSettings()

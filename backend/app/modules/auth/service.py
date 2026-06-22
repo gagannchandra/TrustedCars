@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import delete
 from app.modules.auth.repository import AuthRepository
 from app.modules.auth.schemas import (
     RegisterUserRequest,
@@ -245,7 +246,6 @@ class AuthService:
         import pyotp
         import secrets
         from app.modules.auth.models import UserMFABackupCode
-        from sqlalchemy import delete
 
         await self.session.execute(
             delete(UserMFABackupCode).where(
@@ -425,7 +425,7 @@ class AuthService:
         
         existing = await self.repository.get_user_by_email(email)
         if existing:
-            await otp_service.delete_otp(otp_record)
+            await otp_service.delete_otp(otp_record, commit=True)
             raise CustomException(400, "Email already registered")
             
         user = User(
@@ -448,26 +448,25 @@ class AuthService:
                 await self._log_audit(user.id, "REGISTER_USER", user.id, None, "Registered user account")
             
             await otp_service.delete_otp(otp_record)
+
+            access_token = create_access_token(subject=user.id)
+            refresh_token_plain = create_refresh_token(subject=user.id)
+
+            family_id = uuid.uuid4()
+            rt = RefreshToken(
+                user_id=user.id,
+                token_hash=self.hash_token(refresh_token_plain),
+                family_id=family_id,
+                expires_at=datetime.now(timezone.utc)
+                + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+            )
+            await self.repository.save_refresh_token(rt)
+
             await self.session.commit()
             await self.session.refresh(user)
         except IntegrityError:
             await self.session.rollback()
             raise CustomException(400, "Email already registered")
-            
-        access_token = create_access_token(subject=user.id)
-        refresh_token_plain = create_refresh_token(subject=user.id)
-
-        import uuid
-        family_id = uuid.uuid4()
-        rt = RefreshToken(
-            user_id=user.id,
-            token_hash=self.hash_token(refresh_token_plain),
-            family_id=family_id,
-            expires_at=datetime.now(timezone.utc)
-            + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
-        )
-        await self.repository.save_refresh_token(rt)
-        await self.session.commit()
 
         return {
             "access_token": access_token,
@@ -483,7 +482,7 @@ class AuthService:
         
         user = await self.repository.get_user_by_email(email)
         if not user or str(user.id) != otp_record.context_data["user_id"]:
-            await otp_service.delete_otp(otp_record)
+            await otp_service.delete_otp(otp_record, commit=True)
             raise CustomException(401, "Invalid user record")
             
         await otp_service.delete_otp(otp_record)

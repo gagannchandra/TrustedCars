@@ -1,4 +1,3 @@
-import pyotp
 import uuid
 import passlib.context
 from datetime import datetime, timezone, timedelta
@@ -14,11 +13,6 @@ class OTPService:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    def _generate_otp(self) -> str:
-        # Generate a secure 6-digit random code using pyotp (which uses secrets module)
-        return pyotp.random_base32()[:6].upper() # using base32 prefix and ensuring 6 chars. Actually pyotp.random_base32 is alphanumeric.
-        # Let's generate a strict 6-digit numeric OTP
-    
     def _generate_numeric_otp(self) -> str:
         import secrets
         return "".join(str(secrets.randbelow(10)) for _ in range(6))
@@ -64,11 +58,11 @@ class OTPService:
             raise CustomException(400, "OTP not found or expired")
 
         if datetime.now(timezone.utc) > otp_record.expires_at:
-            await self.delete_otp(otp_record)
+            await self.delete_otp(otp_record, commit=True)
             raise CustomException(400, "OTP has expired. Please request a new one.")
 
         if otp_record.attempts >= settings.OTP_MAX_ATTEMPTS:
-            await self.delete_otp(otp_record)
+            await self.delete_otp(otp_record, commit=True)
             raise CustomException(400, "Maximum OTP attempts exceeded. Please request a new one.")
 
         if not pwd_context.verify(code, otp_record.otp_hash):
@@ -79,9 +73,12 @@ class OTPService:
         # Success - don't delete here so the caller can extract context_data
         return otp_record
 
-    async def delete_otp(self, otp_record: OTPCode):
+    async def delete_otp(self, otp_record: OTPCode, commit: bool = False):
+        """Delete an OTP record. Pass commit=True only when this is the final
+        operation in the current unit-of-work (e.g. error-path cleanup)."""
         await self.session.delete(otp_record)
-        await self.session.commit()
+        if commit:
+            await self.session.commit()
 
     async def enforce_cooldown(self, email: str, otp_type: str):
         """

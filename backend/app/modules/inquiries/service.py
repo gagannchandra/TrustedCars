@@ -13,7 +13,7 @@ from app.core.events import event_bus
 
 
 class InquiryService:
-    def __init__(self, session: AsyncSession, car_provider: CarOwnershipProvider):
+    def __init__(self, session: AsyncSession, car_provider: CarOwnershipProvider | None = None):
         self.repository = InquiryRepository(session)
         self.session = session
         self.car_provider = car_provider

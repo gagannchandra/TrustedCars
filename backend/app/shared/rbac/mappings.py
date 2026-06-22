@@ -23,6 +23,9 @@ ROLE_PERMISSIONS: dict[RoleEnum, Set[PermissionEnum]] = {
         PermissionEnum.RESTORE_REVIEW,
         PermissionEnum.CLOSE_INQUIRY,
         PermissionEnum.ARCHIVE_INQUIRY,
+        PermissionEnum.REOPEN_INQUIRY,
+        PermissionEnum.DELETE_INQUIRY,
+        PermissionEnum.MODERATE_ANY,
     },
     RoleEnum.support_agent: {
         PermissionEnum.VIEW_ADMIN_DASHBOARD,
@@ -30,6 +33,8 @@ ROLE_PERMISSIONS: dict[RoleEnum, Set[PermissionEnum]] = {
         PermissionEnum.RESTORE_USER,
         PermissionEnum.CLOSE_INQUIRY,
         PermissionEnum.ARCHIVE_INQUIRY,
+        PermissionEnum.REOPEN_INQUIRY,
+        PermissionEnum.MODERATE_ANY,
     },
     RoleEnum.content_moderator: {
         PermissionEnum.VIEW_ADMIN_DASHBOARD,
@@ -39,6 +44,7 @@ ROLE_PERMISSIONS: dict[RoleEnum, Set[PermissionEnum]] = {
         PermissionEnum.FEATURE_CAR,
         PermissionEnum.DELETE_REVIEW,
         PermissionEnum.RESTORE_REVIEW,
+        PermissionEnum.MODERATE_ANY,
     },
     RoleEnum.superadmin: set(PermissionEnum),
 }

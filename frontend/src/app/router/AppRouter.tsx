@@ -20,6 +20,7 @@ const Sell = lazy(() => import('../../features/sell/Sell'));
 const Dashboard = lazy(() => import('../../features/dashboard/Dashboard'));
 const AdminPanel = lazy(() => import('../../features/admin/AdminPanel'));
 const SellerListings = lazy(() => import('../../features/sell/pages/SellerListings'));
+const ComingSoon = lazy(() => import('../../components/layout/ComingSoon'));
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -66,16 +67,7 @@ export default function App() {
               <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['user', 'dealer', 'admin']}><Dashboard /></ProtectedRoute>} />
               <Route path="/dashboard/:tab" element={<ProtectedRoute allowedRoles={['user', 'dealer', 'admin']}><Dashboard /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminPanel /></ProtectedRoute>} />
-              <Route path="*" element={
-                <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                  <div className="text-center">
-                    <div className="text-8xl mb-4">🚗</div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Page Not Found</h2>
-                    <p className="text-gray-500 mb-6">The page you're looking for doesn't exist.</p>
-                    <a href="/" className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 inline-block">Go Home</a>
-                  </div>
-                </div>
-              } />
+              <Route path="*" element={<ComingSoon />} />
             </Routes>
           </Suspense>
         </AppLayout>

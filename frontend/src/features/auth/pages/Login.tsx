@@ -163,13 +163,14 @@ export default function Login() {
               <div className="space-y-2.5">
                 {[
                   { role: 'Admin', email: 'admin@trustedcars.in', password: 'Admin@123' },
+                  { role: 'Dealer', email: 'dealer@trustedcars.in', password: 'Dealer@123' },
                   { role: 'Standard User', email: 'rahul.sharma@gmail.com', password: 'User@123' },
                   { role: 'Standard User', email: 'sneha.kapoor@gmail.com', password: 'User@123' },
                 ].map(cred => (
                   <button type="button" key={cred.email} onClick={() => fillCredential(cred)}
                     className="w-full flex items-center justify-between text-left px-4 py-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-primary/40 hover:shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary/20 group/btn">
                     <div>
-                      <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide mr-3 transition-colors ${cred.role === 'Admin' ? 'bg-purple-100 text-purple-700 group-hover/btn:bg-purple-200' : 'bg-primary/10 text-primary group-hover/btn:bg-primary/20'}`}>
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide mr-3 transition-colors ${cred.role === 'Admin' ? 'bg-purple-100 text-purple-700 group-hover/btn:bg-purple-200' : cred.role === 'Dealer' ? 'bg-amber-100 text-amber-700 group-hover/btn:bg-amber-200' : 'bg-primary/10 text-primary group-hover/btn:bg-primary/20'}`}>
                         {cred.role}
                       </span>
                       <span className="text-sm font-medium text-slate-700 group-hover/btn:text-slate-900 transition-colors">{cred.email}</span>

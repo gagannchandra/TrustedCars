@@ -76,6 +76,10 @@ class User(Base):
 
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
+    __table_args__ = (
+        Index("ix_refresh_tokens_user_id", "user_id"),
+        Index("ix_refresh_tokens_expires_at", "expires_at"),  # for TTL cleanup
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
@@ -159,6 +163,10 @@ class Dealership(Base):
 
 class OTPCode(Base):
     __tablename__ = "otp_codes"
+    __table_args__ = (
+        Index("ix_otp_codes_email_type", "email", "type"),
+        Index("ix_otp_codes_expires_at", "expires_at"),  # for TTL cleanup
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4

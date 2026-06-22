@@ -23,10 +23,10 @@ class Settings(BaseSettings):
 
     # S3 Storage Config
     S3_BUCKET_NAME: str = "trustedcars-images"
-    AWS_ACCESS_KEY_ID: str = "minioadmin"
-    AWS_SECRET_ACCESS_KEY: str = "minioadmin"
+    AWS_ACCESS_KEY_ID: str          # Required — no default
+    AWS_SECRET_ACCESS_KEY: str      # Required — no default
     AWS_REGION: str = "us-east-1"
-    S3_ENDPOINT_URL: str | None = "http://localhost:9000"
+    S3_ENDPOINT_URL: str | None = None  # None = real AWS; set for MinIO/local dev
 
     CORS_ORIGINS: List[str] = [
         "http://localhost:5173",

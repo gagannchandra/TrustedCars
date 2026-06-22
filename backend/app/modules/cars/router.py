@@ -96,12 +96,17 @@ async def get_car(
 
 
 @router.post("/batch", response_model=list[CarResponse])
+@limiter.limit("30/minute")
 async def get_cars_batch(
+    request: Request,
     ids: list[UUID],
     service: CarService = Depends(get_car_service),
 ):
     if not ids:
         return []
+    if len(ids) > 50:
+        from app.shared.exceptions.handlers import CustomException
+        raise CustomException(400, "Batch size cannot exceed 50 items")
     return await service.get_cars_by_ids(ids)
 
 @router.get("", response_model=PaginatedCarResponse)

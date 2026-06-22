@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
+from pydantic import BaseModel, EmailStr
 from app.db.session import get_db
 from app.modules.users.schemas import (
     UserPrivateProfile,
@@ -11,6 +12,7 @@ from app.modules.users.schemas import (
 from app.modules.users.service import UserService
 from app.modules.auth.models import User
 from app.shared.dependencies.auth import get_current_active_user
+from app.core.limiter import limiter
 
 router = APIRouter()
 dealers_router = APIRouter()
@@ -18,6 +20,17 @@ dealers_router = APIRouter()
 
 def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
     return UserService(db)
+
+
+class EmailChangeRequest(BaseModel):
+    model_config = {"extra": "forbid"}
+    new_email: EmailStr
+
+
+class EmailVerifyRequest(BaseModel):
+    model_config = {"extra": "forbid"}
+    new_email: EmailStr
+    code: str
 
 
 @router.get("/me", response_model=UserPrivateProfile)
@@ -35,6 +48,28 @@ async def update_current_user(
     service: UserService = Depends(get_user_service),
 ):
     return await service.update_user_profile(current_user.id, req)
+
+
+@router.post("/me/email/request-change")
+@limiter.limit("5/minute")
+async def request_email_change(
+    request: Request,
+    req: EmailChangeRequest,
+    current_user: User = Depends(get_current_active_user),
+    service: UserService = Depends(get_user_service),
+):
+    return await service.request_email_change(current_user.id, str(req.new_email))
+
+
+@router.post("/me/email/verify-change")
+@limiter.limit("10/minute")
+async def verify_email_change(
+    request: Request,
+    req: EmailVerifyRequest,
+    current_user: User = Depends(get_current_active_user),
+    service: UserService = Depends(get_user_service),
+):
+    return await service.verify_email_change(current_user.id, str(req.new_email), req.code)
 
 
 @router.delete("/me")

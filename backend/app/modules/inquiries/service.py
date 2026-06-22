@@ -166,6 +166,20 @@ class InquiryService:
             self._format_inquiry_response(inquiry, car) for inquiry, car in inquiries
         ]
 
+    async def list_my_inquiries(
+        self,
+        current_user: User,
+        cursor: datetime | None = None,
+        limit: int = 100,
+    ):
+        """Return all inquiries where user is buyer OR seller — single DB query."""
+        inquiries = await self.repository.list_all_user_inquiries(
+            current_user.id, cursor, limit
+        )
+        return [
+            self._format_inquiry_response(inquiry, car) for inquiry, car in inquiries
+        ]
+
     async def list_inquiry_messages(
         self, inquiry_id: UUID, current_user: User, cursor: datetime | None, limit: int
     ) -> dict:

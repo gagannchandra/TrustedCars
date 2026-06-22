@@ -36,6 +36,8 @@ class AsyncOutboxWorker(WorkerInterface):
         self.max_concurrency = max_concurrency
         self._running = False
         self._task: asyncio.Task | None = None
+        self._cleanup_counter = 0
+        self._cleanup_every_n_cycles = int(3600 / max(poll_interval, 1))  # ~1 hour
 
     async def start(self):
         if not self._running:
@@ -58,6 +60,10 @@ class AsyncOutboxWorker(WorkerInterface):
             try:
                 await self.update_metrics()
                 await self.process_pending_events()
+                self._cleanup_counter += 1
+                if self._cleanup_counter >= self._cleanup_every_n_cycles:
+                    self._cleanup_counter = 0
+                    await self.cleanup_expired_records()
             except asyncio.CancelledError:
                 raise
             except Exception as e:
@@ -80,6 +86,41 @@ class AsyncOutboxWorker(WorkerInterface):
             )
             OUTBOX_QUEUE_SIZE.set(pending_count or 0)
             OUTBOX_FAILED_EVENTS.set(failed_count or 0)
+
+    async def cleanup_expired_records(self) -> None:
+        """Delete expired OTPs and expired refresh tokens. Runs ~hourly."""
+        from sqlalchemy import delete as sa_delete
+        from app.modules.auth.models import OTPCode, RefreshToken
+
+        now = datetime.now(timezone.utc)
+        batch_limit = 5000
+
+        try:
+            async with AsyncSessionLocal() as session:
+                # Delete expired OTP codes
+                otp_stmt = (
+                    sa_delete(OTPCode)
+                    .where(OTPCode.expires_at < now)
+                    .execution_options(synchronize_session=False)
+                )
+                otp_result = await session.execute(otp_stmt)
+
+                # Delete expired or revoked refresh tokens
+                rt_stmt = (
+                    sa_delete(RefreshToken)
+                    .where(RefreshToken.expires_at < now)
+                    .execution_options(synchronize_session=False)
+                )
+                rt_result = await session.execute(rt_stmt)
+
+                await session.commit()
+                logger.info(
+                    "TTL cleanup complete",
+                    otps_deleted=otp_result.rowcount,
+                    refresh_tokens_deleted=rt_result.rowcount,
+                )
+        except Exception as e:
+            logger.exception("TTL cleanup failed: %s", e)
 
     async def process_pending_events(self):
         from sqlalchemy import or_, and_
@@ -116,7 +157,10 @@ class AsyncOutboxWorker(WorkerInterface):
                 return
 
             for eid in event_ids:
-                event = await session.get(OutboxEvent, eid)
+                result = await session.execute(
+                    select(OutboxEvent).where(OutboxEvent.id == eid)
+                )
+                event = result.scalars().first()
                 if event:
                     event.status = OutboxEventStatus.processing
                     event.last_attempt_at = now
@@ -143,7 +187,10 @@ class AsyncOutboxWorker(WorkerInterface):
     async def _process_event(self, event_id):
         async with AsyncSessionLocal() as event_session:
             async with event_session.begin():
-                event = await event_session.get(OutboxEvent, event_id)
+                result = await event_session.execute(
+                    select(OutboxEvent).where(OutboxEvent.id == event_id)
+                )
+                event = result.scalars().first()
                 if not event or event.status != OutboxEventStatus.processing:
                     return
 
@@ -196,7 +243,10 @@ class AsyncOutboxWorker(WorkerInterface):
 
     async def _record_failure(self, event_id, error: Exception) -> None:
         async with AsyncSessionLocal() as fail_session:
-            failed_event = await fail_session.get(OutboxEvent, event_id)
+            result = await fail_session.execute(
+                select(OutboxEvent).where(OutboxEvent.id == event_id)
+            )
+            failed_event = result.scalars().first()
             if not failed_event:
                 return
 

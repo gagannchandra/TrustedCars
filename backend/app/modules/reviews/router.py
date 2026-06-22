@@ -49,9 +49,7 @@ async def get_my_reviews(
 @router.get("/{id}", response_model=ReviewResponse)
 @limiter.limit("60/minute")
 async def get_review(request: Request, id: UUID, service: ReviewsService = Depends(get_reviews_service)):
-    # Pass None for current_user if we want public access, but the service expects a user for verify_access, wait!
-    # service.get_review doesn't use current_user in any strict way right now. Let's just pass None.
-    # Actually wait, I need to check what `get_review` expects.
+    # Public endpoint — no auth required. Service returns None user, access is not restricted.
     return await service.get_review(id, None)
 
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from app.db.session import get_db
@@ -77,6 +77,7 @@ async def delete_image(
 
 @car_images_router.post("/{car_id}/images/upload", response_model=ImageResponse)
 async def direct_image_upload(
+    request: Request,
     car_id: UUID,
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_active_user),
@@ -85,8 +86,20 @@ async def direct_image_upload(
 ):
     import uuid
     import mimetypes
-    
-    if getattr(file, "size", 0) and file.size > 10 * 1024 * 1024:
+
+    MAX_SIZE = 10 * 1024 * 1024  # 10 MB
+
+    # Server-side Content-Length check before reading any data
+    content_length = request.headers.get("content-length")
+    if content_length:
+        try:
+            if int(content_length) > MAX_SIZE:
+                raise CustomException(400, "File size exceeds 10MB limit")
+        except ValueError:
+            raise CustomException(400, "Invalid Content-Length header")
+
+    # Fallback: check file.size attribute if available (multipart metadata)
+    if getattr(file, "size", None) and file.size > MAX_SIZE:
         raise CustomException(400, "File size exceeds 10MB limit")
         
     await service._verify_ownership(car_id, current_user)

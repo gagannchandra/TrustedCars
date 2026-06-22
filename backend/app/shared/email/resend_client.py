@@ -82,5 +82,20 @@ class EmailService:
         """
         return await self._send_email(to_email, subject, html)
 
+    async def send_email_change_otp(self, new_email: str, otp: str):
+        subject = f"Verify your new {self.app_name} email address"
+        html = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+            <h2 style="color: #0F172A;">Email Address Change</h2>
+            <p>We received a request to change your {self.app_name} account email to this address. Use the code below to confirm:</p>
+            <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 20px; text-align: center; margin: 30px 0;">
+                <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #3B82F6;">{otp}</span>
+            </div>
+            <p style="font-size: 14px; color: #64748B;">This code will expire in {getattr(settings, 'OTP_EXPIRY_MINUTES', 10)} minutes.</p>
+            <p>If you didn't request this change, please secure your account immediately — someone may have access to it.</p>
+        </div>
+        """
+        return await self._send_email(new_email, subject, html)
+
 # Global singleton
 email_service = EmailService()

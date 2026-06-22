@@ -48,11 +48,14 @@ class UserService:
         if not user:
             raise CustomException(404, "User not found")
 
-        if req.email and req.email != user.email:
-            existing = await self.repository.get_user_by_email(req.email)
-            if existing:
-                raise CustomException(400, "Email already in use")
-            user.email = req.email
+        # Email changes are NOT allowed through this endpoint.
+        # They require OTP re-verification via /me/email/request-change and /me/email/verify-change.
+        if req.email and str(req.email) != str(user.email):
+            raise CustomException(
+                400,
+                "Email cannot be changed here. Use the email change flow: "
+                "POST /me/email/request-change, then POST /me/email/verify-change.",
+            )
 
         if req.full_name is not None:
             user.full_name = req.full_name
@@ -70,9 +73,89 @@ class UserService:
             await self.session.refresh(user)
         except IntegrityError:
             await self.session.rollback()
-            raise CustomException(400, "Data validation failed or email in use")
+            raise CustomException(400, "Data validation failed")
 
         return user
+
+    async def request_email_change(self, user_id: UUID, new_email: str):
+        """Step 1: Validate new email and send OTP to the NEW address."""
+        from app.modules.auth.otp_service import OTPService
+        from app.shared.email.resend_client import email_service
+
+        user = await self.repository.get_user_by_id(user_id)
+        if not user:
+            raise CustomException(404, "User not found")
+
+        if str(new_email).lower() == str(user.email).lower():
+            raise CustomException(400, "New email is the same as the current email")
+
+        existing = await self.repository.get_user_by_email(new_email)
+        if existing:
+            raise CustomException(400, "Email already in use")
+
+        otp_service = OTPService(self.session)
+        await otp_service.enforce_cooldown(new_email, "email_change")
+
+        otp = await otp_service.create_otp(
+            email=new_email,
+            otp_type="email_change",
+            context_data={"user_id": str(user_id), "new_email": new_email},
+        )
+        await email_service.send_email_change_otp(new_email, otp)
+        return {"message": "A verification code was sent to the new email address."}
+
+    async def verify_email_change(self, user_id: UUID, new_email: str, code: str):
+        """Step 2: Verify OTP sent to new address and apply the change."""
+        from sqlalchemy import delete as sa_delete
+        from app.modules.auth.otp_service import OTPService
+        from app.modules.auth.models import RefreshToken
+
+        otp_service = OTPService(self.session)
+        otp_record = await otp_service.verify_otp(new_email, "email_change", code)
+
+        ctx = otp_record.context_data
+        if str(ctx.get("user_id")) != str(user_id):
+            await otp_service.delete_otp(otp_record, commit=True)
+            raise CustomException(403, "OTP does not belong to this user")
+
+        if str(ctx.get("new_email")).lower() != str(new_email).lower():
+            await otp_service.delete_otp(otp_record, commit=True)
+            raise CustomException(400, "Email mismatch")
+
+        user = await self.repository.get_user_by_id(user_id)
+        if not user:
+            await otp_service.delete_otp(otp_record, commit=True)
+            raise CustomException(404, "User not found")
+
+        existing = await self.repository.get_user_by_email(new_email)
+        if existing and existing.id != user.id:
+            await otp_service.delete_otp(otp_record, commit=True)
+            raise CustomException(400, "Email already in use")
+
+        old_email = user.email
+        user.email = new_email
+
+        # Revoke all sessions — user must log in again with new email
+        await self.session.execute(
+            sa_delete(RefreshToken).where(RefreshToken.user_id == user.id)
+        )
+
+        await otp_service.delete_otp(otp_record)
+        await self.repository.update_user(user)
+        await self._log_audit(
+            user_id, "EMAIL_CHANGED", user_id, None,
+            f"Email changed from {old_email} to {new_email}"
+        )
+
+        try:
+            await self.session.commit()
+            await self.session.refresh(user)
+        except IntegrityError:
+            await self.session.rollback()
+            raise CustomException(400, "Email already in use")
+
+        return {"message": "Email changed successfully. Please log in again."}
+
 
     async def soft_delete_user(self, user_id: UUID):
         user = await self.repository.get_user_by_id(user_id)

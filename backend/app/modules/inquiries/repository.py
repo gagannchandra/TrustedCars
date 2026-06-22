@@ -56,6 +56,28 @@ class InquiryRepository:
         result = await self.session.execute(stmt)
         return [(row[0], row[1]) for row in result.all()]
 
+    async def list_all_user_inquiries(
+        self,
+        user_id: UUID,
+        cursor: "datetime | None" = None,
+        limit: int = 100,
+    ) -> list[tuple["Inquiry", "Car | None"]]:
+        """Fetch all inquiries where user_id is buyer OR seller — single query."""
+        from sqlalchemy import or_
+        stmt = (
+            select(Inquiry, Car)
+            .outerjoin(Car, Inquiry.car_id == Car.id)
+            .where(
+                Inquiry.deleted_at.is_(None),
+                or_(Inquiry.buyer_id == user_id, Inquiry.seller_id == user_id),
+            )
+        )
+        if cursor:
+            stmt = stmt.where(Inquiry.updated_at < cursor)
+        stmt = stmt.order_by(Inquiry.updated_at.desc(), Inquiry.id.desc()).limit(limit)
+        result = await self.session.execute(stmt)
+        return [(row[0], row[1]) for row in result.all()]
+
     async def list_all_inquiries(
         self, cursor: "datetime | None" = None, limit: int = 100
     ) -> list[tuple[Inquiry, Car | None]]:

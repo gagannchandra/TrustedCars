@@ -52,47 +52,31 @@ services:
       mc anonymous set public myminio/trustedcars-images
       "
 
-  pgbouncer:
-    image: edoburu/pgbouncer:latest
-    environment:
-      - DB_USER=trustedcars_user
-      - DB_PASSWORD=trustedcars_password
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=trustedcars_db
-      - POOL_MODE=transaction
-      - MAX_CLIENT_CONN=100
-      - DEFAULT_POOL_SIZE=20
-      - IGNORE_STARTUP_PARAMETERS=extra_float_digits
-    ports:
-      - "6432:5432"
-    depends_on:
-      db:
-        condition: service_healthy
+
 
   api:
     build: .
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://trustedcars_user:trustedcars_password@pgbouncer:5432/trustedcars_db
+      - DATABASE_URL=postgresql+asyncpg://trustedcars_user:trustedcars_password@db:5432/trustedcars_db
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_POOL_SIZE=5
       - S3_ENDPOINT_URL=http://minio:9000
     depends_on:
-      - pgbouncer
+      - db
       - redis
 
   worker:
     build: .
     command: ["python", "worker_main.py"]
     environment:
-      - DATABASE_URL=postgresql+asyncpg://trustedcars_user:trustedcars_password@pgbouncer:5432/trustedcars_db
+      - DATABASE_URL=postgresql+asyncpg://trustedcars_user:trustedcars_password@db:5432/trustedcars_db
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_POOL_SIZE=5
       - S3_ENDPOINT_URL=http://minio:9000
     depends_on:
-      - pgbouncer
+      - db
       - redis
 
 volumes:

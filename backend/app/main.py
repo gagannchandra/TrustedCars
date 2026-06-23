@@ -34,10 +34,17 @@ async def lifespan(app: FastAPI):
     # Startup
     setup_logging()
     if settings.SENTRY_DSN:
+        # Use environment-based sampling rates
+        # Development: 100% sampling for debugging
+        # Production: 10% sampling to reduce overhead and quota usage
+        traces_sample_rate = 1.0 if settings.ENVIRONMENT == "development" else 0.1
+        profiles_sample_rate = 1.0 if settings.ENVIRONMENT == "development" else 0.1
+        
         sentry_sdk.init(
             dsn=settings.SENTRY_DSN,
-            traces_sample_rate=1.0,
-            profiles_sample_rate=1.0,
+            traces_sample_rate=traces_sample_rate,
+            profiles_sample_rate=profiles_sample_rate,
+            environment=settings.ENVIRONMENT,
         )
     setup_subscribers()
     yield
@@ -67,8 +74,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Correlation-ID", "X-Request-ID"],
 )
 
 # Exception handlers

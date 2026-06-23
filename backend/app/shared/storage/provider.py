@@ -3,6 +3,7 @@ from botocore.exceptions import ClientError
 from botocore.client import Config
 import uuid
 import logging
+import asyncio
 from typing import Optional
 from app.core.config import settings
 from app.shared.exceptions.handlers import CustomException
@@ -13,10 +14,10 @@ class StorageProvider:
     def get_public_url(self, storage_key: str) -> str:
         raise NotImplementedError
 
-    def delete_object(self, storage_key: str) -> None:
+    async def delete_object(self, storage_key: str) -> None:
         raise NotImplementedError
 
-    def delete_objects(self, storage_keys: list[str]) -> None:
+    async def delete_objects(self, storage_keys: list[str]) -> None:
         raise NotImplementedError
 
 
@@ -33,13 +34,19 @@ class S3StorageProvider(StorageProvider):
             config=Config(signature_version="s3v4"),
         )
 
-    def delete_object(self, storage_key: str) -> None:
+    async def delete_object(self, storage_key: str) -> None:
+        """Delete a single object from S3 asynchronously."""
         try:
-            self.s3_client.delete_object(Bucket=self.bucket, Key=storage_key)
+            await asyncio.to_thread(
+                self.s3_client.delete_object, 
+                Bucket=self.bucket, 
+                Key=storage_key
+            )
         except ClientError as e:
             logger.error(f"Failed to delete object {storage_key}: {e}")
 
-    def delete_objects(self, storage_keys: list[str]) -> None:
+    async def delete_objects(self, storage_keys: list[str]) -> None:
+        """Delete multiple objects from S3 asynchronously in batches."""
         if not storage_keys:
             return
         
@@ -51,7 +58,11 @@ class S3StorageProvider(StorageProvider):
                 "Quiet": True
             }
             try:
-                self.s3_client.delete_objects(Bucket=self.bucket, Delete=delete_params)
+                await asyncio.to_thread(
+                    self.s3_client.delete_objects,
+                    Bucket=self.bucket,
+                    Delete=delete_params
+                )
             except ClientError as e:
                 logger.error(f"Failed to delete objects chunk: {e}")
 

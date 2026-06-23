@@ -186,8 +186,8 @@ class ImageService:
         )
         await self.session.commit()
         
-        # Physically delete from storage
-        self.storage.delete_object(image.storage_key)
+        # Physically delete from storage asynchronously
+        await self.storage.delete_object(image.storage_key)
 
     async def handle_car_deleted(self, car_id: UUID):
         from sqlalchemy import update
@@ -205,9 +205,9 @@ class ImageService:
         )
         await self.session.execute(stmt)
         
-        # Physically delete from storage
+        # Physically delete from storage asynchronously
         storage_keys = [img.storage_key for img in images]
-        self.storage.delete_objects(storage_keys)
+        await self.storage.delete_objects(storage_keys)
 
     async def handle_cars_bulk_deleted(self, car_ids: list[str]):
         if not car_ids:
@@ -234,4 +234,4 @@ class ImageService:
             await self.session.execute(stmt)
             
         if storage_keys:
-            self.storage.delete_objects(list(storage_keys))
+            await self.storage.delete_objects(list(storage_keys))

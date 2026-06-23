@@ -93,12 +93,13 @@ async def refresh(
     if not refresh_token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token missing")
     tokens = await service.refresh(refresh_token)
+    # SECURITY: SameSite=Strict provides stronger CSRF protection
     response.set_cookie(
         key="access_token",
         value=tokens["access_token"],
         httponly=True,
         secure=True,
-        samesite="lax",
+        samesite="strict",
         max_age=30 * 60,
     )
     response.set_cookie(
@@ -106,7 +107,7 @@ async def refresh(
         value=tokens["refresh_token"],
         httponly=True,
         secure=True,
-        samesite="lax",
+        samesite="strict",
         max_age=7 * 24 * 60 * 60,
     )
     return {"detail": "Successfully refreshed"}
@@ -133,11 +134,12 @@ async def verify_registration(
     request: Request, response: Response, req: VerifyOTPRequest, service: AuthService = Depends(get_auth_service)
 ):
     tokens = await service.verify_registration(req.email, req.code)
+    # SECURITY: SameSite=Strict provides stronger CSRF protection
     response.set_cookie(
-        key="access_token", value=tokens["access_token"], httponly=True, secure=True, samesite="lax", max_age=30 * 60,
+        key="access_token", value=tokens["access_token"], httponly=True, secure=True, samesite="strict", max_age=30 * 60,
     )
     response.set_cookie(
-        key="refresh_token", value=tokens["refresh_token"], httponly=True, secure=True, samesite="lax", max_age=7 * 24 * 60 * 60,
+        key="refresh_token", value=tokens["refresh_token"], httponly=True, secure=True, samesite="strict", max_age=7 * 24 * 60 * 60,
     )
     return {"detail": "Successfully verified and logged in"}
 
@@ -148,11 +150,12 @@ async def verify_login(
     request: Request, response: Response, req: VerifyOTPRequest, service: AuthService = Depends(get_auth_service)
 ):
     tokens = await service.verify_login(req.email, req.code)
+    # SECURITY: SameSite=Strict provides stronger CSRF protection
     response.set_cookie(
-        key="access_token", value=tokens["access_token"], httponly=True, secure=True, samesite="lax", max_age=30 * 60,
+        key="access_token", value=tokens["access_token"], httponly=True, secure=True, samesite="strict", max_age=30 * 60,
     )
     response.set_cookie(
-        key="refresh_token", value=tokens["refresh_token"], httponly=True, secure=True, samesite="lax", max_age=7 * 24 * 60 * 60,
+        key="refresh_token", value=tokens["refresh_token"], httponly=True, secure=True, samesite="strict", max_age=7 * 24 * 60 * 60,
     )
     return {"detail": "Successfully logged in"}
 

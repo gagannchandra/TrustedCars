@@ -8,8 +8,10 @@ services:
       POSTGRES_USER: trustedcars_user
       POSTGRES_PASSWORD: trustedcars_password
       POSTGRES_DB: trustedcars_db
-    ports:
-      - "5432:5432"
+    # SECURITY: Remove port mapping in production - DB should be internal only
+    # Uncomment for local development if needed:
+    # ports:
+    #   - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -20,8 +22,15 @@ services:
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6380:6379"
+    # SECURITY: Remove port mapping in production - Redis should be internal only
+    # Uncomment for local development if needed:
+    # ports:
+    #   - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   minio:
     image: minio/minio:latest
@@ -64,8 +73,18 @@ services:
       - DATABASE_POOL_SIZE=5
       - S3_ENDPOINT_URL=http://minio:9000
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health/live')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
 
   worker:
     build: .
@@ -76,8 +95,11 @@ services:
       - DATABASE_POOL_SIZE=5
       - S3_ENDPOINT_URL=http://minio:9000
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   postgres_data:

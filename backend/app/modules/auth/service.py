@@ -82,9 +82,15 @@ class AuthService:
         await otp_service.enforce_cooldown(req.email, "register")
         
         hashed = await self.hash_password(req.password)
+        
+        # Store password hash in Redis with OTP expiry instead of DB for security
+        from app.db.redis import get_redis
+        redis_client = await get_redis()
+        temp_key = f"otp:reg:pwd:{req.email}"
+        await redis_client.setex(temp_key, 600, hashed)  # 10 min expiry
+        
         context_data = {
             "full_name": req.full_name,
-            "password_hash": hashed,
             "role": RoleEnum.user.value
         }
         
@@ -108,9 +114,15 @@ class AuthService:
         await otp_service.enforce_cooldown(req.email, "register")
         
         hashed = await self.hash_password(req.password)
+        
+        # Store password hash in Redis with OTP expiry instead of DB for security
+        from app.db.redis import get_redis
+        redis_client = await get_redis()
+        temp_key = f"otp:reg:pwd:{req.email}"
+        await redis_client.setex(temp_key, 600, hashed)  # 10 min expiry
+        
         context_data = {
             "full_name": req.full_name,
-            "password_hash": hashed,
             "role": RoleEnum.dealer.value,
             "dealership_name": req.dealership_name,
             "dealership_address": req.dealership_address
@@ -418,19 +430,30 @@ class AuthService:
 
     async def verify_registration(self, email: str, code: str) -> User:
         from app.modules.auth.otp_service import OTPService
+        from app.db.redis import get_redis
+        
         otp_service = OTPService(self.session)
+        redis_client = await get_redis()
         
         otp_record = await otp_service.verify_otp(email, "register", code)
         context = otp_record.context_data
         
+        # Retrieve password hash from Redis
+        temp_key = f"otp:reg:pwd:{email}"
+        password_hash = await redis_client.get(temp_key)
+        if not password_hash:
+            await otp_service.delete_otp(otp_record, commit=True)
+            raise CustomException(400, "Registration session expired. Please start again.")
+        
         existing = await self.repository.get_user_by_email(email)
         if existing:
             await otp_service.delete_otp(otp_record, commit=True)
+            await redis_client.delete(temp_key)
             raise CustomException(400, "Email already registered")
             
         user = User(
             email=email,
-            hashed_password=context["password_hash"],
+            hashed_password=password_hash,
             full_name=context["full_name"],
             role=RoleEnum(context["role"]),
         )
@@ -448,6 +471,7 @@ class AuthService:
                 await self._log_audit(user.id, "REGISTER_USER", user.id, None, "Registered user account")
             
             await otp_service.delete_otp(otp_record)
+            await redis_client.delete(temp_key)  # Clean up password hash
 
             access_token = create_access_token(subject=user.id)
             refresh_token_plain = create_refresh_token(subject=user.id)
@@ -466,6 +490,7 @@ class AuthService:
             await self.session.refresh(user)
         except IntegrityError:
             await self.session.rollback()
+            await redis_client.delete(temp_key)
             raise CustomException(400, "Email already registered")
 
         return {

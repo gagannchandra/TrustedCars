@@ -2,7 +2,7 @@
 set -e
 
 echo "=== Database Performance Metrics ==="
-docker-compose exec -T db psql -U trustedcars_user -d trustedcars_db -c "
+docker-compose exec -T db psql -U trustedcarz_user -d trustedcarz_db -c "
 -- Total and Active Connections
 SELECT count(*) as total_connections,
        sum(case when state = 'active' then 1 else 0 end) as active_connections
@@ -16,7 +16,7 @@ WHERE wait_event_type = 'Lock';
 -- Deadlocks
 SELECT pg_stat_get_db_deadlocks(oid) as deadlocks 
 FROM pg_database 
-WHERE datname = 'trustedcars_db';
+WHERE datname = 'trustedcarz_db';
 
 -- Sequential Scans vs Index Scans (Overview)
 SELECT sum(seq_scan) as total_seq_scans, 

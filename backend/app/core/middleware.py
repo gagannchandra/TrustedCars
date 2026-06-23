@@ -38,7 +38,7 @@ class CorrelationIdMiddleware(BaseHTTPMiddleware):
 
         logger.info(
             "request_started",
-            service="trustedcars-api",
+            service="trustedcarz-api",
             method=request.method,
             url=str(request.url),
             client_host=request.client.host if request.client else None,
@@ -62,7 +62,7 @@ class CorrelationIdMiddleware(BaseHTTPMiddleware):
 
             logger.info(
                 "request_completed",
-                service="trustedcars-api",
+                service="trustedcarz-api",
                 status_code=response.status_code,
                 duration=duration,
             )
@@ -76,7 +76,7 @@ class CorrelationIdMiddleware(BaseHTTPMiddleware):
             REQUEST_ERRORS.labels(method=request.method, endpoint=endpoint).inc()
             logger.error(
                 "request_failure",
-                service="trustedcars-api",
+                service="trustedcarz-api",
                 duration=duration,
                 error=str(e),
                 exc_info=True,

@@ -60,7 +60,7 @@ services:
     # NO PORT MAPPING - use reverse proxy
 
   api:
-    image: ${DOCKER_REGISTRY}/trustedcars-api:${IMAGE_TAG:-latest}
+    image: ${DOCKER_REGISTRY}/trustedcarz-api:${IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: Dockerfile
@@ -108,7 +108,7 @@ services:
         max-file: "3"
 
   worker:
-    image: ${DOCKER_REGISTRY}/trustedcars-api:${IMAGE_TAG:-latest}
+    image: ${DOCKER_REGISTRY}/trustedcarz-api:${IMAGE_TAG:-latest}
     command: ["python", "worker_main.py"]
     environment:
       - ENVIRONMENT=production

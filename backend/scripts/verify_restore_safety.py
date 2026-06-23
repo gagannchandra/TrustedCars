@@ -21,7 +21,7 @@ async def verify_restore_safety():
     async with async_session() as session:
         print("Creating test user...")
         user = User(
-            email=f"test_restore_{uuid.uuid4()}@trustedcars.com",
+            email=f"test_restore_{uuid.uuid4()}@trustedcarz.com",
             hashed_password="fakehash",
             full_name="Test Dealer",
             role=RoleEnum.dealer

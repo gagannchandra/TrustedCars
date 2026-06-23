@@ -2,7 +2,7 @@
 set -e
 
 echo "=== Capturing Data Integrity BEFORE Chaos ==="
-docker-compose exec -T db psql -U trustedcars_user -d trustedcars_db -c "
+docker-compose exec -T db psql -U trustedcarz_user -d trustedcarz_db -c "
 SELECT 'users' as table_name, count(*) FROM users
 UNION ALL SELECT 'cars', count(*) FROM cars
 UNION ALL SELECT 'reviews', count(*) FROM reviews
@@ -30,11 +30,11 @@ wait $LOAD_PID || true
 
 echo "=== Capturing Data Integrity AFTER Chaos ==="
 # wait for db to be up
-while ! docker-compose exec -T db pg_isready -U trustedcars_user -d trustedcars_db > /dev/null; do
+while ! docker-compose exec -T db pg_isready -U trustedcarz_user -d trustedcarz_db > /dev/null; do
   sleep 1
 done
 
-docker-compose exec -T db psql -U trustedcars_user -d trustedcars_db -c "
+docker-compose exec -T db psql -U trustedcarz_user -d trustedcarz_db -c "
 SELECT 'users' as table_name, count(*) FROM users
 UNION ALL SELECT 'cars', count(*) FROM cars
 UNION ALL SELECT 'reviews', count(*) FROM reviews

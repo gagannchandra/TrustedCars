@@ -13,10 +13,10 @@ from app.shared.rbac.roles import RoleEnum
 
 async def seed_users():
     users_to_create = [
-        {"email": "admin@trustedcars.in", "password": "Admin@123", "role": RoleEnum.admin, "full_name": "Admin User"},
+        {"email": "admin@trustedcarz.in", "password": "Admin@123", "role": RoleEnum.admin, "full_name": "Admin User"},
         {"email": "rahul.sharma@gmail.com", "password": "User@123", "role": RoleEnum.user, "full_name": "Rahul Sharma"},
         {"email": "sneha.kapoor@gmail.com", "password": "User@123", "role": RoleEnum.user, "full_name": "Sneha Kapoor"},
-        {"email": "dealer@trustedcars.in", "password": "Dealer@123", "role": RoleEnum.dealer, "full_name": "Demo Dealer"}
+        {"email": "dealer@trustedcarz.in", "password": "Dealer@123", "role": RoleEnum.dealer, "full_name": "Demo Dealer"}
     ]
     
     async with AsyncSessionLocal() as session:

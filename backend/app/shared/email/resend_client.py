@@ -8,8 +8,8 @@ class EmailService:
     def __init__(self):
         # Graceful fallback if api key is missing to avoid crashing app startup
         self.api_key = getattr(settings, 'RESEND_API_KEY', None)
-        self.from_email = getattr(settings, 'RESEND_FROM_EMAIL', 'noreply@trustedcars.com')
-        self.app_name = getattr(settings, 'APP_NAME', 'TrustedCars')
+        self.from_email = getattr(settings, 'RESEND_FROM_EMAIL', 'noreply@trustedcarz.com')
+        self.app_name = getattr(settings, 'APP_NAME', 'TrustedCarz')
         
         if self.api_key:
             resend.api_key = self.api_key

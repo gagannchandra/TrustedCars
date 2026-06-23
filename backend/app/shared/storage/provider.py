@@ -73,7 +73,7 @@ class S3StorageProvider(StorageProvider):
         If using actual AWS S3, it generates the standard virtual-hosted style URL.
         """
         if settings.S3_ENDPOINT_URL:
-            # e.g. http://localhost:9000/trustedcars-images/123.jpg
+            # e.g. http://localhost:9000/trustedcarz-images/123.jpg
             # Note: For frontend access, we might need a public endpoint if S3_ENDPOINT_URL is internal.
             # We assume S3_ENDPOINT_URL is accessible by the client (e.g. localhost:9000)
             base = settings.S3_ENDPOINT_URL.rstrip('/')

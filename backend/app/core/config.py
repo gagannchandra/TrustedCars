@@ -3,7 +3,7 @@ from typing import List
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "TrustedCars Enterprise"
+    PROJECT_NAME: str = "TrustedCarz Enterprise"
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str
     JWT_SECRET_KEY: str
@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     SENTRY_DSN: str | None = None
 
     # S3 Storage Config
-    S3_BUCKET_NAME: str = "trustedcars-images"
+    S3_BUCKET_NAME: str = "trustedcarz-images"
     AWS_ACCESS_KEY_ID: str          # Required — no default
     AWS_SECRET_ACCESS_KEY: str      # Required — no default
     AWS_REGION: str = "us-east-1"

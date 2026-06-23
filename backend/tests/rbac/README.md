@@ -2,7 +2,7 @@
 
 ## Overview
 
-Comprehensive test suite for Role-Based Access Control (RBAC) permission enforcement covering all critical security issues identified in the TrustedCars audit.
+Comprehensive test suite for Role-Based Access Control (RBAC) permission enforcement covering all critical security issues identified in the TrustedCarz audit.
 
 **Priority**: 🔴 CRITICAL - #2 Security Risk from Audit  
 **Coverage Target**: 100% of RBAC permission enforcement logic  

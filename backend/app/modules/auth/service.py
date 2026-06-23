@@ -287,7 +287,7 @@ class AuthService:
         await self.session.commit()
 
         uri = pyotp.totp.TOTP(secret).provisioning_uri(
-            name=current_user.email, issuer_name="TrustedCars"
+            name=current_user.email, issuer_name="TrustedCarz"
         )
         return {
             "secret": secret,

@@ -100,3 +100,30 @@ async def get_current_user_optional(
         return None
     except (InvalidTokenError, Exception):
         return None
+
+
+
+from typing import List, Callable
+
+
+def require_roles(allowed_roles: List[str]) -> Callable:
+    """
+    Dependency factory that returns a FastAPI dependency
+    requiring the current user to have one of the specified roles.
+    
+    Usage:
+        @router.get("/admin-only", dependencies=[Depends(require_roles(["admin"]))])
+        async def admin_endpoint():
+            ...
+    """
+    async def role_checker(
+        current_user: User = Depends(get_current_active_user),
+    ) -> User:
+        if current_user.role not in allowed_roles:
+            raise CustomException(
+                403,
+                f"Access denied. Required roles: {', '.join(allowed_roles)}"
+            )
+        return current_user
+    
+    return role_checker

@@ -17,9 +17,27 @@ const registerSchema = z.object({
     .regex(passwordRegex, 'Password must contain at least 1 uppercase, 1 lowercase, 1 number, and 1 special character'),
   confirm_password: z.string().min(1, 'Please confirm your password'),
   role: z.enum(['user', 'dealer']),
+  dealership_name: z.string().optional(),
+  dealership_address: z.string().optional(),
 }).refine((data) => data.password === data.confirm_password, {
   message: "Passwords don't match",
   path: ["confirm_password"],
+}).refine((data) => {
+  if (data.role === 'dealer') {
+    return data.dealership_name && data.dealership_name.length >= 2;
+  }
+  return true;
+}, {
+  message: "Dealership name is required and must be at least 2 characters",
+  path: ["dealership_name"],
+}).refine((data) => {
+  if (data.role === 'dealer') {
+    return data.dealership_address && data.dealership_address.length >= 5;
+  }
+  return true;
+}, {
+  message: "Dealership address is required and must be at least 5 characters",
+  path: ["dealership_address"],
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -32,18 +50,27 @@ export default function Register() {
   const [authError, setAuthError] = useState('');
   const [selectedRole, setSelectedRole] = useState<'user' | 'dealer'>('user');
   
-  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<RegisterFormValues>({
+  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { full_name: '', email: '', password: '', confirm_password: '', role: 'user' }
+    defaultValues: { full_name: '', email: '', password: '', confirm_password: '', role: 'user', dealership_name: '', dealership_address: '' }
   });
+
+  const watchedRole = watch('role');
 
   const onSubmit = async (data: RegisterFormValues) => {
     setAuthError('');
     const { confirm_password, ...submitData } = data;
     const result = await authRegister(submitData as any);
     if (result.success) {
-      toast.success('Account created successfully!');
-      navigate('/verify-otp', { state: { email: data.email, intent: 'register' } });
+      // Check if OTP is disabled (tokens returned directly)
+      if ((result as any).otpDisabled) {
+        toast.success('Account created successfully!');
+        navigate('/');
+      } else {
+        // OTP is enabled, go to verification page
+        toast.success('Account created! Please verify your email.');
+        navigate('/verify-otp', { state: { email: data.email, intent: 'register' } });
+      }
     } else {
       setAuthError(result.message || 'Registration failed. Please try again.');
     }
@@ -198,6 +225,36 @@ export default function Register() {
               </div>
               {errors.confirm_password && <p className="text-error text-xs font-bold mt-1.5 animate-in slide-in-from-top-1">{errors.confirm_password.message}</p>}
             </div>
+
+            {/* Dealer-specific fields */}
+            {watchedRole === 'dealer' && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="pt-4 border-t border-slate-200">
+                  <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-primary" />
+                    Dealership Information
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-bold text-slate-700 block mb-2">Dealership Name</label>
+                      <input type="text" {...register('dealership_name')}
+                        placeholder="e.g., Premium Auto Sales"
+                        className={`w-full border rounded-xl px-4 py-3.5 text-base outline-none transition-all shadow-sm ${errors.dealership_name ? 'border-error focus:border-error focus:ring-4 focus:ring-error/10' : 'border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-slate-300'}`} />
+                      {errors.dealership_name && <p className="text-error text-xs font-bold mt-1.5 animate-in slide-in-from-top-1">{errors.dealership_name.message}</p>}
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-bold text-slate-700 block mb-2">Dealership Address</label>
+                      <textarea {...register('dealership_address')}
+                        placeholder="e.g., 123 Main Street, Bangalore, Karnataka"
+                        rows={3}
+                        className={`w-full border rounded-xl px-4 py-3.5 text-base outline-none transition-all shadow-sm resize-none ${errors.dealership_address ? 'border-error focus:border-error focus:ring-4 focus:ring-error/10' : 'border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-slate-300'}`} />
+                      {errors.dealership_address && <p className="text-error text-xs font-bold mt-1.5 animate-in slide-in-from-top-1">{errors.dealership_address.message}</p>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             
             <button type="submit" disabled={isSubmitting}
               className="w-full bg-primary hover:bg-blue-800 disabled:opacity-60 text-white font-bold py-4 rounded-xl transition-all shadow-md hover:shadow-lg text-base mt-2 transform hover:-translate-y-0.5 active:translate-y-0 duration-200 focus:outline-none focus:ring-4 focus:ring-primary/30">

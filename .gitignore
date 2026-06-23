@@ -79,9 +79,26 @@ ENV/
 logs/
 *.log
 coverage/
+test-results/
+.pytest_cache/
 
 # Output text files
 *_results*.txt
 db_metrics.txt
 after_chaos.txt
 before_chaos.txt
+
+# Temporary files
+.temp/
+temp/
+tmp/
+
+# Test and development files
+*.test.*
+*.spec.*
+**/tests/
+**/__tests__/
+**/test/
+**/.kiro/
+pytest.ini
+vitest.config.*

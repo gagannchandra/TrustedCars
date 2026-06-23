@@ -29,8 +29,15 @@ export default function Login() {
     setAuthError('');
     const result = await login(data.email, data.password);
     if (result.success) {
-      toast.success(result.message || 'OTP sent to email!');
-      navigate('/verify-otp', { state: { email: data.email, intent: 'login' } });
+      // Check if OTP is disabled (tokens returned directly)
+      if ((result as any).otpDisabled) {
+        toast.success('Login successful!');
+        navigate('/');
+      } else {
+        // OTP is enabled, go to verification page
+        toast.success(result.message || 'OTP sent to email!');
+        navigate('/verify-otp', { state: { email: data.email, intent: 'login' } });
+      }
     } else {
       setAuthError(result.message || 'Invalid email or password. Try demo credentials below.');
     }

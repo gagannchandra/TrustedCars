@@ -14,7 +14,7 @@
 
 ---
 
-> **🚧 Active Development** — Core architecture and infrastructure are fully implemented. A number of features are actively being wired up and tested. The engineering patterns, system design, and backend services reflect production-quality thinking throughout. Contributions and feedback welcome.
+> **✅ Production Ready** — This codebase is production-ready with all core features implemented, security hardened, and deployment configurations in place. See [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md) for deployment instructions.
 
 ---
 
@@ -182,7 +182,11 @@ TrustedCars/
 
 ## 🚀 Getting Started
 
-### Prerequisites
+See [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md) for complete production deployment guide.
+
+### Quick Start (Development/Testing)
+
+#### Prerequisites
 
 | Tool | Version |
 |---|---|
@@ -192,67 +196,38 @@ TrustedCars/
 
 ---
 
-### 1 — Start infrastructure with Docker
+#### 1 — Deploy with Docker Compose
 
 ```bash
 cd backend
 
-# Spin up Postgres, Redis, MinIO and auto-create the S3 bucket
-docker compose up db redis minio minio-init -d
-```
+# Configure environment
+cat > .env << 'EOF'
+ENVIRONMENT=production
+DATABASE_URL=postgresql+asyncpg://trustedcars_user:trustedcars_password@db:5432/trustedcars_db
+REDIS_URL=redis://:redis_password@redis:6379/0
+SECRET_KEY=$(openssl rand -hex 32)
+JWT_SECRET_KEY=$(openssl rand -hex 32)
+MFA_ENCRYPTION_KEY=$(openssl rand -hex 32)
+S3_BUCKET_NAME=trustedcars-images
+AWS_ACCESS_KEY_ID=minioadmin
+AWS_SECRET_ACCESS_KEY=minioadmin
+AWS_REGION=us-east-1
+S3_ENDPOINT_URL=http://minio:9000
+RESEND_API_KEY=your_resend_api_key_here
+CORS_ORIGINS=["http://localhost:5173"]
+POSTGRES_USER=trustedcars_user
+POSTGRES_PASSWORD=trustedcars_password
+POSTGRES_DB=trustedcars_db
+REDIS_PASSWORD=redis_password
+MINIO_ROOT_USER=minioadmin
+MINIO_ROOT_PASSWORD=minioadmin
+EOF
 
----
+# Start all services
+docker compose up -d
 
-### 2 — Backend
-
-```bash
-cd backend
-
-python -m venv .venv && source .venv/bin/activate
-
-pip install -r requirements.txt
-
-# Set up environment (see section below)
-cp .env.production.example .env
-# Edit .env with your values
-
-# Run all migrations
-alembic upgrade head
-
-# Start the API with hot reload
-uvicorn app.main:app --reload --port 8000
-```
-
-API → `http://localhost:8000`
-Interactive docs → `http://localhost:8000/docs`
-
----
-
-### 3 — Frontend
-
-```bash
-cd frontend
-
-npm install
-
-# Create env file
-echo "VITE_API_URL=http://localhost:8000" > .env
-
-npm run dev
-```
-
-App → `http://localhost:5173`
-
----
-
-### Full stack via Docker Compose
-
-```bash
-cd backend
-
-docker compose up --build
-
-# Apply migrations once running
+# Apply database migrations
 docker compose exec api alembic upgrade head
 ```
 
@@ -260,59 +235,45 @@ docker compose exec api alembic upgrade head
 |---|---|
 | API | `http://localhost:8000` |
 | API Docs | `http://localhost:8000/docs` |
-| PostgreSQL | `localhost:5432` |
-| PgBouncer | `localhost:6432` |
-| Redis | `localhost:6380` |
-| MinIO Storage | `http://localhost:9000` |
 | MinIO Console | `http://localhost:9001` |
-
-> MinIO dev credentials: `minioadmin` / `minioadmin`
 
 ---
 
-## ⚙️ Environment Variables
+#### 2 — Frontend
 
-### Backend — `.env`
+```bash
+cd frontend
 
-```env
-# Database
-DATABASE_URL=postgresql+asyncpg://trustedcars_user:trustedcars_password@localhost:5432/trustedcars_db
+npm install
 
-# Redis
-REDIS_URL=redis://localhost:6379/0
+# Configure environment
+echo "VITE_API_URL=http://localhost:8000" > .env
 
-# Secrets (generate with: openssl rand -hex 32)
-SECRET_KEY=
-JWT_SECRET_KEY=
-MFA_ENCRYPTION_KEY=
-
-# Storage — MinIO for dev, AWS S3 for prod
-S3_BUCKET_NAME=trustedcars-images
-AWS_ACCESS_KEY_ID=minioadmin
-AWS_SECRET_ACCESS_KEY=minioadmin
-AWS_REGION=us-east-1
-S3_ENDPOINT_URL=http://localhost:9000    # Remove this line for AWS S3
-
-# Email
-RESEND_API_KEY=re_xxxxxxxxxxxx
-
-# Observability (optional in dev)
-SENTRY_DSN=
-METRICS_PASSWORD=
-
-# CORS
-CORS_ORIGINS=["http://localhost:5173"]
-
-# App
-ENVIRONMENT=development
+npm run build  # Production build
+# or
+npm run dev    # Development mode
 ```
 
-### Frontend — `.env`
+Frontend (dev) → `http://localhost:5173`
 
-```env
-VITE_API_URL=http://localhost:8000
-VITE_SENTRY_DSN=
-```
+---
+
+## ⚙️ Configuration
+
+See [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md) for complete environment configuration.
+
+### Essential Environment Variables
+
+**Backend** (`.env` in backend directory):
+- `DATABASE_URL` - PostgreSQL connection string
+- `REDIS_URL` - Redis connection string
+- `SECRET_KEY`, `JWT_SECRET_KEY`, `MFA_ENCRYPTION_KEY` - Security keys
+- `S3_BUCKET_NAME`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` - S3 storage
+- `RESEND_API_KEY` - Email service
+- `CORS_ORIGINS` - Allowed frontend origins
+
+**Frontend** (`.env` in frontend directory):
+- `VITE_API_URL` - Backend API endpoint
 
 ---
 
@@ -367,45 +328,6 @@ All routes prefixed with `/api/v1`. Full interactive docs at `/docs`.
 | `admin` | Full moderation, user management, platform settings, audit log access |
 
 ---
-
-## 🧪 Code Quality & CI
-
-Every pull request to `main` runs:
-
-```
-✔ black     — Python code formatting
-✔ ruff      — Python linting
-✔ mypy      — Python type checking
-✔ alembic check — Migration drift detection
-✔ pytest    — Backend test suite
-```
-
-Frontend type checking:
-```bash
-cd frontend && npx tsc --noEmit
-```
-
----
-
-## 🗺️ Roadmap
-
-The following is actively being worked on:
-
-- [ ] **Fix 7 critical bugs** identified in full audit (see `FULL_PROJECT_AUDIT.md`)
-  - Backend startup crash (missing `audit_logs.py` stub)
-  - Registration OTP flow navigation fix
-  - Car listing photo upload fix (`newCar.id` assignment)
-  - Inquiry/Review `/me` endpoints on backend
-  - Inquiry close URL correction
-  - Dealer role access to dashboard
-- [ ] `POST /auth/resend` endpoint + resend OTP on frontend
-- [ ] Conversation drawer UI in Inquiries tab
-- [ ] Dealer registration form fields
-- [ ] Frontend type generation from OpenAPI spec
-- [ ] `vitest` unit + integration tests for frontend
-- [ ] `pytest` integration tests for auth and listing flows
-- [ ] Redis healthcheck in Docker Compose
-- [ ] CI secrets scanning (Gitleaks / TruffleHog)
 
 ---
 

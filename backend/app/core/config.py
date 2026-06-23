@@ -5,6 +5,7 @@ from typing import List
 class Settings(BaseSettings):
     PROJECT_NAME: str = "TrustedCarz Enterprise"
     API_V1_STR: str = "/api/v1"
+    ENVIRONMENT: str = "development"
     SECRET_KEY: str
     JWT_SECRET_KEY: str
     MFA_ENCRYPTION_KEY: str
@@ -44,6 +45,7 @@ class Settings(BaseSettings):
     OTP_MAX_ATTEMPTS: int = 5
     OTP_RATE_LIMIT_WINDOW_MINUTES: int = 15
     OTP_RATE_LIMIT_MAX_REQUESTS: int = 10
+    DISABLE_OTP_AUTH: bool = False  # Set to True to bypass OTP for development
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", case_sensitive=True

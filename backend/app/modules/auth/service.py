@@ -74,14 +74,50 @@ class AuthService:
         existing = await self.repository.get_user_by_email(req.email)
         if existing:
             raise CustomException(400, "Email already registered")
+        
+        hashed = await self.hash_password(req.password)
+        
+        # Skip OTP if disabled (dev mode)
+        if settings.DISABLE_OTP_AUTH:
+            user = User(
+                email=req.email,
+                hashed_password=hashed,
+                full_name=req.full_name,
+                role=RoleEnum.user,
+            )
+            try:
+                user = await self.repository.create_user(user)
+                await self._log_audit(user.id, "REGISTER_USER", user.id, None, "Registered user account (OTP disabled)")
+                
+                access_token = create_access_token(subject=user.id)
+                refresh_token_plain = create_refresh_token(subject=user.id)
+
+                family_id = uuid.uuid4()
+                rt = RefreshToken(
+                    user_id=user.id,
+                    token_hash=self.hash_token(refresh_token_plain),
+                    family_id=family_id,
+                    expires_at=datetime.now(timezone.utc)
+                    + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+                )
+                await self.repository.save_refresh_token(rt)
+                await self.session.commit()
+                await self.session.refresh(user)
+            except IntegrityError:
+                await self.session.rollback()
+                raise CustomException(400, "Email already registered")
+
+            return {
+                "access_token": access_token,
+                "refresh_token": refresh_token_plain,
+                "token_type": "bearer",
+            }
             
         from app.modules.auth.otp_service import OTPService
         from app.shared.email.resend_client import email_service
         
         otp_service = OTPService(self.session)
         await otp_service.enforce_cooldown(req.email, "register")
-        
-        hashed = await self.hash_password(req.password)
         
         # Store password hash in Redis with OTP expiry instead of DB for security
         from app.db.redis import get_redis
@@ -106,14 +142,56 @@ class AuthService:
         existing = await self.repository.get_user_by_email(req.email)
         if existing:
             raise CustomException(400, "Email already registered")
+        
+        hashed = await self.hash_password(req.password)
+        
+        # Skip OTP if disabled (dev mode)
+        if settings.DISABLE_OTP_AUTH:
+            user = User(
+                email=req.email,
+                hashed_password=hashed,
+                full_name=req.full_name,
+                role=RoleEnum.dealer,
+            )
+            try:
+                user = await self.repository.create_user(user)
+                dealer = Dealership(
+                    user_id=user.id,
+                    name=req.dealership_name,
+                    address=req.dealership_address,
+                )
+                await self.repository.create_dealership(dealer)
+                await self._log_audit(user.id, "REGISTER_DEALER", user.id, None, f"Registered dealership {dealer.name} (OTP disabled)")
+                
+                access_token = create_access_token(subject=user.id)
+                refresh_token_plain = create_refresh_token(subject=user.id)
+
+                family_id = uuid.uuid4()
+                rt = RefreshToken(
+                    user_id=user.id,
+                    token_hash=self.hash_token(refresh_token_plain),
+                    family_id=family_id,
+                    expires_at=datetime.now(timezone.utc)
+                    + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+                )
+                await self.repository.save_refresh_token(rt)
+                await self.session.commit()
+                await self.session.refresh(user)
+            except IntegrityError:
+                await self.session.rollback()
+                raise CustomException(400, "Email already registered")
+
+            return {
+                "access_token": access_token,
+                "refresh_token": refresh_token_plain,
+                "token_type": "bearer",
+            }
             
         from app.modules.auth.otp_service import OTPService
         from app.shared.email.resend_client import email_service
         
         otp_service = OTPService(self.session)
         await otp_service.enforce_cooldown(req.email, "register")
-        
-        hashed = await self.hash_password(req.password)
         
         # Store password hash in Redis with OTP expiry instead of DB for security
         from app.db.redis import get_redis
@@ -182,6 +260,29 @@ class AuthService:
             await redis_client.delete(lockout_key)
         except Exception:
             pass
+
+        # Skip OTP if disabled (dev mode)
+        if settings.DISABLE_OTP_AUTH:
+            access_token = create_access_token(subject=user.id)
+            refresh_token_plain = create_refresh_token(subject=user.id)
+
+            family_id = uuid.uuid4()
+            rt = RefreshToken(
+                user_id=user.id,
+                token_hash=self.hash_token(refresh_token_plain),
+                family_id=family_id,
+                expires_at=datetime.now(timezone.utc)
+                + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+            )
+            await self.repository.save_refresh_token(rt)
+            await self._log_audit(user.id, "LOGIN_DIRECT", user.id, None, "User logged in (OTP disabled)")
+            await self.session.commit()
+
+            return {
+                "access_token": access_token,
+                "refresh_token": refresh_token_plain,
+                "token_type": "bearer",
+            }
 
         from app.modules.auth.otp_service import OTPService
         from app.shared.email.resend_client import email_service

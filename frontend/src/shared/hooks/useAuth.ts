@@ -8,6 +8,8 @@ interface RegisterPayload {
   password: string;
   full_name: string;
   role: 'user' | 'dealer';
+  dealership_name?: string;
+  dealership_address?: string;
 }
 
 export function useAuth() {

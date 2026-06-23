@@ -7,9 +7,9 @@ interface AuthState {
   isAuthenticated: boolean;
   setAuthenticated: (status: boolean) => void;
   logout: () => void;
-  login: (email: string, password: string) => Promise<{success: boolean; message?: string}>;
+  login: (email: string, password: string) => Promise<{success: boolean; message?: string; otpDisabled?: boolean}>;
   verifyLogin: (email: string, code: string) => Promise<{success: boolean; message?: string}>;
-  register: (data: { email: string; password: string; full_name: string; role: 'user' | 'dealer' }) => Promise<{success: boolean; message?: string}>;
+  register: (data: { email: string; password: string; full_name: string; role: 'user' | 'dealer'; dealership_name?: string; dealership_address?: string }) => Promise<{success: boolean; message?: string; otpDisabled?: boolean}>;
   verifyRegistration: (email: string, code: string) => Promise<{success: boolean; message?: string}>;
   forgotPassword: (email: string) => Promise<{success: boolean; message?: string}>;
   verifyResetPassword: (email: string, code: string) => Promise<{success: boolean; message?: string; resetToken?: string}>;
@@ -26,7 +26,13 @@ export const useAuthStore = create<AuthState>()(
       login: async (email, password) => {
         try {
           const res = await axiosInstance.post('/auth/login', { email, password });
-          return { success: true, message: res.data.message || 'OTP sent' };
+          // Check if OTP is disabled (backend returns tokens directly)
+          if (res.data.access_token) {
+            set({ isAuthenticated: true });
+            return { success: true, message: 'Login successful', otpDisabled: true };
+          }
+          // OTP is enabled (backend returns message)
+          return { success: true, message: res.data.message || 'OTP sent', otpDisabled: false };
         } catch (error: any) {
           const msg = error.response?.data?.detail || 'Login failed. Please try again.';
           return { success: false, message: msg };
@@ -50,17 +56,27 @@ export const useAuthStore = create<AuthState>()(
       register: async (data) => {
         try {
           const endpoint = data.role === 'user' ? '/auth/register/user' : '/auth/register/dealer';
-          const payload = {
-            email: data.email,
-            password: data.password,
-            full_name: data.full_name,
-            ...(data.role === 'dealer' && {
-              dealership_name: (data as any).dealership_name || 'Pending Dealership',
-              dealership_address: (data as any).dealership_address || 'Pending Address',
-            })
-          };
+          const payload = data.role === 'user' 
+            ? {
+                email: data.email,
+                password: data.password,
+                full_name: data.full_name,
+              }
+            : {
+                email: data.email,
+                password: data.password,
+                full_name: data.full_name,
+                dealership_name: data.dealership_name || 'Pending Dealership',
+                dealership_address: data.dealership_address || 'Pending Address',
+              };
           const res = await axiosInstance.post(endpoint, payload);
-          return { success: true, message: res.data.message || 'OTP sent' };
+          // Check if OTP is disabled (backend returns tokens directly)
+          if (res.data.access_token) {
+            set({ isAuthenticated: true });
+            return { success: true, message: 'Registration successful', otpDisabled: true };
+          }
+          // OTP is enabled (backend returns message)
+          return { success: true, message: res.data.message || 'OTP sent', otpDisabled: false };
         } catch (error: any) {
           const msg = error.response?.data?.detail || 'Registration failed. Please try again.';
           return { success: false, message: msg };

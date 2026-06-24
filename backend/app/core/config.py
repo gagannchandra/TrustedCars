@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
 from typing import List
 
 
@@ -47,8 +48,40 @@ class Settings(BaseSettings):
     OTP_RATE_LIMIT_MAX_REQUESTS: int = 10
     DISABLE_OTP_AUTH: bool = False  # Set to True to bypass OTP for development
 
+    @field_validator("DISABLE_OTP_AUTH")
+    @classmethod
+    def validate_otp_auth(cls, v: bool, info) -> bool:
+        """
+        Prevent OTP authentication from being disabled in production.
+        
+        Security Requirement: OTP (One-Time Password) email verification is mandatory
+        in production environments to ensure user email ownership and prevent
+        unauthorized account access.
+        
+        Args:
+            v: The value of DISABLE_OTP_AUTH
+            info: Validation context containing other field values
+            
+        Returns:
+            bool: The validated DISABLE_OTP_AUTH value
+            
+        Raises:
+            ValueError: If OTP auth is disabled in production environment
+        """
+        # Get ENVIRONMENT from validation context data
+        environment = info.data.get("ENVIRONMENT", "development")
+        
+        if v is True and environment == "production":
+            raise ValueError(
+                "CRITICAL SECURITY ERROR: OTP authentication cannot be disabled in production environment. "
+                "Email verification via OTP is required for production deployments to ensure account security. "
+                "Set DISABLE_OTP_AUTH=false or remove it entirely (defaults to false)."
+            )
+        
+        return v
+
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", case_sensitive=True
+        env_file=".env", env_file_encoding="utf-8", case_sensitive=True, extra="ignore"
     )
 
 

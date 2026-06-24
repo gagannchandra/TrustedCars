@@ -33,6 +33,27 @@ from app.db.session import engine
 async def lifespan(app: FastAPI):
     # Startup
     setup_logging()
+    
+    # Validate OTP authentication is enabled in production
+    if settings.ENVIRONMENT == "production" and settings.DISABLE_OTP_AUTH:
+        error_msg = (
+            "CRITICAL SECURITY ERROR: Application startup blocked!\n"
+            "OTP authentication is disabled (DISABLE_OTP_AUTH=true) in production environment.\n"
+            "This is a security violation that bypasses email verification.\n\n"
+            "Required Action:\n"
+            "  - Set DISABLE_OTP_AUTH=false in production environment variables\n"
+            "  - Or remove DISABLE_OTP_AUTH entirely (defaults to false)\n\n"
+            "OTP email verification is mandatory for production to ensure:\n"
+            "  - Users own the email addresses they register with\n"
+            "  - Account security through verified email access\n"
+            "  - Prevention of unauthorized account creation\n"
+        )
+        # Log the error before raising
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.critical(error_msg)
+        raise RuntimeError(error_msg)
+    
     if settings.SENTRY_DSN:
         # Use environment-based sampling rates
         # Development: 100% sampling for debugging

@@ -42,8 +42,10 @@ def create_access_token(
 
     import uuid
 
+    now = datetime.now(timezone.utc)
     to_encode = {
         "exp": expire,
+        "iat": now,  # Issued at timestamp
         "sub": str(subject),
         "type": "access",
         "jti": str(uuid.uuid4()),
@@ -66,8 +68,10 @@ def create_refresh_token(
 
     import uuid
 
+    now = datetime.now(timezone.utc)
     to_encode = {
         "exp": expire,
+        "iat": now,  # Issued at timestamp
         "sub": str(subject),
         "type": "refresh",
         "jti": str(uuid.uuid4()),

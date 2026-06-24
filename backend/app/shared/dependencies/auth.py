@@ -27,6 +27,19 @@ async def get_current_user_id(
         if user_id_val is None:
             raise CustomException(401, "Could not validate credentials")
         user_id = str(user_id_val)
+        
+        # Check if session was issued before credential rotation
+        if settings.SESSIONS_VALID_FROM:
+            from datetime import datetime, timezone
+            try:
+                valid_from = datetime.fromisoformat(settings.SESSIONS_VALID_FROM.replace('Z', '+00:00'))
+                token_issued_at = datetime.fromtimestamp(payload.get("iat", 0), tz=timezone.utc)
+                if token_issued_at < valid_from:
+                    raise CustomException(401, "Session invalidated due to credential rotation. Please login again.")
+            except (ValueError, TypeError) as e:
+                # Invalid timestamp format, log and continue
+                import logging
+                logging.getLogger(__name__).warning(f"Invalid SESSIONS_VALID_FROM format: {e}")
 
         from app.db.redis import get_redis
 

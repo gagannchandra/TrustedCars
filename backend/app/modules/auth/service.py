@@ -307,6 +307,19 @@ class AuthService:
             )
             if payload.get("type") != "refresh":
                 raise CustomException(401, "Invalid token type")
+            
+            # Check if session was issued before credential rotation
+            if settings.SESSIONS_VALID_FROM:
+                from datetime import datetime, timezone
+                try:
+                    valid_from = datetime.fromisoformat(settings.SESSIONS_VALID_FROM.replace('Z', '+00:00'))
+                    token_issued_at = datetime.fromtimestamp(payload.get("iat", 0), tz=timezone.utc)
+                    if token_issued_at < valid_from:
+                        raise CustomException(401, "Session invalidated due to credential rotation. Please login again.")
+                except (ValueError, TypeError) as e:
+                    # Invalid timestamp format, log and continue
+                    import structlog
+                    structlog.get_logger(__name__).warning(f"Invalid SESSIONS_VALID_FROM format: {e}")
         except InvalidTokenError:
             raise CustomException(401, "Invalid or expired token")
 

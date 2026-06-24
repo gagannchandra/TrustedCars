@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    SESSIONS_VALID_FROM: str | None = None  # ISO 8601 timestamp - invalidates all sessions issued before this time
 
     DATABASE_URL: str
     DATABASE_POOL_SIZE: int = 20

@@ -48,6 +48,66 @@ class Settings(BaseSettings):
     OTP_RATE_LIMIT_MAX_REQUESTS: int = 10
     DISABLE_OTP_AUTH: bool = False  # Set to True to bypass OTP for development
 
+    @field_validator("RESEND_API_KEY")
+    @classmethod
+    def validate_resend_api_key(cls, v: str, info) -> str:
+        """
+        Validate RESEND_API_KEY is properly configured.
+        
+        Security Requirement: Email service is critical for OTP delivery, password resets,
+        and account verification. A missing or placeholder API key will cause silent
+        failures in production, preventing users from registering or authenticating.
+        
+        Args:
+            v: The value of RESEND_API_KEY
+            info: Validation context containing other field values
+            
+        Returns:
+            str: The validated RESEND_API_KEY value
+            
+        Raises:
+            ValueError: If API key is empty, None, or a known placeholder value
+        """
+        # Check if key is empty or None
+        if not v or v.strip() == "":
+            raise ValueError(
+                "CRITICAL CONFIGURATION ERROR: RESEND_API_KEY is not configured. "
+                "Email service is required for OTP delivery, user registration, and password resets. "
+                "Set RESEND_API_KEY in environment variables with a valid Resend API key. "
+                "Get your API key from: https://resend.com/api-keys"
+            )
+        
+        # Check for common placeholder values that indicate misconfiguration
+        placeholder_patterns = [
+            "re_placeholder",
+            "your_resend_api_key",
+            "replace_me",
+            "changeme",
+            "xxx",
+            "test_key",
+            "fake_key",
+        ]
+        
+        v_lower = v.lower()
+        for pattern in placeholder_patterns:
+            if pattern in v_lower:
+                raise ValueError(
+                    f"CRITICAL CONFIGURATION ERROR: RESEND_API_KEY appears to be a placeholder value: '{v[:20]}...'. "
+                    "Please replace it with a valid Resend API key. "
+                    "Email service will not function with placeholder keys. "
+                    "Get your API key from: https://resend.com/api-keys"
+                )
+        
+        # Valid Resend API keys start with "re_" prefix
+        if not v.startswith("re_"):
+            raise ValueError(
+                f"INVALID RESEND_API_KEY FORMAT: Key must start with 're_' prefix. "
+                f"Current value starts with: '{v[:10]}...'. "
+                "Please verify you're using a valid Resend API key from: https://resend.com/api-keys"
+            )
+        
+        return v
+
     @field_validator("DISABLE_OTP_AUTH")
     @classmethod
     def validate_otp_auth(cls, v: bool, info) -> bool:

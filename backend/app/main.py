@@ -54,6 +54,36 @@ async def lifespan(app: FastAPI):
         logger.critical(error_msg)
         raise RuntimeError(error_msg)
     
+    # Validate email service is configured
+    if not settings.RESEND_API_KEY or settings.RESEND_API_KEY.strip() == "":
+        error_msg = (
+            "CRITICAL CONFIGURATION ERROR: Application startup blocked!\n"
+            "RESEND_API_KEY is not configured.\n\n"
+            "Email service is required for:\n"
+            "  - User registration (OTP delivery)\n"
+            "  - Login verification (OTP delivery)\n"
+            "  - Password reset requests\n"
+            "  - Email address changes\n\n"
+            "Required Action:\n"
+            "  - Set RESEND_API_KEY in environment variables\n"
+            "  - Get your API key from: https://resend.com/api-keys\n\n"
+            "Note: Application cannot function without email service in production.\n"
+        )
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.critical(error_msg)
+        raise RuntimeError(error_msg)
+    
+    # Warn if using test API key in production
+    if settings.ENVIRONMENT == "production" and settings.RESEND_API_KEY.startswith("re_test_"):
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(
+            "WARNING: Using Resend test API key in production environment. "
+            "Test keys have limited functionality and should only be used for development. "
+            "Replace with a production API key from: https://resend.com/api-keys"
+        )
+    
     if settings.SENTRY_DSN:
         # Use environment-based sampling rates
         # Development: 100% sampling for debugging

@@ -6,21 +6,15 @@ logger = logging.getLogger(__name__)
 
 class EmailService:
     def __init__(self):
-        # Graceful fallback if api key is missing to avoid crashing app startup
-        self.api_key = getattr(settings, 'RESEND_API_KEY', None)
-        self.from_email = getattr(settings, 'RESEND_FROM_EMAIL', 'noreply@trustedcarz.com')
-        self.app_name = getattr(settings, 'APP_NAME', 'TrustedCarz')
+        # Email service is now validated at startup - API key is guaranteed to be present
+        self.api_key = settings.RESEND_API_KEY
+        self.from_email = settings.RESEND_FROM_EMAIL
+        self.app_name = settings.APP_NAME
         
-        if self.api_key:
-            resend.api_key = self.api_key
-        else:
-            logger.warning("RESEND_API_KEY is not configured. Emails will NOT be sent.")
+        # Configure Resend SDK with API key
+        resend.api_key = self.api_key
 
     async def _send_email(self, to_email: str, subject: str, html_content: str):
-        if not self.api_key:
-            logger.error(f"Cannot send email to {to_email}. RESEND_API_KEY is missing.")
-            return False
-            
         try:
             params = {
                 "from": f"{self.app_name} <{self.from_email}>",
@@ -46,7 +40,7 @@ class EmailService:
             <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 20px; text-align: center; margin: 30px 0;">
                 <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #3B82F6;">{otp}</span>
             </div>
-            <p style="font-size: 14px; color: #64748B;">This code will expire in {getattr(settings, 'OTP_EXPIRY_MINUTES', 10)} minutes.</p>
+            <p style="font-size: 14px; color: #64748B;">This code will expire in {settings.OTP_EXPIRY_MINUTES} minutes.</p>
             <p>If you didn't request this, you can safely ignore this email.</p>
         </div>
         """
@@ -61,7 +55,7 @@ class EmailService:
             <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 20px; text-align: center; margin: 30px 0;">
                 <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #3B82F6;">{otp}</span>
             </div>
-            <p style="font-size: 14px; color: #64748B;">This code will expire in {getattr(settings, 'OTP_EXPIRY_MINUTES', 10)} minutes.</p>
+            <p style="font-size: 14px; color: #64748B;">This code will expire in {settings.OTP_EXPIRY_MINUTES} minutes.</p>
             <p>If you didn't attempt to log in, please reset your password immediately as your credentials may be compromised.</p>
         </div>
         """
@@ -76,7 +70,7 @@ class EmailService:
             <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 20px; text-align: center; margin: 30px 0;">
                 <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #3B82F6;">{otp}</span>
             </div>
-            <p style="font-size: 14px; color: #64748B;">This code will expire in {getattr(settings, 'OTP_EXPIRY_MINUTES', 10)} minutes.</p>
+            <p style="font-size: 14px; color: #64748B;">This code will expire in {settings.OTP_EXPIRY_MINUTES} minutes.</p>
             <p>If you didn't request a password reset, you can safely ignore this email.</p>
         </div>
         """
@@ -91,7 +85,7 @@ class EmailService:
             <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 20px; text-align: center; margin: 30px 0;">
                 <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #3B82F6;">{otp}</span>
             </div>
-            <p style="font-size: 14px; color: #64748B;">This code will expire in {getattr(settings, 'OTP_EXPIRY_MINUTES', 10)} minutes.</p>
+            <p style="font-size: 14px; color: #64748B;">This code will expire in {settings.OTP_EXPIRY_MINUTES} minutes.</p>
             <p>If you didn't request this change, please secure your account immediately — someone may have access to it.</p>
         </div>
         """

@@ -25,7 +25,13 @@ from app.core.config import settings
 
 router = APIRouter(tags=["Images"])
 car_images_router = APIRouter(tags=["Car Images"])
-s3_session = aioboto3.Session()
+
+# Initialize aioboto3 session with credentials from settings
+s3_session = aioboto3.Session(
+    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    region_name=settings.AWS_REGION
+)
 
 
 def get_image_service(
@@ -122,16 +128,28 @@ async def direct_image_upload(
     
     storage_key = f"{uuid.uuid4()}{ext}"
     try:
-        s3_endpoint = settings.S3_ENDPOINT_URL if hasattr(settings, 'S3_ENDPOINT_URL') and settings.S3_ENDPOINT_URL else None
-        s3_region = settings.S3_REGION_NAME if hasattr(settings, 'S3_REGION_NAME') and settings.S3_REGION_NAME else None
-        
-        async with s3_session.client("s3", endpoint_url=s3_endpoint, region_name=s3_region) as s3:
+        # Use aioboto3 session which now has credentials configured
+        async with s3_session.client("s3", endpoint_url=settings.S3_ENDPOINT_URL) as s3:
+            # Ensure bucket exists
+            try:
+                await s3.head_bucket(Bucket=storage.bucket)
+            except Exception:
+                # Bucket doesn't exist, create it
+                try:
+                    await s3.create_bucket(Bucket=storage.bucket)
+                except Exception as bucket_err:
+                    # Ignore if bucket already exists (race condition)
+                    if "BucketAlreadyOwnedByYou" not in str(bucket_err) and "BucketAlreadyExists" not in str(bucket_err):
+                        raise
+            
             await s3.upload_fileobj(
                 file.file,
                 storage.bucket,
                 storage_key,
                 ExtraArgs={"ContentType": content_type},
             )
+    except CustomException:
+        raise
     except Exception as e:
         raise CustomException(500, f"Upload failed: {str(e)}")
         

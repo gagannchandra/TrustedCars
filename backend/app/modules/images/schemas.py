@@ -6,7 +6,7 @@ from datetime import datetime
 class ImageCreateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     car_id: UUID
-    image_url: HttpUrl
+    image_url: str  # Changed from HttpUrl to str to avoid Pydantic Url type in database
     storage_key: str = Field(..., pattern=r"^[a-zA-Z0-9/_\.-]+$")
     sort_order: int = 0
     is_primary: bool = False

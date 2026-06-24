@@ -64,7 +64,8 @@ class CarService:
             current_user.id, "CREATE_CAR", car.id, None, f"Created car {car.id}"
         )
         await self.session.commit()
-        await self.session.refresh(car)
+        # Refresh car with images relationship to avoid lazy loading after session closes
+        await self.session.refresh(car, ["images"])
         return car
 
     async def update_car(

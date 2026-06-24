@@ -76,7 +76,7 @@ class S3StorageProvider(StorageProvider):
             # e.g. http://localhost:9000/trustedcarz-images/123.jpg
             # Note: For frontend access, we might need a public endpoint if S3_ENDPOINT_URL is internal.
             # We assume S3_ENDPOINT_URL is accessible by the client (e.g. localhost:9000)
-            base = settings.S3_ENDPOINT_URL.rstrip('/')
+            base = str(settings.S3_ENDPOINT_URL).rstrip('/')
             return f"{base}/{self.bucket}/{storage_key}"
         else:
             return f"https://{self.bucket}.s3.{settings.AWS_REGION}.amazonaws.com/{storage_key}"

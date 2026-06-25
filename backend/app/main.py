@@ -1,4 +1,6 @@
 from fastapi import FastAPI, Depends, status, Response
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import sentry_sdk
 import secrets
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,6 +8,8 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from app.core.logging import setup_logging
 from contextlib import asynccontextmanager
 from app.core.config import settings
+from pathlib import Path
+import os
 from app.shared.exceptions.handlers import (
     CustomException,
     custom_exception_handler,
@@ -121,6 +125,47 @@ from app.core.middleware import CorrelationIdMiddleware, SecurityHeadersMiddlewa
 
 app.add_middleware(CorrelationIdMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
+
+# CORS Middleware Configuration
+# 
+# Purpose: Enable Cross-Origin Resource Sharing for frontend-backend communication
+# 
+# Configuration Details:
+#   - allow_origins: List of allowed origins from settings.CORS_ORIGINS
+#     * Development: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"]
+#     * Production: Must be updated to actual production domain(s) via environment variable
+#   
+#   - allow_credentials=True: REQUIRED for cookie-based JWT authentication
+#     * Enables the frontend to send cookies with cross-origin requests
+#     * Required for secure authentication flow with httponly cookies
+#     * When credentials=True, origins MUST be explicit (no wildcards)
+#   
+#   - allow_methods: HTTP methods permitted for cross-origin requests
+#     * Covers all RESTful operations needed by the API
+#   
+#   - allow_headers: Request headers the browser can send in cross-origin requests
+#     * Content-Type: For JSON request bodies
+#     * Authorization: For Bearer token authentication (backup to cookies)
+#     * X-Correlation-ID, X-Request-ID: For distributed tracing
+# 
+# Development Mode (Separate Servers):
+#   Frontend: http://localhost:5173 (Vite dev server)
+#   Backend:  http://localhost:8000 (FastAPI)
+#   → CORS is ACTIVE - frontend makes cross-origin requests to backend
+# 
+# Integrated Mode (Backend Serves Frontend):
+#   Application: http://localhost:8000 (serves both API and frontend)
+#   → CORS is NOT needed (same-origin), but configuration remains active for consistency
+# 
+# Production Configuration:
+#   Set CORS_ORIGINS environment variable to your production domain(s):
+#   Example: CORS_ORIGINS='["https://trustedcars.com","https://www.trustedcars.com"]'
+# 
+# Security Requirements:
+#   ✓ Always use explicit origins (never "*" with credentials)
+#   ✓ Use HTTPS in production
+#   ✓ Limit origins to the minimum set of trusted domains
+#   ✓ Keep allow_credentials=True for authentication to work
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -191,3 +236,126 @@ app.include_router(user_reviews_router)
 app.include_router(admin_router, prefix=f"{settings.API_V1_STR}/admin", tags=["admin"])
 app.include_router(audit_router, prefix=f"{settings.API_V1_STR}")
 app.include_router(settings_router, prefix=f"{settings.API_V1_STR}/admin")
+
+# ============================================
+# STATIC FILE SERVING FOR FRONTEND INTEGRATION
+# ============================================
+# Mount static files and implement SPA fallback AFTER all API routers
+# to ensure API routes have priority over static file serving
+# Configuration: Set SERVE_FRONTEND=true in .env to enable this feature
+
+# Frontend build directory path (relative to backend/app/main.py)
+FRONTEND_DIST_PATH = Path(__file__).parent.parent.parent / "frontend" / "dist"
+
+if settings.SERVE_FRONTEND:
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    # Validate frontend build directory exists
+    if not FRONTEND_DIST_PATH.exists():
+        error_msg = (
+            f"Frontend build directory not found: {FRONTEND_DIST_PATH}\n"
+            "The backend is configured to serve frontend static files (SERVE_FRONTEND=true), "
+            "but the frontend has not been built yet.\n\n"
+            "Required Action:\n"
+            "  1. Build the frontend: cd frontend && npm run build\n"
+            "  2. Or disable frontend serving: Set SERVE_FRONTEND=false in .env\n\n"
+            "To run backend without frontend integration:\n"
+            "  - Set SERVE_FRONTEND=false (API-only mode)\n"
+            "  - Run frontend separately: cd frontend && npm run dev"
+        )
+        logger.critical(error_msg)
+        raise RuntimeError(error_msg)
+    
+    # Validate index.html exists
+    index_file = FRONTEND_DIST_PATH / "index.html"
+    if not index_file.exists():
+        error_msg = (
+            f"Frontend index.html not found: {index_file}\n"
+            "The frontend build directory exists but appears to be incomplete.\n\n"
+            "Required Action:\n"
+            "  - Rebuild the frontend: cd frontend && npm run build\n"
+            "  - Ensure the build process completes successfully"
+        )
+        logger.critical(error_msg)
+        raise RuntimeError(error_msg)
+    
+    # Mount /assets directory for static assets (JS, CSS, images)
+    # These files have hashed filenames and are immutable, so they get aggressive caching
+    assets_path = FRONTEND_DIST_PATH / "assets"
+    if assets_path.exists():
+        app.mount(
+            "/assets",
+            StaticFiles(directory=str(assets_path)),
+            name="static_assets"
+        )
+        logger.info(f"✓ Mounted /assets directory from {assets_path}")
+    else:
+        logger.warning(f"⚠️  Assets directory not found: {assets_path}")
+    
+    # SPA Fallback Route: Serve index.html for all unmatched routes
+    # This enables client-side routing (React Router) to handle frontend routes
+    # Must be registered LAST to act as a catch-all for non-API routes
+    @app.get("/{full_path:path}")
+    async def serve_frontend_spa_fallback(full_path: str):
+        """
+        SPA (Single Page Application) fallback route.
+        
+        Serves index.html for all routes that don't match API endpoints or static assets.
+        This enables client-side routing where React Router handles navigation without
+        server-side redirects.
+        
+        Route Priority:
+        1. API routes (e.g., /api/v1/cars) - handled by FastAPI routers
+        2. Static assets (e.g., /assets/index-abc123.js) - handled by StaticFiles middleware
+        3. Everything else (e.g., /, /cars, /login) - handled by this fallback (returns index.html)
+        
+        Cache Headers:
+        - index.html gets no-cache headers to ensure users always get the latest version
+        - This is critical for deploying frontend updates without cache issues
+        - Static assets in /assets get immutable cache headers (set by StaticFiles middleware)
+        
+        Args:
+            full_path: The requested path (captured by FastAPI path parameter)
+            
+        Returns:
+            FileResponse: The index.html file with no-cache headers
+            
+        Raises:
+            HTTPException: 404 if the route starts with 'api/' but no API handler matched
+        """
+        # This should never happen because API routes are registered first,
+        # but we include this check for clarity and debugging
+        if full_path.startswith("api/"):
+            from fastapi import HTTPException
+            raise HTTPException(
+                status_code=404, 
+                detail="API endpoint not found"
+            )
+        
+        # Serve index.html for all other routes (SPA client-side routing)
+        # React Router will handle the routing on the client side
+        return FileResponse(
+            index_file,
+            media_type="text/html",
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0"
+            }
+        )
+    
+    logger.info(
+        f"✓ Frontend static file serving enabled\n"
+        f"  - Serving from: {FRONTEND_DIST_PATH}\n"
+        f"  - SPA fallback: All non-API routes return index.html\n"
+        f"  - Access application at: {settings.BACKEND_URL}"
+    )
+else:
+    logger = logging.getLogger(__name__)
+    logger.info(
+        "ℹ️  Frontend serving disabled (SERVE_FRONTEND=false)\n"
+        "  - Backend running in API-only mode\n"
+        "  - API available at: {}/api/v1\n"
+        "  - To enable frontend serving: Set SERVE_FRONTEND=true in .env"
+    )

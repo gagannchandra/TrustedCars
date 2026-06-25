@@ -16,4 +16,38 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  
+  // Production build configuration
+  build: {
+    outDir: "dist",
+    assetsDir: "assets",
+    manifest: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "react-router-dom"],
+          ui: ["lucide-react", "react-hot-toast"],
+        },
+      },
+    },
+  },
+  
+  // Development server configuration
+  server: {
+    port: 5173,
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+      "/metrics": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+      "/health": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+    },
+  },
 });

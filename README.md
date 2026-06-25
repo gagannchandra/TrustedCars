@@ -133,7 +133,8 @@ CREATE INDEX ix_cars_active_make ON cars (make, asking_price)
 | **Email** | Resend API | OTP and transactional email delivery |
 | **Auth** | PyJWT + pyotp | httpOnly cookies, TOTP MFA |
 | **Monitoring** | Sentry + Prometheus + structlog | Error tracking, metrics, structured logs |
-| **Containers** | Docker + Docker Compose | Reproducible local stack |
+| **Development** | Native services | PostgreSQL, Redis, MinIO installed locally |
+| **Deployment** | Docker (optional) | Container images for production (CI/CD, Kubernetes, ECS) |
 | **CI** | GitHub Actions | Lint, type-check, migration drift, tests |
 
 ---
@@ -182,30 +183,108 @@ TrustedCars/
 
 ## 🚀 Getting Started
 
-See [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md) for complete production deployment guide.
+> **Note:** TrustedCars uses **native service installation** for local development — **Docker is NOT required**. This provides direct access to services for debugging, faster iteration, and simpler troubleshooting. Docker is kept as an **optional deployment target** for production use (CI/CD, Kubernetes, ECS, etc.).
 
-### Quick Start (Development/Testing)
+TrustedCars uses native service installation for local development (no Docker required). This provides direct access to services for debugging and faster iteration.
 
-#### Prerequisites
+See [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md) for production deployment guide.
 
-| Tool | Version |
-|---|---|
-| Python | 3.11 |
-| Node.js | 18+ |
-| Docker + Docker Compose | Latest stable |
+### Prerequisites
+
+| Tool | Version | Purpose |
+|---|---|---|
+| Python | 3.11+ | Backend runtime |
+| Node.js | 18+ | Frontend tooling |
+| PostgreSQL | 15 | Database |
+| Redis | 7 | Session storage & rate limiting |
+| MinIO | Latest | S3-compatible storage (or AWS S3) |
 
 ---
 
-#### 1 — Deploy with Docker Compose
+## Local Development Setup
+
+TrustedCars runs entirely with native services — no Docker required for local development. This approach provides:
+
+- **Direct database access** for debugging and query optimization
+- **Faster startup times** without container overhead
+- **Native tooling** integration (psql, redis-cli, etc.)
+- **Simplified development** with familiar service management
+
+### Step 1: Install Native Services
+
+You'll need three services running locally: PostgreSQL 15, Redis 7, and MinIO (S3-compatible storage).
+
+**📚 Platform-Specific Instructions:**
+
+Detailed installation guides with troubleshooting for your platform:
+- [docs/NATIVE_SETUP.md](docs/NATIVE_SETUP.md) — Complete instructions for **macOS**, **Linux (Ubuntu/Debian)**, and **Windows**
+
+**Quick Installation (macOS with Homebrew):**
+
+```bash
+# Install services
+brew install postgresql@15 redis minio/stable/minio minio/stable/mc
+
+# Start PostgreSQL and Redis services
+brew services start postgresql@15
+brew services start redis
+
+# Configure PostgreSQL
+createuser -s trustedcars_user
+psql postgres -c "ALTER USER trustedcars_user WITH PASSWORD 'trustedcars_password';"
+createdb -O trustedcars_user trustedcars_db
+
+# Configure Redis with password authentication
+echo "requirepass redis_password" >> /opt/homebrew/etc/redis.conf
+brew services restart redis
+
+# Start MinIO (in separate terminal or background)
+mkdir -p ~/minio/data
+minio server ~/minio/data --console-address :9001 &
+
+# Create MinIO bucket for image storage
+mc alias set local http://localhost:9000 minioadmin minioadmin
+mc mb local/trustedcars-images
+mc anonymous set download local/trustedcars-images
+```
+
+**Verify Installation:**
+
+```bash
+# PostgreSQL
+psql -U trustedcars_user -d trustedcars_db -h localhost -c "SELECT 1;"
+# Should output: 1
+
+# Redis
+redis-cli -a redis_password ping
+# Should output: PONG
+
+# MinIO
+curl http://localhost:9000/minio/health/live
+# Should output: 200 OK
+```
+
+For **Linux**, **Windows**, or detailed troubleshooting, see [docs/NATIVE_SETUP.md](docs/NATIVE_SETUP.md).
+
+---
+
+### Step 2: Configure Backend
 
 ```bash
 cd backend
 
-# Configure environment
+# Create Python virtual environment
+python3.11 -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment (native localhost connections)
 cat > .env << 'EOF'
-ENVIRONMENT=production
-DATABASE_URL=postgresql+asyncpg://trustedcars_user:trustedcars_password@db:5432/trustedcars_db
-REDIS_URL=redis://:redis_password@redis:6379/0
+ENVIRONMENT=development
+DATABASE_URL=postgresql+asyncpg://trustedcars_user:trustedcars_password@localhost:5432/trustedcars_db
+REDIS_URL=redis://:redis_password@localhost:6379/0
 SECRET_KEY=$(openssl rand -hex 32)
 JWT_SECRET_KEY=$(openssl rand -hex 32)
 MFA_ENCRYPTION_KEY=$(openssl rand -hex 32)
@@ -213,48 +292,497 @@ S3_BUCKET_NAME=trustedcars-images
 AWS_ACCESS_KEY_ID=minioadmin
 AWS_SECRET_ACCESS_KEY=minioadmin
 AWS_REGION=us-east-1
-S3_ENDPOINT_URL=http://minio:9000
+S3_ENDPOINT_URL=http://localhost:9000
 RESEND_API_KEY=your_resend_api_key_here
 CORS_ORIGINS=["http://localhost:5173"]
-POSTGRES_USER=trustedcars_user
-POSTGRES_PASSWORD=trustedcars_password
-POSTGRES_DB=trustedcars_db
-REDIS_PASSWORD=redis_password
-MINIO_ROOT_USER=minioadmin
-MINIO_ROOT_PASSWORD=minioadmin
+SERVE_FRONTEND=false
 EOF
 
-# Start all services
-docker compose up -d
-
-# Apply database migrations
-docker compose exec api alembic upgrade head
+# Run database migrations
+alembic upgrade head
 ```
-
-| Service | URL / Port |
-|---|---|
-| API | `http://localhost:8000` |
-| API Docs | `http://localhost:8000/docs` |
-| MinIO Console | `http://localhost:9001` |
 
 ---
 
-#### 2 — Frontend
+### Step 3: Configure Frontend
 
 ```bash
 cd frontend
 
+# Install dependencies
 npm install
 
-# Configure environment
-echo "VITE_API_URL=http://localhost:8000" > .env
-
-npm run build  # Production build
-# or
-npm run dev    # Development mode
+# Configure environment (optional - has sensible defaults)
+echo "VITE_API_URL=http://localhost:8000" > .env.development
 ```
 
-Frontend (dev) → `http://localhost:5173`
+---
+
+## Development Modes
+
+TrustedCars supports **two development workflows** to match different stages of development:
+
+### 🔥 Mode 1: Separate Servers (Hot Module Replacement)
+
+**Best for:** Active frontend development with instant updates
+
+This mode runs the Vite dev server separately, giving you Hot Module Replacement (HMR) for instant feedback on code changes. The Vite dev server automatically proxies API requests to the backend.
+
+**Start the services:**
+
+**Terminal 1 - Backend API:**
+```bash
+cd backend
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Terminal 2 - Frontend Dev Server:**
+```bash
+cd frontend
+npm run dev
+```
+
+**Terminal 3 - Background Worker:**
+```bash
+cd backend
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python worker_main.py
+```
+
+**Access Points:**
+- **Frontend (with HMR):** http://localhost:5173
+- **Backend API:** http://localhost:8000
+- **API Docs:** http://localhost:8000/docs
+- **MinIO Console:** http://localhost:9001
+
+**✅ Benefits:**
+- ⚡ **Instant frontend updates** — changes appear in browser without page reload
+- 🔍 **Full TypeScript type checking** — catch errors during development
+- 🛠️ **React DevTools support** — inspect component state and props
+- 🔄 **Automatic API proxying** — Vite forwards `/api/*` requests to backend
+
+**When to use:** Day-to-day frontend development, UI iteration, component work
+
+---
+
+### 🚀 Mode 2: Integrated (Production-Like)
+
+**Best for:** Testing production build, validating static file serving, pre-deployment checks
+
+This mode serves the built frontend from the FastAPI backend — exactly how it runs in production. Use this to test the optimized build, verify asset paths, and ensure everything works together.
+
+**Build and start:**
+
+**Terminal 1 - Build Frontend:**
+```bash
+cd frontend
+npm run build
+# Creates frontend/dist with optimized assets
+```
+
+**Terminal 2 - Start Backend with Frontend:**
+```bash
+cd backend
+export SERVE_FRONTEND=true  # Windows: set SERVE_FRONTEND=true
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Terminal 3 - Background Worker:**
+```bash
+cd backend
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python worker_main.py
+```
+
+**Access Points:**
+- **Integrated App:** http://localhost:8000 (serves both frontend + API)
+- **API Docs:** http://localhost:8000/docs
+- **MinIO Console:** http://localhost:9001
+
+**✅ Benefits:**
+- 🎯 **Production-like environment** — tests exactly how production will run
+- 🔗 **Single endpoint** — frontend and API served from same origin
+- ⚡ **Optimized assets** — minified JS/CSS with hashed filenames
+- 📦 **Cache header validation** — ensure assets cached correctly
+
+**⚠️ When to rebuild frontend:**
+- After **any** frontend code changes (changes won't appear until rebuilt)
+- Before testing in integrated mode
+- Before deploying to production
+
+**When to use:** Pre-deployment validation, testing static file serving, production simulation
+
+---
+
+### 📊 Mode Comparison
+
+| Feature | Separate Servers (Mode 1) | Integrated (Mode 2) |
+|---------|---------------------------|---------------------|
+| **Frontend Updates** | Instant (HMR) | Manual rebuild required |
+| **Setup Complexity** | 3 terminals | 3 terminals + build step |
+| **TypeScript Checking** | Full dev-time checking | Build-time only |
+| **API Proxying** | Vite dev server | Not needed (same origin) |
+| **CORS** | Handled by Vite proxy | Not needed (same origin) |
+| **Performance** | Dev build (unoptimized) | Production build (optimized) |
+| **Use Case** | Daily development | Pre-deployment testing |
+
+---
+
+## Troubleshooting
+
+Common issues and their solutions when setting up TrustedCars locally.
+
+### 🔴 Services Not Running
+
+**PostgreSQL Connection Failed:**
+
+```bash
+# Error: could not connect to server: Connection refused
+# Is the server running on host "localhost" (127.0.0.1) and accepting TCP/IP connections on port 5432?
+
+# Solution: Start PostgreSQL service
+# macOS:
+brew services start postgresql@15
+
+# Linux (Ubuntu/Debian):
+sudo systemctl start postgresql
+sudo systemctl enable postgresql  # Start on boot
+
+# Windows:
+net start postgresql-x64-15
+
+# Verify it's running:
+psql -U trustedcars_user -d trustedcars_db -h localhost -c "SELECT 1;"
+```
+
+**Redis Connection Failed:**
+
+```bash
+# Error: Error connecting to Redis: Connection refused
+
+# Solution: Start Redis service
+# macOS:
+brew services start redis
+
+# Linux (Ubuntu/Debian):
+sudo systemctl start redis-server
+sudo systemctl enable redis-server  # Start on boot
+
+# Windows:
+net start Redis
+
+# Verify it's running:
+redis-cli -a redis_password ping
+# Should output: PONG
+```
+
+**MinIO Not Accessible:**
+
+```bash
+# Error: Could not connect to the endpoint URL: "http://localhost:9000"
+
+# Solution: Start MinIO server
+# macOS/Linux:
+minio server ~/minio/data --console-address :9001
+
+# Windows:
+cd C:\minio
+.\minio.exe server C:\minio\data --console-address :9001
+
+# Verify it's running:
+curl http://localhost:9000/minio/health/live
+# Should return: 200 OK
+
+# Check MinIO Console:
+# Open browser: http://localhost:9001
+# Login: minioadmin / minioadmin
+```
+
+---
+
+### 🔴 Backend Connection Errors
+
+**Database URL Incorrect:**
+
+```bash
+# Error: asyncpg.exceptions.InvalidCatalogNameError: database "trustedcars_db" does not exist
+
+# Solution: Create the database
+createdb -O trustedcars_user trustedcars_db
+
+# Verify database exists:
+psql -U trustedcars_user -d trustedcars_db -h localhost -c "\l"
+```
+
+**Redis Password Authentication Failed:**
+
+```bash
+# Error: redis.exceptions.AuthenticationError: Authentication required
+
+# Solution: Ensure Redis is configured with password
+# Check Redis config (macOS Homebrew):
+grep "requirepass" /opt/homebrew/etc/redis.conf
+# Should output: requirepass redis_password
+
+# If not set, add it:
+echo "requirepass redis_password" >> /opt/homebrew/etc/redis.conf
+brew services restart redis
+
+# Verify REDIS_URL in backend/.env matches:
+# REDIS_URL=redis://:redis_password@localhost:6379/0
+```
+
+**MinIO Bucket Not Found:**
+
+```bash
+# Error: botocore.exceptions.ClientError: An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist
+
+# Solution: Create the bucket
+mc alias set local http://localhost:9000 minioadmin minioadmin
+mc mb local/trustedcars-images
+mc anonymous set download local/trustedcars-images
+
+# Verify bucket exists:
+mc ls local/
+# Should list: trustedcars-images
+```
+
+**Environment Variables Not Set:**
+
+```bash
+# Error: FastAPI startup fails with "SECRET_KEY not set"
+
+# Solution: Ensure backend/.env exists and has all required variables
+cd backend
+cat .env  # Verify file exists
+
+# Generate missing secrets:
+openssl rand -hex 32  # Copy output to SECRET_KEY, JWT_SECRET_KEY, MFA_ENCRYPTION_KEY
+```
+
+---
+
+### 🔴 Frontend Issues
+
+**Frontend Not Loading in Integrated Mode:**
+
+```bash
+# Error: RuntimeError: Frontend build directory not found
+
+# Solution: Build the frontend first
+cd frontend
+npm run build
+
+# Verify dist directory was created:
+ls -la dist/
+# Should show: index.html, assets/
+
+# Ensure backend/.env has:
+# SERVE_FRONTEND=true
+
+# Restart backend:
+cd ../backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Frontend Build Fails:**
+
+```bash
+# Error: npm ERR! Missing script: "build"
+
+# Solution: Install frontend dependencies first
+cd frontend
+npm install
+
+# Then build:
+npm run build
+```
+
+**API Calls Failing from Frontend Dev Server:**
+
+```bash
+# Error: CORS policy: No 'Access-Control-Allow-Origin' header
+
+# Solution: Ensure Vite proxy is configured
+# Check frontend/vite.config.ts has proxy:
+# proxy: { "/api": { target: "http://localhost:8000", changeOrigin: true } }
+
+# Verify backend is running:
+curl http://localhost:8000/health/live
+
+# Verify backend/.env includes:
+# CORS_ORIGINS=["http://localhost:5173"]
+```
+
+---
+
+### 🔴 Port Conflicts
+
+**Port Already in Use:**
+
+```bash
+# Error: OSError: [Errno 48] Address already in use
+
+# Find what's using the port (macOS/Linux):
+sudo lsof -i :8000  # Replace 8000 with your port
+
+# Find what's using the port (Windows):
+netstat -ano | findstr :8000
+
+# Kill the process:
+# macOS/Linux:
+kill -9 <PID>
+
+# Windows:
+taskkill /PID <PID> /F
+
+# Default ports used by TrustedCars:
+# - PostgreSQL: 5432
+# - Redis: 6379
+# - MinIO API: 9000
+# - MinIO Console: 9001
+# - Backend API: 8000
+# - Frontend Dev Server: 5173
+```
+
+---
+
+### 🔴 Database Migration Issues
+
+**Migration Failed:**
+
+```bash
+# Error: alembic.util.exc.CommandError: Can't locate revision identified by 'xxxxx'
+
+# Solution: Reset migrations (development only!)
+cd backend
+
+# Drop and recreate database:
+dropdb -U trustedcars_user trustedcars_db
+createdb -O trustedcars_user trustedcars_db
+
+# Run all migrations from scratch:
+alembic upgrade head
+
+# Verify current migration:
+alembic current
+```
+
+**Schema Drift Detected:**
+
+```bash
+# Error: Target database is not up to date
+
+# Solution: Apply pending migrations
+cd backend
+alembic upgrade head
+
+# Check for drift:
+alembic check
+```
+
+---
+
+### 🔴 Worker Process Issues
+
+**Worker Not Processing Events:**
+
+```bash
+# Error: Worker started but events remain in outbox_events table
+
+# Verify worker is running:
+# Should see: "Starting AsyncOutboxWorker... Polling interval: 5 seconds"
+
+# Check database connection in worker:
+# Verify worker uses same DATABASE_URL as backend
+
+# Check outbox_events table:
+psql -U trustedcars_user -d trustedcars_db -h localhost
+SELECT id, event_type, status, created_at FROM outbox_events ORDER BY created_at DESC LIMIT 10;
+
+# Restart worker:
+# Kill worker process (Ctrl+C) and restart:
+cd backend
+source .venv/bin/activate
+python worker_main.py
+```
+
+---
+
+### 📚 Still Having Issues?
+
+For more detailed troubleshooting and platform-specific solutions:
+
+- **[docs/NATIVE_SETUP.md](docs/NATIVE_SETUP.md)** — Complete native service setup guide
+- **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** — Development workflow and best practices
+- **[PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md)** — Production configuration and deployment
+
+**Check Service Status:**
+
+```bash
+# Quick status check script (macOS/Linux)
+echo "PostgreSQL:" && psql -U trustedcars_user -d trustedcars_db -h localhost -c "SELECT 1;" 2>&1 | grep -q "1" && echo "✅ Running" || echo "❌ Not running"
+echo "Redis:" && redis-cli -a redis_password ping 2>&1 | grep -q "PONG" && echo "✅ Running" || echo "❌ Not running"
+echo "MinIO:" && curl -s http://localhost:9000/minio/health/live > /dev/null && echo "✅ Running" || echo "❌ Not running"
+```
+
+---
+
+## 🐳 Docker (Optional)
+
+**Docker is NOT required for local development.** The application is designed for native development with services installed directly on your machine.
+
+### When Docker Is Useful
+
+Docker configurations (`backend/Dockerfile` and `backend/docker-compose.yml`) are provided for:
+
+1. **Production Deployments**
+   - Container orchestration platforms (Kubernetes, AWS ECS, Google Cloud Run)
+   - Self-hosted production infrastructure
+   - Consistent deployment artifacts
+
+2. **CI/CD Pipelines**
+   - GitHub Actions, GitLab CI, Jenkins
+   - Consistent test environments
+   - Automated integration testing
+
+3. **Team Preference**
+   - Some developers prefer Docker for local development
+   - Fully supported but not recommended for daily iteration
+
+### Using Docker Locally (Optional)
+
+If you prefer Docker for local development:
+
+```bash
+# Start all services
+cd backend
+docker-compose up -d
+
+# View logs
+docker-compose logs -f api
+
+# Stop all services
+docker-compose down
+```
+
+**Note:** Docker-based development has slower iteration cycles compared to native development (container rebuilds, volume mounting overhead). We recommend native development for day-to-day work.
+
+### Building Production Images
+
+The Dockerfile is primarily for production deployments:
+
+```bash
+# Build production image
+docker build -t trustedcars-api:latest backend/
+
+# Run container
+docker run -p 8000:8000 --env-file backend/.env trustedcars-api:latest
+```
+
+For complete production deployment guide, see [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md).
 
 ---
 
@@ -262,18 +790,47 @@ Frontend (dev) → `http://localhost:5173`
 
 See [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md) for complete environment configuration.
 
-### Essential Environment Variables
+### Environment Variables
 
 **Backend** (`.env` in backend directory):
-- `DATABASE_URL` - PostgreSQL connection string
-- `REDIS_URL` - Redis connection string
-- `SECRET_KEY`, `JWT_SECRET_KEY`, `MFA_ENCRYPTION_KEY` - Security keys
-- `S3_BUCKET_NAME`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` - S3 storage
-- `RESEND_API_KEY` - Email service
-- `CORS_ORIGINS` - Allowed frontend origins
 
-**Frontend** (`.env` in frontend directory):
-- `VITE_API_URL` - Backend API endpoint
+```bash
+# Core Settings
+ENVIRONMENT=development  # development, staging, production
+SERVE_FRONTEND=false     # true to serve built frontend from backend
+
+# Database (native localhost)
+DATABASE_URL=postgresql+asyncpg://trustedcars_user:trustedcars_password@localhost:5432/trustedcars_db
+
+# Redis (native localhost)
+REDIS_URL=redis://:redis_password@localhost:6379/0
+REDIS_PASSWORD=redis_password
+
+# Security Keys (generate with: openssl rand -hex 32)
+SECRET_KEY=your_secret_key_here
+JWT_SECRET_KEY=your_jwt_secret_here
+MFA_ENCRYPTION_KEY=your_mfa_encryption_key_here
+
+# S3 Storage (MinIO for development)
+S3_BUCKET_NAME=trustedcars-images
+AWS_ACCESS_KEY_ID=minioadmin
+AWS_SECRET_ACCESS_KEY=minioadmin
+AWS_REGION=us-east-1
+S3_ENDPOINT_URL=http://localhost:9000  # Remove for AWS S3 in production
+
+# Email Service
+RESEND_API_KEY=your_resend_api_key_here
+
+# CORS (allow frontend dev server)
+CORS_ORIGINS=["http://localhost:5173"]
+```
+
+**Frontend** (`.env.development` in frontend directory):
+```bash
+VITE_API_URL=http://localhost:8000  # Backend API endpoint
+```
+
+For production AWS S3, remove `S3_ENDPOINT_URL` or set it to empty string.
 
 ---
 
@@ -339,7 +896,7 @@ All routes prefixed with `/api/v1`. Full interactive docs at `/docs`.
 | API endpoints | 50+ |
 | Alembic migrations | 30+ |
 | Frontend feature slices | 6 |
-| Docker services | 7 (api, worker, db, pgbouncer, redis, minio, minio-init) |
+| Native services | 3 (PostgreSQL 15, Redis 7, MinIO/S3) |
 | GitHub Actions workflows | 3 (CI, deploy, security) |
 
 ---

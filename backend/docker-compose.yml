@@ -1,13 +1,77 @@
-# Production Docker Compose Configuration
-# This file extends the base docker-compose.yml for production deployments
-# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# ============================================================================
+# TrustedCars Docker Compose Configuration (OPTIONAL FOR PRODUCTION)
+# ============================================================================
+#
+# ⚠️  IMPORTANT: Docker is NOT REQUIRED for local development!
+#
+# This application is designed for native local development using services
+# installed directly on your machine (PostgreSQL, Redis, MinIO). See README.md
+# for native setup instructions.
+#
+# This docker-compose.yml file is provided for:
+#   ✅ Production deployments (containerized infrastructure)
+#   ✅ CI/CD pipelines (consistent test environments)
+#   ✅ Team members who prefer Docker for local development (optional)
+#
+# For local development, we recommend the native setup which provides:
+#   • Direct access to services for debugging
+#   • Faster iteration without container overhead
+#   • Simpler troubleshooting with native tools
+#   • No Docker daemon resource usage
+#
+# Usage (if deploying with Docker):
+#   docker-compose up -d
+#
+# For production deployments:
+#   • Consider using managed services (AWS RDS, ElastiCache, S3)
+#   • See PRODUCTION_DEPLOYMENT.md for deployment best practices
+#   • Review the production checklist at the end of this file
+#
+# ============================================================================
 
 version: '3.8'
 
+# ============================================================================
+# WHEN TO USE DOCKER VS NATIVE DEVELOPMENT
+# ============================================================================
+#
+# USE NATIVE DEVELOPMENT (Recommended):
+#   ✅ Day-to-day local development
+#   ✅ Debugging database queries directly with psql
+#   ✅ Inspecting Redis state with redis-cli
+#   ✅ Fast iteration without container rebuilds
+#   ✅ Lower resource usage on development machine
+#   ✅ Access to native profiling and debugging tools
+#
+# USE DOCKER:
+#   ✅ Production deployments (Kubernetes, ECS, Docker Swarm)
+#   ✅ CI/CD pipelines (GitHub Actions, GitLab CI, Jenkins)
+#   ✅ Testing exact production-like environments locally
+#   ✅ Quick team onboarding when native setup is blocked
+#   ✅ Cross-platform consistency for distributed teams
+#
+# NOTE: The Dockerfile is kept for building production container images.
+# You can use Docker for production while developing natively.
+#
+# ============================================================================
+
 services:
   db:
-    # Production: Use managed database (AWS RDS, DigitalOcean, etc.)
-    # Remove this service and configure DATABASE_URL in api/worker to point to managed DB
+    # ========================================================================
+    # PostgreSQL 15 Database
+    # ========================================================================
+    # LOCAL DEVELOPMENT: Install PostgreSQL natively instead of using Docker
+    #   macOS: brew install postgresql@15
+    #   Linux: apt install postgresql-15
+    #   See README.md for detailed native setup instructions
+    #
+    # PRODUCTION: Use managed database service (AWS RDS, DigitalOcean, etc.)
+    #   Remove this service and configure DATABASE_URL in api/worker
+    #
+    # This service is ONLY for:
+    #   • Docker-based production deployments
+    #   • CI/CD test environments
+    # ========================================================================
     image: postgres:15-alpine
     command: ["postgres", "-c", "shared_preload_libraries=pg_stat_statements", "-c", "log_statement=ddl"]
     environment:
@@ -26,8 +90,21 @@ services:
     # NO PORT MAPPING - internal only
 
   redis:
-    # Production: Use managed Redis (AWS ElastiCache, Redis Cloud, etc.)
-    # Remove this service and configure REDIS_URL in api/worker
+    # ========================================================================
+    # Redis 7 Cache
+    # ========================================================================
+    # LOCAL DEVELOPMENT: Install Redis natively instead of using Docker
+    #   macOS: brew install redis
+    #   Linux: apt install redis-server
+    #   See README.md for detailed native setup instructions
+    #
+    # PRODUCTION: Use managed Redis service (AWS ElastiCache, Redis Cloud)
+    #   Remove this service and configure REDIS_URL in api/worker
+    #
+    # This service is ONLY for:
+    #   • Docker-based production deployments
+    #   • CI/CD test environments
+    # ========================================================================
     image: redis:7-alpine
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
     volumes:
@@ -41,8 +118,22 @@ services:
     # NO PORT MAPPING - internal only
 
   minio:
-    # Production: Use AWS S3 instead
-    # Remove this service and configure AWS credentials in api/worker
+    # ========================================================================
+    # MinIO S3-Compatible Storage
+    # ========================================================================
+    # LOCAL DEVELOPMENT: Install MinIO natively instead of using Docker
+    #   macOS: brew install minio/stable/minio
+    #   Linux: Download binary from https://min.io/download
+    #   See README.md for detailed native setup instructions
+    #
+    # PRODUCTION: Use AWS S3 instead of MinIO
+    #   Remove this service and configure AWS credentials in api/worker
+    #   Set S3_ENDPOINT_URL to empty or remove it entirely
+    #
+    # This service is ONLY for:
+    #   • Docker-based development (if you prefer Docker over native)
+    #   • CI/CD test environments
+    # ========================================================================
     image: minio/minio:latest
     command: server /data --console-address ":9001"
     environment:
@@ -172,7 +263,9 @@ networks:
       config:
         - subnet: 172.20.0.0/16
 
-# PRODUCTION DEPLOYMENT CHECKLIST:
+# ============================================================================
+# PRODUCTION DEPLOYMENT CHECKLIST
+# ============================================================================
 # [ ] Use managed database (AWS RDS, DigitalOcean Managed Database)
 # [ ] Use managed Redis (AWS ElastiCache, Redis Cloud)
 # [ ] Use AWS S3 instead of MinIO
@@ -189,3 +282,92 @@ networks:
 # [ ] Set up alerting (PagerDuty, OpsGenie)
 # [ ] Document runbook for common issues
 # [ ] Perform load testing before launch
+
+# ============================================================================
+# DOCKER USAGE GUIDE
+# ============================================================================
+#
+# FOR LOCAL DEVELOPMENT:
+# ----------------------
+# We recommend NATIVE installation (not Docker) for daily development:
+#
+#   1. Install PostgreSQL 15 natively (brew install postgresql@15)
+#   2. Install Redis 7 natively (brew install redis)
+#   3. Install MinIO natively (brew install minio/stable/minio)
+#   4. Run backend directly: uvicorn app.main:app --reload
+#   5. Run frontend dev server: npm run dev
+#
+# See README.md section "Local Development Setup" for complete instructions.
+#
+# Benefits of native development:
+#   • Faster iteration (no container rebuilds)
+#   • Direct debugging access (psql, redis-cli, minio console)
+#   • Lower resource usage
+#   • Simpler troubleshooting
+#
+# WHEN TO USE THIS DOCKER COMPOSE FILE:
+# --------------------------------------
+# 
+# 1. CI/CD Pipelines:
+#    Use Docker to create consistent test environments in GitHub Actions,
+#    GitLab CI, or Jenkins. Example:
+#
+#      docker-compose up -d db redis minio
+#      pytest tests/
+#      docker-compose down
+#
+# 2. Production Deployments (Self-Hosted):
+#    If deploying to your own infrastructure with Docker/Kubernetes:
+#
+#      docker-compose up -d
+#
+#    Or build images for Kubernetes:
+#
+#      docker build -t myregistry/trustedcars-api:v1.0.0 .
+#      docker push myregistry/trustedcars-api:v1.0.0
+#
+# 3. Team Member Preference:
+#    Some team members may prefer Docker for local development.
+#    This is supported but not recommended for daily iteration.
+#
+# 4. Quick Testing of Production-Like Environment:
+#    Test the full containerized stack locally before deployment:
+#
+#      docker-compose up -d
+#      # Test integrated app at http://localhost:8000
+#      docker-compose down
+#
+# THE DOCKERFILE:
+# ---------------
+# The Dockerfile (backend/Dockerfile) is KEPT for building production
+# container images. You can use it to:
+#
+#   • Build images for AWS ECS, Azure Container Instances, Google Cloud Run
+#   • Build images for Kubernetes deployments
+#   • Create consistent production artifacts in CI/CD
+#
+# The Dockerfile is used even if you develop natively. Docker is a
+# deployment target, not a development requirement.
+#
+# EXAMPLE: Native Development + Docker Production
+# ------------------------------------------------
+# Most teams do this:
+#
+#   Local development:
+#     • PostgreSQL installed via brew
+#     • Redis installed via brew
+#     • MinIO installed via brew or using AWS S3
+#     • Backend runs with: uvicorn app.main:app --reload
+#     • Frontend runs with: npm run dev
+#
+#   Production deployment:
+#     • Backend built as Docker image: docker build -t api:latest .
+#     • Deployed to AWS ECS or Kubernetes
+#     • Uses AWS RDS (PostgreSQL), ElastiCache (Redis), S3 (storage)
+#     • No MinIO, no PgBouncer, no self-hosted services
+#
+# This gives you the best of both worlds:
+#   • Fast native development iteration
+#   • Reliable containerized production deployment
+#
+# ============================================================================
